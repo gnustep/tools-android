@@ -10,8 +10,8 @@ export ANDROID_CMAKE_ROOT=${ANDROID_HOME}/cmake/3.10.2.4988404
 export CMAKE_TOOLCHAIN_FILE=${ANDROID_NDK_HOME}/build/cmake/android.toolchain.cmake
 export NINJA=${ANDROID_CMAKE_ROOT}/bin/ninja
 export ROOT_DIR=`pwd`
-export GSROOT=${ROOT_DIR}/gnustep
-export INSTALL_PREFIX=${ROOT_DIR}/android-gnustep
+export GSROOT=${ROOT_DIR}/src
+export INSTALL_PREFIX=${ROOT_DIR}/GNUstep
 export ANDROID_GNUSTEP_INSTALL_ROOT="${INSTALL_PREFIX}"
 
 cd $ROOT_DIR
@@ -43,10 +43,7 @@ ${ANDROID_CMAKE_ROOT}/bin/cmake \
   -DCMAKE_INSTALL_PREFIX="${ANDROID_GNUSTEP_INSTALL_ROOT}"
 
 cd ${GSROOT}/libobjc2/build
-pwd
-
 sed 's/-Wl,--fatal-warnings//' build.ninja > build2.ninja && mv build2.ninja build.ninja
-#sed 's/-stdlib=libc++//g' build.ninja > build2.ninja && mv build2.ninja build.ninja
 
 ${NINJA} -j6
 
@@ -75,6 +72,7 @@ if [ "$?" != "0" ]; then
     echo "### MAKE BUILD FAILED!!!"
     exit 0
 fi
+echo "### Source ${ANDROID_GNUSTEP_INSTALL_ROOT}/share/GNUstep/Makefiles/GNUstep.sh"
 . "${ANDROID_GNUSTEP_INSTALL_ROOT}"/share/GNUstep/Makefiles/GNUstep.sh
 
 
@@ -82,7 +80,8 @@ echo "### Setup build for base..."
 cd "${GSROOT}"
 git clone https://github.com/gnustep/libs-base
 cd "${GSROOT}"/libs-base
-configure it
+sed 's/cross_objc2_runtime=0/cross_objc2_runtime=1/g' cross.config > cross.config2 && mv cross.config2 cross.config
+
 ./configure --host=arm-linux-androideabi \
   --enable-nxconstantstring \
   --disable-invocations \
