@@ -13,12 +13,16 @@ export ROOT_DIR=`pwd`
 export GSROOT=${ROOT_DIR}/src
 export INSTALL_PREFIX=${ROOT_DIR}/GNUstep
 export ANDROID_GNUSTEP_INSTALL_ROOT="${INSTALL_PREFIX}"
+export SYSTEM_LIBRARY_DIR=${INSTALL_PREFIX}/System/Library/Libraries
+export SYSTEM_HEADERS_DIR=${INSTALL_PREFIX}/System/Library/Headers
 
 cd $ROOT_DIR
 
 echo "### Setup build for libobjc2"
 rm -rf "${GSROOT}"
 mkdir -p "${GSROOT}"
+rm -rf ${INSTALL_PREFIX}
+mkdir ${INSTALL_PREFIX}
   
 if [[ ! -e "${GSROOT}"/libobjc2 ]] ; then
   cd "${GSROOT}"
@@ -46,6 +50,11 @@ cd ${GSROOT}/libobjc2/build
 sed 's/-Wl,--fatal-warnings//' build.ninja > build2.ninja && mv build2.ninja build.ninja
 
 ${NINJA} -j6
+mkdir ${SYSTEM_LIBRARY_DIR}
+mkdir -p ${SYSTEM_HEADERS_DIR}/objc
+
+cp libobjc.so ${SYSTEM_LIBRARY_DIR}
+cp -r ../objc/* ${SYSTEM_HEADERS_DIR}/objc
 
 if [ "$?" != "0" ]; then
     echo "### LIBOBJC2 BUILD FAILED!!!"
@@ -66,21 +75,23 @@ echo "### Build make..."
 cd "${GSROOT}"
 git clone https://github.com/gnustep/tools-make
 cd "${GSROOT}"/tools-make
-./configure --host=arm-linux-androideabi --prefix="${ANDROID_GNUSTEP_INSTALL_ROOT}" OBJCFLAGS="${OBJCFLAGS} -integrated-as"
-gnumake install
+./configure --host=arm-linux-androideabi --libdir=${SYSTEM_LIBRARY_DIR} --includedir=${SYSTEM_HEADERS_DIR} --prefix="${ANDROID_GNUSTEP_INSTALL_ROOT}" --with-layout=gnustep OBJCFLAGS="${OBJCFLAGS} -integrated-as"
+gnumake GNUSTEP_INSTALLATION_DOMAIN=SYSTEM install
 if [ "$?" != "0" ]; then
     echo "### MAKE BUILD FAILED!!!"
     exit 0
 fi
 echo "### Source ${ANDROID_GNUSTEP_INSTALL_ROOT}/share/GNUstep/Makefiles/GNUstep.sh"
-. "${ANDROID_GNUSTEP_INSTALL_ROOT}"/share/GNUstep/Makefiles/GNUstep.sh
+. "${ANDROID_GNUSTEP_INSTALL_ROOT}"/System/Library/Makefiles/GNUstep.sh
 
 
 echo "### Setup build for base..."
 cd "${GSROOT}"
 git clone https://github.com/gnustep/libs-base
 cd "${GSROOT}"/libs-base
+pwd
 sed 's/cross_objc2_runtime=0/cross_objc2_runtime=1/g' cross.config > cross.config2 && mv cross.config2 cross.config
+cat cross.config
 
 ./configure --host=arm-linux-androideabi \
   --enable-nxconstantstring \
@@ -89,7 +100,6 @@ sed 's/cross_objc2_runtime=0/cross_objc2_runtime=1/g' cross.config > cross.confi
   --disable-tls \
   --disable-icu \
   --disable-xml \
-  --disable-openssl \
   --disable-mixedabi \
   --with-cross-compilation-info=./cross.config
 
