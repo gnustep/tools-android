@@ -23,12 +23,22 @@ rm -rf "${GSROOT}"
 mkdir -p "${GSROOT}"
 rm -rf ${INSTALL_PREFIX}
 mkdir ${INSTALL_PREFIX}
-  
-if [[ ! -e "${GSROOT}"/libobjc2 ]] ; then
-  cd "${GSROOT}"
-  git clone https://github.com/gnustep/libobjc2
-  mkdir -p "${GSROOT}"/libobjc2/build
-fi
+ 
+cd "${GSROOT}"
+git clone https://github.com/gnustep/libobjc2
+mkdir -p "${GSROOT}"/libobjc2/build
+
+echo "### Build libffi"
+cd ${GSROOT}
+git clone http://github.com/libffi/libffi.git
+# git clone https://android.googlesource.com/platform/external/libffi
+cd libffi
+./autogen.sh
+
+echo "### Build libxml2"
+cd ${GSROOT}
+git clone https://github.com/GNOME/libxml2.git
+cd libxml2
 
 echo "### Build libobjc2"
 cd "${GSROOT}"
@@ -55,6 +65,7 @@ mkdir -p ${SYSTEM_HEADERS_DIR}/objc
 
 cp libobjc.so ${SYSTEM_LIBRARY_DIR}
 cp -r ../objc/* ${SYSTEM_HEADERS_DIR}/objc
+# cp -r ../objc/* ${SYSTEM_HEADERS_DIR}
 
 if [ "$?" != "0" ]; then
     echo "### LIBOBJC2 BUILD FAILED!!!"
@@ -68,14 +79,14 @@ export CXX="${TOOLCHAIN}"/bin/clang++
 export OBJC="${TOOLCHAIN}"/bin/clang
 export LD="${CC}"
 export CFLAGS="--gcc-toolchain=${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/darwin-x86_64 --target=armv7-none-linux-androideabi23"
-export OBJCFLAGS="${CFLAGS}"
-export LDFLAGS="${CFLAGS}"
+export OBJCFLAGS="${CFLAGS} -I${SYSTEM_HEADERS_DIR}"
+export LDFLAGS="${CFLAGS} -L${SYSTEM_LIBRARY_DIR}"
 
 echo "### Build make..."
 cd "${GSROOT}"
 git clone https://github.com/gnustep/tools-make
 cd "${GSROOT}"/tools-make
-./configure --host=arm-linux-androideabi --libdir=${SYSTEM_LIBRARY_DIR} --includedir=${SYSTEM_HEADERS_DIR} --prefix="${ANDROID_GNUSTEP_INSTALL_ROOT}" --with-layout=gnustep OBJCFLAGS="${OBJCFLAGS} -integrated-as"
+./configure --host=arm-linux-androideabi --prefix="${ANDROID_GNUSTEP_INSTALL_ROOT}" --with-layout=gnustep OBJCFLAGS="${OBJCFLAGS} -integrated-as"
 gnumake GNUSTEP_INSTALLATION_DOMAIN=SYSTEM install
 if [ "$?" != "0" ]; then
     echo "### MAKE BUILD FAILED!!!"
