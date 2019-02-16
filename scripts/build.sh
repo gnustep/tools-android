@@ -15,3 +15,6 @@ export SCRIPT_DIR=${ROOT_DIR}/scripts
 
 cd ${PROJECT}
 make -j6 all
+
+# install
+${ADB} install *.apk

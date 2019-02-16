@@ -11,4 +11,4 @@ export INSTALL_PREFIX=${ROOT_DIR}/GNUstep
 export ANDROID_GNUSTEP_INSTALL_ROOT="${INSTALL_PREFIX}"
 export SYSTEM_LIBRARY_DIR=${INSTALL_PREFIX}/System/Library/Libraries
 export SYSTEM_HEADERS_DIR=${INSTALL_PREFIX}/System/Library/Headers
-
+export PLATFORM_TOOLS=${ANDROID_HOME}/platform-tools
