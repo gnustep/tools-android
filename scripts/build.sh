@@ -14,7 +14,9 @@ export SCRIPT_DIR=${ROOT_DIR}/scripts
 . ${SCRIPT_DIR}/makeenv.sh
 
 cd ${PROJECT}
+make clean
 make -j6 all
 
 # install
+rm *.unsigned.apk
 ${ADB} install *.apk
