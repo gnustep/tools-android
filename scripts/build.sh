@@ -2,6 +2,10 @@
 
 PROJECT=$1
 
+if [ ! -e GNUstep ]; then
+    ${SCRIPT_DIR}/setup.sh
+fi
+
 export ROOT_DIR=`pwd`
 export SCRIPT_DIR=${ROOT_DIR}/scripts
 
