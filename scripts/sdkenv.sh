@@ -2,6 +2,9 @@
 
 export ANDROID_HOME="${HOME}"/Library/Android/sdk
 export ANDROID_NDK_HOME=${ANDROID_HOME}/ndk-bundle
+export ANDROID_SYSROOT=${ANDROID_NDK_HOME}/sysroot
+export ANDROID_INCLUDE=${ANDROID_SYSROOT}/usr/include
+export ANDROID_LIB=${ANDROID_SYSROOT}/usr/lib
 export ANDROID_CMAKE_ROOT=${ANDROID_HOME}/cmake/3.10.2.4988404
 export CMAKE_BIN=${ANDROID_CMAKE_ROOT}/bin
 export CMAKE=${CMAKE_BIN}/cmake
