@@ -115,7 +115,7 @@ echo "### Setup build for libpng"
 cd "${GSROOT}"
 git clone https://github.com/julienr/libpng-android.git
 cd "${GSROOT}"/libpng-android
-./build.sh
+PATH="$PATH:$ANDROID_NDK_HOME" ./build.sh
 # ${CMAKE} .
 # gnumake LD="${LD}" LDFLAGS="${LDFLAGS} -nopie" -j6 GNUSTEP_INSTALLATION_DOMAIN=SYSTEM messages=yes install
 # gnumake LD="${LD}" LDFLAGS="${LDFLAGS} -nopie" CFLAGS="${CFLAGS} -I${ANDROID_INCLUDE}" -j6
