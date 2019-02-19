@@ -28,13 +28,13 @@ ${ANDROID_CMAKE_ROOT}/bin/cmake \
   -H"${GSROOT}"/libobjc2 \
   -B"${GSROOT}"/libobjc2/build \
   -G"Ninja" \
-  -DANDROID_ABI=armeabi-v7a \
+  -DANDROID_ABI=${ABI_NAME} \
   -DANDROID_NDK=${ANDROID_NDK_HOME} \
   -DCMAKE_LIBRARY_OUTPUT_DIRECTORY="${GSROOT}"/libobjc2/build \
   -DCMAKE_BUILD_TYPE=Debug \
   -DCMAKE_MAKE_PROGRAM=${NINJA} \
   -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE} \
-  -DANDROID_NATIVE_API_LEVEL=23 \
+  -DANDROID_NATIVE_API_LEVEL=${ABI_LEVEL} \
   -DANDROID_TOOLCHAIN=clang \
   -DCMAKE_INSTALL_PREFIX="${ANDROID_GNUSTEP_INSTALL_ROOT}"
 
@@ -64,7 +64,7 @@ echo "### Build make..."
 cd "${GSROOT}"
 git clone https://github.com/gnustep/tools-make
 cd "${GSROOT}"/tools-make
-./configure --host=arm-linux-androideabi --prefix="${ANDROID_GNUSTEP_INSTALL_ROOT}" --with-layout=gnustep OBJCFLAGS="${OBJCFLAGS} -integrated-as"
+./configure --host=arm-linux-androideabi --prefix="${ANDROID_GNUSTEP_INSTALL_ROOT}" --enable-objc-arc=yes --with-layout=gnustep OBJCFLAGS="${OBJCFLAGS} -integrated-as"
 gnumake GNUSTEP_INSTALLATION_DOMAIN=SYSTEM install
 if [ "$?" != "0" ]; then
     echo "### MAKE BUILD FAILED!!!"
@@ -101,7 +101,7 @@ sed 's/SUBPROJECTS += Tools NSTimeZones Resources Tests//' GNUmakefile > GNUmake
 echo " "
 echo "### Build base..."
 sed 's/cross_objc2_runtime=0/cross_objc2_runtime=1/g' cross.config > cross.config2 && mv cross.config2 cross.config
-gnumake LD="${LD}" LDFLAGS="${LDFLAGS} -nopie" -j6 GNUSTEP_INSTALLATION_DOMAIN=SYSTEM messages=yes install
+gnumake LD="${LD}" LDFLAGS="${LDFLAGS} -nopie" -j6 GNUSTEP_INSTALLATION_DOMAIN=SYSTEM install
 if [ "$?" != "0" ]; then
     echo "### BASE BUILD FAILED!!!"
     exit 0
@@ -116,9 +116,6 @@ cd "${GSROOT}"
 git clone https://github.com/julienr/libpng-android.git
 cd "${GSROOT}"/libpng-android
 PATH="$PATH:$ANDROID_NDK_HOME" ./build.sh
-# ${CMAKE} .
-# gnumake LD="${LD}" LDFLAGS="${LDFLAGS} -nopie" -j6 GNUSTEP_INSTALLATION_DOMAIN=SYSTEM messages=yes install
-# gnumake LD="${LD}" LDFLAGS="${LDFLAGS} -nopie" CFLAGS="${CFLAGS} -I${ANDROID_INCLUDE}" -j6
 if [ "$?" != "0" ]; then
     echo "### LIBPNG BUILD FAILED!!!"
     exit 0

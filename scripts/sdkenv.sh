@@ -18,3 +18,5 @@ export SYSTEM_LIBRARY_DIR=${INSTALL_PREFIX}/System/Library/Libraries
 export SYSTEM_HEADERS_DIR=${INSTALL_PREFIX}/System/Library/Headers
 export PLATFORM_TOOLS=${ANDROID_HOME}/platform-tools
 export PNG_DIR=${GSROOT}/libpng-android
+export ABI_NAME=armeabi-v7a
+export ABI_LEVEL=23
