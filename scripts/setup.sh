@@ -84,8 +84,10 @@ git clone https://github.com/gnustep/libs-base
 cd "${GSROOT}"/libs-base
 pwd
 sed 's/cross_objc2_runtime=0/cross_objc2_runtime=1/g' cross.config > cross.config2 && mv cross.config2 cross.config
-cat cross.config
+sed 's/-fobjc-runtime=gcc/-fobjc-runtime=2.0/g' configure.ac > configure2.ac && mv configure2.ac configure.ac
+sed 's/-fobjc-runtime=gcc/-fobjc-runtime=2.0/g' configure.ac > configure2.ac && mv configure2.ac configure.ac
 sed 's/SUBPROJECTS += Tools NSTimeZones Resources Tests//' GNUmakefile > GNUmakefile2 && mv GNUmakefile2 GNUmakefile
+autoconf
 
 ./configure --host=arm-linux-androideabi \
   --enable-nxconstantstring \
@@ -101,7 +103,8 @@ sed 's/SUBPROJECTS += Tools NSTimeZones Resources Tests//' GNUmakefile > GNUmake
 echo " "
 echo "### Build base..."
 sed 's/cross_objc2_runtime=0/cross_objc2_runtime=1/g' cross.config > cross.config2 && mv cross.config2 cross.config
-gnumake LD="${LD}" LDFLAGS="${LDFLAGS} -nopie" -j6 GNUSTEP_INSTALLATION_DOMAIN=SYSTEM install
+gnumake LD="${LD}" LDFLAGS="${LDFLAGS} -nopie" -j6 GNUSTEP_INSTALLATION_DOMAIN=SYSTEM install messages=yes
+
 if [ "$?" != "0" ]; then
     echo "### BASE BUILD FAILED!!!"
     exit 0
