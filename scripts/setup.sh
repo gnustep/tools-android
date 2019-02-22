@@ -95,8 +95,8 @@ pwd
 sed 's/cross_objc2_runtime=0/cross_objc2_runtime=1/g' cross.config > cross.config2 && mv cross.config2 cross.config
 sed 's/cross_have_unexpected=no/cross_have_unexpected=yes/g' cross.config > cross.config2 && mv cross.config2 cross.config
 sed 's/cross_non_fragile=no/cross_non_fragile=yes/g' cross.config > cross.config2 && mv cross.config2 cross.config
+sed 's/cross_gs_cv_objc_compiler_supports_constant_string_class=no/cross_gs_cv_objc_compiler_supports_constant_string_class=yes/g' cross.config > cross.config2 && mv cross.config2 cross.config
 sed 's/SUBPROJECTS += Tools NSTimeZones Resources Tests//' GNUmakefile > GNUmakefile2 && mv GNUmakefile2 GNUmakefile
-#autoconf
 
 ./configure \
   --host=arm-linux-androideabi \
@@ -112,9 +112,7 @@ sed 's/SUBPROJECTS += Tools NSTimeZones Resources Tests//' GNUmakefile > GNUmake
 
 echo " "
 echo "### Build base..."
-sed 's/cross_objc2_runtime=0/cross_objc2_runtime=1/g' cross.config > cross.config2 && mv cross.config2 cross.config
-sed 's/cross_have_unexpected=no/cross_have_unexpected=yes/g' cross.config > cross.config2 && mv cross.config2 cross.config
-sed 's/cross_non_fragile=no/cross_non_fragile=yes/g' cross.config > cross.config2 && mv cross.config2 cross.config
+
 gnumake LD="${LD}" LDFLAGS="${LDFLAGS} -nopie" -j6 GNUSTEP_INSTALLATION_DOMAIN=SYSTEM install messages=yes
 
 if [ "$?" != "0" ]; then
