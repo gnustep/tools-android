@@ -64,11 +64,16 @@ echo "### Build make..."
 cd "${SRCROOT}"
 git clone https://github.com/gnustep/tools-make
 cd "${SRCROOT}"/tools-make
-#sed 's/-fobjc-runtime=gcc/-fobjc-runtime=gnustep-2.0/g' configure.ac > configure2.ac && mv configure2.ac configure.ac
-#sed 's/-fobjc-runtime=gcc/-fobjc-runtime=gnustep-2.0/g' library-combo.make > library-combo2.make && mv library-combo2.make library-combo.make
-#sed 's/-fobjc-runtime=gcc/-fobjc-runtime=gnustep-2.0/g' target.make > target2.make && mv target2.make target.make
-#autoconf
-./configure --host=arm-linux-androideabi --prefix="${ANDROID_GNUSTEP_INSTALL_ROOT}" --enable-objc-arc=yes --with-layout=gnustep OBJCFLAGS="${OBJCFLAGS} -integrated-as"
+
+./configure \
+  --host=arm-linux-androideabi \
+  --prefix="${ANDROID_GNUSTEP_INSTALL_ROOT}" \
+  --with-library-combo=ng-gnu-gnu \
+  --with-layout=gnustep \
+  --enable-objc-arc \
+  --enable-native-objc-exceptions \
+  OBJCFLAGS="${OBJCFLAGS} -integrated-as"
+
 gnumake GNUSTEP_INSTALLATION_DOMAIN=SYSTEM install
 if [ "$?" != "0" ]; then
     echo "### MAKE BUILD FAILED!!!"
@@ -88,12 +93,13 @@ git clone https://github.com/gnustep/libs-base
 cd "${SRCROOT}"/libs-base
 pwd
 sed 's/cross_objc2_runtime=0/cross_objc2_runtime=1/g' cross.config > cross.config2 && mv cross.config2 cross.config
-#sed 's/-fobjc-runtime=gcc/-fobjc-runtime=gnustep-2.0/g' configure.ac > configure2.ac && mv configure2.ac configure.ac
-#sed 's/-fobjc-runtime=gcc/-fobjc-runtime=gnustep-2.0/g' configure.ac > configure2.ac && mv configure2.ac configure.ac
+sed 's/cross_have_unexpected=no/cross_have_unexpected=yes/g' cross.config > cross.config2 && mv cross.config2 cross.config
+sed 's/cross_non_fragile=no/cross_non_fragile=yes/g' cross.config > cross.config2 && mv cross.config2 cross.config
 sed 's/SUBPROJECTS += Tools NSTimeZones Resources Tests//' GNUmakefile > GNUmakefile2 && mv GNUmakefile2 GNUmakefile
 #autoconf
 
-./configure --host=arm-linux-androideabi \
+./configure \
+  --host=arm-linux-androideabi \
   --enable-nxconstantstring \
   --disable-invocations \
   --disable-iconv \
@@ -107,6 +113,8 @@ sed 's/SUBPROJECTS += Tools NSTimeZones Resources Tests//' GNUmakefile > GNUmake
 echo " "
 echo "### Build base..."
 sed 's/cross_objc2_runtime=0/cross_objc2_runtime=1/g' cross.config > cross.config2 && mv cross.config2 cross.config
+sed 's/cross_have_unexpected=no/cross_have_unexpected=yes/g' cross.config > cross.config2 && mv cross.config2 cross.config
+sed 's/cross_non_fragile=no/cross_non_fragile=yes/g' cross.config > cross.config2 && mv cross.config2 cross.config
 gnumake LD="${LD}" LDFLAGS="${LDFLAGS} -nopie" -j6 GNUSTEP_INSTALLATION_DOMAIN=SYSTEM install messages=yes
 
 if [ "$?" != "0" ]; then

@@ -21,3 +21,4 @@ export PLATFORM_TOOLS=${ANDROID_HOME}/platform-tools
 export PNG_DIR=${SRCROOT}/libpng-android
 export ABI_NAME=armeabi-v7a
 export ABI_LEVEL=23
+export RUNTIME_VERSION=gnustep-2.0
