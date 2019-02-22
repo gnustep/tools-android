@@ -91,11 +91,7 @@ echo "### Setup build for base..."
 cd "${SRCROOT}"
 git clone https://github.com/gnustep/libs-base
 cd "${SRCROOT}"/libs-base
-pwd
-sed 's/cross_objc2_runtime=0/cross_objc2_runtime=1/g' cross.config > cross.config2 && mv cross.config2 cross.config
-sed 's/cross_have_unexpected=no/cross_have_unexpected=yes/g' cross.config > cross.config2 && mv cross.config2 cross.config
-sed 's/cross_non_fragile=no/cross_non_fragile=yes/g' cross.config > cross.config2 && mv cross.config2 cross.config
-sed 's/cross_gs_cv_objc_compiler_supports_constant_string_class=no/cross_gs_cv_objc_compiler_supports_constant_string_class=yes/g' cross.config > cross.config2 && mv cross.config2 cross.config
+
 sed 's/SUBPROJECTS += Tools NSTimeZones Resources Tests//' GNUmakefile > GNUmakefile2 && mv GNUmakefile2 GNUmakefile
 
 ./configure \
@@ -108,7 +104,8 @@ sed 's/SUBPROJECTS += Tools NSTimeZones Resources Tests//' GNUmakefile > GNUmake
   --disable-xml \
   --disable-mixedabi \
   --disable-gdomap \
-  --with-cross-compilation-info=./cross.config
+  --with-cross-compilation-info=${ROOT_DIR}/scripts/cross.config
+
 
 echo " "
 echo "### Build base..."
