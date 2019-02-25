@@ -5,7 +5,7 @@ PROJECT=$1
 export ROOT_DIR=`pwd`
 export SCRIPT_DIR=${ROOT_DIR}/scripts
 
-if [ ! -e GNUstep ]; then
+if [ ! -e ${INSTALL_PREFIX}/GNUstep ]; then
     ${SCRIPT_DIR}/setup.sh
 fi
 
