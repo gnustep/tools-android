@@ -5,13 +5,15 @@ PROJECT=$1
 export ROOT_DIR=`pwd`
 export SCRIPT_DIR=${ROOT_DIR}/scripts
 
-if [ ! -e ${INSTALL_PREFIX}/GNUstep ]; then
-    ${SCRIPT_DIR}/setup.sh
-fi
-
 . ${SCRIPT_DIR}/sdkenv.sh
 . ${SCRIPT_DIR}/toolchain.sh
 . ${SCRIPT_DIR}/makeenv.sh
+
+if [ ! -e ${ANDROID_GNUSTEP_INSTALL_ROOT} ]; then
+    ${SCRIPT_DIR}/setup.sh
+fi
+
+# env
 
 cd ${PROJECT}
 make clean
