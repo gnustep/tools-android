@@ -3,6 +3,8 @@
 # from android documentation:
 # http://web.archive.org/web/20190210195102/
 # https://developer.android.com/ndk/guides/cmake
+#
+# See license details in LICENSE
 
 export ROOT_DIR=`pwd`
 
@@ -10,12 +12,13 @@ export ROOT_DIR=`pwd`
 
 cd $ROOT_DIR
 
-echo "###### SETTING UP GNUSTEP ANDROID BUILD SYSTEM"
+echo "# SETTING UP GNUSTEP ANDROID BUILD SYSTEM"
 echo "### Setup build for libobjc2"
 rm -rf "${SRCROOT}"
 mkdir -p "${SRCROOT}"
 rm -rf ${INSTALL_PREFIX}
-mkdir ${INSTALL_PREFIX}
+mkdir -p ${INSTALL_PREFIX}/logs
+
  
 cd "${SRCROOT}"
 git clone https://github.com/gnustep/libobjc2
@@ -74,7 +77,7 @@ cd "${SRCROOT}"/tools-make
   --enable-native-objc-exceptions \
   OBJCFLAGS="${OBJCFLAGS} -integrated-as"
 
-gnumake GNUSTEP_INSTALLATION_DOMAIN=SYSTEM install
+gnumake 2> ${INSTALL_PREFIX}/logs/make_build_error.log GNUSTEP_INSTALLATION_DOMAIN=SYSTEM install
 if [ "$?" != "0" ]; then
     echo "### MAKE BUILD FAILED!!!"
     exit 0
@@ -110,7 +113,7 @@ sed 's/SUBPROJECTS += Tools NSTimeZones Resources Tests//' GNUmakefile > GNUmake
 echo " "
 echo "### Build base..."
 
-gnumake LD="${LD}" LDFLAGS="${LDFLAGS} -nopie" -j6 GNUSTEP_INSTALLATION_DOMAIN=SYSTEM install messages=yes
+gnumake 2> ${INSTALL_PREFIX}/logs/base_build_error.log LD="${LD}" LDFLAGS="${LDFLAGS} -nopie" -j6 GNUSTEP_INSTALLATION_DOMAIN=SYSTEM install messages=no
 
 if [ "$?" != "0" ]; then
     echo "### BASE BUILD FAILED!!!"

@@ -1,5 +1,6 @@
 #!/bin/sh
 
+echo "### Setting SDK environment"
 export LIBRARY_DIR=${HOME}/Library
 export ANDROID_ROOT=${LIBRARY_DIR}/Android
 export ANDROID_HOME="${ANDROID_ROOT}"/sdk
