@@ -109,13 +109,12 @@ git clone https://github.com/gnustep/tools-make
 cd "${SRCROOT}"/tools-make
 
 ./configure \
-  --host=arm-linux-androideabi \
+  --host=${ANDROID_TARGET} \
   --prefix="${ANDROID_GNUSTEP_INSTALL_ROOT}" \
   --with-library-combo=ng-gnu-gnu \
   --with-layout=gnustep \
   --enable-objc-arc \
-  --enable-native-objc-exceptions \
-  OBJCFLAGS="${OBJCFLAGS} -integrated-as"
+  --enable-native-objc-exceptions
 
 gnumake install
 if [ "$?" != "0" ]; then
@@ -138,7 +137,7 @@ cd "${SRCROOT}"/libs-base
 sed 's/SUBPROJECTS += Tools NSTimeZones Resources Tests//' GNUmakefile > GNUmakefile2 && mv GNUmakefile2 GNUmakefile
 
 ./configure \
-  --host=arm-linux-androideabi \
+  --host=${ANDROID_TARGET} \
   --enable-nxconstantstring \
   --disable-invocations \
   --disable-iconv \
