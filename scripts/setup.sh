@@ -56,6 +56,56 @@ else
     echo "### Done with libobj2 build"
 fi
 
+cd "${SRCROOT}"
+#git clone https://github.com/apple/swift-corelibs-libdispatch.git libdispatch
+git clone -b fix-printf-ptr https://github.com/triplef/swift-corelibs-libdispatch.git libdispatch
+mkdir -p "${SRCROOT}"/libdispatch/build
+
+echo " "
+echo "### Build libdispatch"
+cd "${SRCROOT}"
+
+${ANDROID_CMAKE_ROOT}/bin/cmake \
+  -H"${SRCROOT}"/libdispatch \
+  -B"${SRCROOT}"/libdispatch/build \
+  -G"Ninja" \
+  -DCMAKE_MAKE_PROGRAM=${NINJA} \
+  -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
+  -DCMAKE_INSTALL_PREFIX="${ANDROID_GNUSTEP_INSTALL_ROOT}" \
+  -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE} \
+  -DANDROID_NATIVE_API_LEVEL=${ABI_LEVEL} \
+  -DANDROID_ABI=${ABI_NAME} \
+  -DANDROID_NDK=${ANDROID_NDK_HOME} \
+  -DBUILD_SHARED_LIBS=YES
+
+cd ${SRCROOT}/libdispatch/build
+
+${NINJA}
+${NINJA} install
+
+if [ "$?" != "0" ]; then
+    echo "### LIBDISPATCH BUILD FAILED!!!"
+    exit 0
+else
+    echo "### Done with libdispatch build"
+fi
+
+# move libobjc and libdispatch files into GNUstep folders
+
+mkdir -p "${SYSTEM_HEADERS_DIR}"
+mv "${ANDROID_GNUSTEP_INSTALL_ROOT}"/include/* "${SYSTEM_HEADERS_DIR}"/
+rm -df "${ANDROID_GNUSTEP_INSTALL_ROOT}"/include
+
+mkdir -p "${SYSTEM_LIBRARY_DIR}"
+mv "${ANDROID_GNUSTEP_INSTALL_ROOT}"/lib/* "${SYSTEM_LIBRARY_DIR}"/
+rm -df "${ANDROID_GNUSTEP_INSTALL_ROOT}"/lib
+
+mkdir -p "${SYSTEM_DOCUMENTATION_DIR}"/man
+mv "${ANDROID_GNUSTEP_INSTALL_ROOT}"/share/man/* "${SYSTEM_DOCUMENTATION_DIR}"/man/
+rm -df "${ANDROID_GNUSTEP_INSTALL_ROOT}"/share/man
+rm -df "${ANDROID_GNUSTEP_INSTALL_ROOT}"/share
+
+
 . ${ROOT_DIR}/scripts/toolchain.sh
 
 echo " "
