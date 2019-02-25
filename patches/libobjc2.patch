@@ -1,23 +1,24 @@
 diff --git a/objc_msgSend.arm.S b/objc_msgSend.arm.S
-index ec550fa..01064d6 100644
+index ec550fa..def6174 100644
 --- a/objc_msgSend.arm.S
 +++ b/objc_msgSend.arm.S
-@@ -52,9 +52,11 @@
+@@ -51,10 +51,11 @@
+                                               // directives for them, but not for any other pushes
         tst    \receiver, SMALLOBJ_MASK        // Sets Z if this is not a small int
  
- 
+-
 -       itte   ne
 -       ldrne  r4, LSmallIntClass              // Small Int class -> r4 if this is a small int
 -       ldrne  r4, [r4]
-+       ldr    r4, 6f                          // PC-relative offset of Small Int class -> r4
++       ldr    r4, 6f
 +42:
-+       add    r4, pc                          // Address of Small Int class -> r4
-+       ldr    r4, [r4]                        // Small Int class -> r4
++       add    r4, pc
++       ldr    r4, [r4]
 +       it     eq
         ldreq  r4, [\receiver]                 // Load class to r4 if not a small int
  
         ldr    r4, [r4, #DTABLE_OFFSET]        // Dtable -> r4
-@@ -123,6 +125,9 @@
+@@ -123,6 +124,9 @@
  #endif
         bx     lr
  .fnend
@@ -27,7 +28,7 @@ index ec550fa..01064d6 100644
  .endm
  
  .globl CDECL(objc_msgSend_fpret)
-@@ -137,6 +142,3 @@ TYPE_DIRECTIVE(CDECL(objc_msgSend_stret), %function)
+@@ -137,6 +141,3 @@ TYPE_DIRECTIVE(CDECL(objc_msgSend_stret), %function)
  CDECL(objc_msgSend_stret):
         MSGSEND r1, r2
  
