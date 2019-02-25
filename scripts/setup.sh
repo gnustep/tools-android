@@ -74,7 +74,7 @@ cd "${SRCROOT}"/tools-make
   --enable-native-objc-exceptions \
   OBJCFLAGS="${OBJCFLAGS} -integrated-as"
 
-gnumake GNUSTEP_INSTALLATION_DOMAIN=SYSTEM install
+gnumake install
 if [ "$?" != "0" ]; then
     echo "### MAKE BUILD FAILED!!!"
     exit 0
@@ -116,7 +116,7 @@ if [ "$?" != "0" ]; then
     echo "### BASE BUILD FAILED!!!"
     exit 0
 else
-    echo ### "Done building libobjc2"
+    echo ### "Done building base"
 fi
 
 echo " "
