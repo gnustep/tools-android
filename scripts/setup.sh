@@ -21,8 +21,11 @@ mkdir -p ${INSTALL_PREFIX}/logs
  
 cd "${SRCROOT}"
 git clone https://github.com/gnustep/libobjc2
-echo "** Applying patches"
-cp ${ROOT_DIR}/patches/*.S ${SRCROOT}/libobjc2
+
+echo "### Applying patches"
+cd ${SRCROOT}/libobjc2
+patch -p1 < "${ROOT_DIR}"/patches/libobjc2.patch
+
 mkdir -p "${SRCROOT}"/libobjc2/build
 
 echo " "
