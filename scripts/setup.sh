@@ -41,7 +41,6 @@ ${ANDROID_CMAKE_ROOT}/bin/cmake \
   -DANDROID_NATIVE_API_LEVEL=${ANDROID_API_LEVEL} \
 
 cd ${SRCROOT}/libobjc2/build
-sed 's/-Wl,--fatal-warnings//' build.ninja > build2.ninja && mv build2.ninja build.ninja
 
 ${NINJA}
 ${NINJA} install
