@@ -15,7 +15,7 @@ fi
 
 # env
 
-cd ${PROJECT}
+cd examples/${PROJECT}
 make clean
 make -j6 all
 
