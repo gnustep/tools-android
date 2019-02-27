@@ -89,22 +89,6 @@ else
     echo "### Done with libdispatch build"
 fi
 
-# move libobjc and libdispatch files into GNUstep folders
-
-mkdir -p "${SYSTEM_HEADERS_DIR}"
-mv "${ANDROID_GNUSTEP_INSTALL_ROOT}"/include/* "${SYSTEM_HEADERS_DIR}"/
-rm -df "${ANDROID_GNUSTEP_INSTALL_ROOT}"/include
-
-mkdir -p "${SYSTEM_LIBRARY_DIR}"
-mv "${ANDROID_GNUSTEP_INSTALL_ROOT}"/lib/* "${SYSTEM_LIBRARY_DIR}"/
-rm -df "${ANDROID_GNUSTEP_INSTALL_ROOT}"/lib
-
-mkdir -p "${SYSTEM_DOCUMENTATION_DIR}"/man
-mv "${ANDROID_GNUSTEP_INSTALL_ROOT}"/share/man/* "${SYSTEM_DOCUMENTATION_DIR}"/man/
-rm -df "${ANDROID_GNUSTEP_INSTALL_ROOT}"/share/man
-rm -df "${ANDROID_GNUSTEP_INSTALL_ROOT}"/share
-
-
 . ${ROOT_DIR}/scripts/toolchain.sh
 
 echo " "
@@ -118,7 +102,7 @@ cd "${SRCROOT}"/tools-make
   --host=${ANDROID_TARGET} \
   --prefix="${ANDROID_GNUSTEP_INSTALL_ROOT}" \
   --with-library-combo=ng-gnu-gnu \
-  --with-layout=gnustep \
+  --with-layout=fhs \
   --enable-objc-arc \
   --enable-native-objc-exceptions
 
@@ -131,7 +115,7 @@ else
 fi
 
 echo "### Source ${ANDROID_GNUSTEP_INSTALL_ROOT}/share/GNUstep/Makefiles/GNUstep.sh"
-. "${ANDROID_GNUSTEP_INSTALL_ROOT}"/System/Library/Makefiles/GNUstep.sh
+. "${ANDROID_GNUSTEP_INSTALL_ROOT}"/share/GNUstep/Makefiles/GNUstep.sh
 
 echo " "
 echo "#### BUILD GNUSTEP FOUNDATION"
