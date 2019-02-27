@@ -42,6 +42,7 @@ ${ANDROID_CMAKE_ROOT}/bin/cmake \
   -DANDROID_ABI=${ABI_NAME} \
   -DANDROID_NDK=${ANDROID_NDK_HOME} \
   -DANDROID_NATIVE_API_LEVEL=${ANDROID_API_LEVEL} \
+  -DCMAKE_C_FLAGS="-DDEBUG_EXCEPTIONS=1" # debug exception throwing
 
 cd ${SRCROOT}/libobjc2/build
 
