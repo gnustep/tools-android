@@ -33,26 +33,19 @@ ${ANDROID_CMAKE_ROOT}/bin/cmake \
   -H"${SRCROOT}"/libobjc2 \
   -B"${SRCROOT}"/libobjc2/build \
   -G"Ninja" \
+  -DCMAKE_MAKE_PROGRAM=${NINJA} \
+  -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
+  -DCMAKE_INSTALL_PREFIX="${ANDROID_GNUSTEP_INSTALL_ROOT}" \
+  -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE} \
   -DANDROID_ABI=${ABI_NAME} \
   -DANDROID_NDK=${ANDROID_NDK_HOME} \
-  -DCMAKE_LIBRARY_OUTPUT_DIRECTORY="${SRCROOT}"/libobjc2/build \
-  -DCMAKE_BUILD_TYPE=Debug \
-  -DCMAKE_MAKE_PROGRAM=${NINJA} \
-  -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE} \
-  -DANDROID_NATIVE_API_LEVEL=${ABI_LEVEL} \
-  -DANDROID_TOOLCHAIN=clang \
-  -DCMAKE_INSTALL_PREFIX="${ANDROID_GNUSTEP_INSTALL_ROOT}"
+  -DANDROID_NATIVE_API_LEVEL=${ANDROID_API_LEVEL} \
 
 cd ${SRCROOT}/libobjc2/build
 sed 's/-Wl,--fatal-warnings//' build.ninja > build2.ninja && mv build2.ninja build.ninja
 
-${NINJA} -j6
-mkdir -p ${SYSTEM_LIBRARY_DIR}
-mkdir -p ${SYSTEM_HEADERS_DIR}/objc
-
-cp libobjc.so ${SYSTEM_LIBRARY_DIR}
-cp -r ../objc/* ${SYSTEM_HEADERS_DIR}/objc
-# cp -r ../objc/* ${SYSTEM_HEADERS_DIR}
+${NINJA}
+${NINJA} install
 
 if [ "$?" != "0" ]; then
     echo "### LIBOBJC2 BUILD FAILED!!!"
@@ -60,6 +53,56 @@ if [ "$?" != "0" ]; then
 else
     echo "### Done with libobj2 build"
 fi
+
+cd "${SRCROOT}"
+#git clone https://github.com/apple/swift-corelibs-libdispatch.git libdispatch
+git clone -b fix-printf-ptr https://github.com/triplef/swift-corelibs-libdispatch.git libdispatch
+mkdir -p "${SRCROOT}"/libdispatch/build
+
+echo " "
+echo "### Build libdispatch"
+cd "${SRCROOT}"
+
+${ANDROID_CMAKE_ROOT}/bin/cmake \
+  -H"${SRCROOT}"/libdispatch \
+  -B"${SRCROOT}"/libdispatch/build \
+  -G"Ninja" \
+  -DCMAKE_MAKE_PROGRAM=${NINJA} \
+  -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
+  -DCMAKE_INSTALL_PREFIX="${ANDROID_GNUSTEP_INSTALL_ROOT}" \
+  -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE} \
+  -DANDROID_NATIVE_API_LEVEL=${ANDROID_API_LEVEL} \
+  -DANDROID_ABI=${ABI_NAME} \
+  -DANDROID_NDK=${ANDROID_NDK_HOME} \
+  -DBUILD_SHARED_LIBS=YES
+
+cd ${SRCROOT}/libdispatch/build
+
+${NINJA}
+${NINJA} install
+
+if [ "$?" != "0" ]; then
+    echo "### LIBDISPATCH BUILD FAILED!!!"
+    exit 0
+else
+    echo "### Done with libdispatch build"
+fi
+
+# move libobjc and libdispatch files into GNUstep folders
+
+mkdir -p "${SYSTEM_HEADERS_DIR}"
+mv "${ANDROID_GNUSTEP_INSTALL_ROOT}"/include/* "${SYSTEM_HEADERS_DIR}"/
+rm -df "${ANDROID_GNUSTEP_INSTALL_ROOT}"/include
+
+mkdir -p "${SYSTEM_LIBRARY_DIR}"
+mv "${ANDROID_GNUSTEP_INSTALL_ROOT}"/lib/* "${SYSTEM_LIBRARY_DIR}"/
+rm -df "${ANDROID_GNUSTEP_INSTALL_ROOT}"/lib
+
+mkdir -p "${SYSTEM_DOCUMENTATION_DIR}"/man
+mv "${ANDROID_GNUSTEP_INSTALL_ROOT}"/share/man/* "${SYSTEM_DOCUMENTATION_DIR}"/man/
+rm -df "${ANDROID_GNUSTEP_INSTALL_ROOT}"/share/man
+rm -df "${ANDROID_GNUSTEP_INSTALL_ROOT}"/share
+
 
 . ${ROOT_DIR}/scripts/toolchain.sh
 
@@ -71,13 +114,12 @@ git clone https://github.com/gnustep/tools-make
 cd "${SRCROOT}"/tools-make
 
 ./configure \
-  --host=arm-linux-androideabi \
+  --host=${ANDROID_TARGET} \
   --prefix="${ANDROID_GNUSTEP_INSTALL_ROOT}" \
   --with-library-combo=ng-gnu-gnu \
   --with-layout=gnustep \
   --enable-objc-arc \
-  --enable-native-objc-exceptions \
-  OBJCFLAGS="${OBJCFLAGS} -integrated-as"
+  --enable-native-objc-exceptions
 
 gnumake 2> ${INSTALL_PREFIX}/logs/make_build_error.log GNUSTEP_INSTALLATION_DOMAIN=SYSTEM install
 if [ "$?" != "0" ]; then
@@ -100,7 +142,7 @@ cd "${SRCROOT}"/libs-base
 sed 's/SUBPROJECTS += Tools NSTimeZones Resources Tests//' GNUmakefile > GNUmakefile2 && mv GNUmakefile2 GNUmakefile
 
 ./configure \
-  --host=arm-linux-androideabi \
+  --host=${ANDROID_TARGET} \
   --enable-nxconstantstring \
   --disable-invocations \
   --disable-iconv \
@@ -121,7 +163,7 @@ if [ "$?" != "0" ]; then
     echo "### BASE BUILD FAILED!!!"
     exit 0
 else
-    echo ### "Done building libobjc2"
+    echo ### "Done building base"
 fi
 
 echo " "
