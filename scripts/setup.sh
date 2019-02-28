@@ -122,7 +122,7 @@ cd "${SRCROOT}"/tools-make
   --enable-objc-arc \
   --enable-native-objc-exceptions
 
-gnumake 2> ${INSTALL_PREFIX}/logs/make_build_error.log GNUSTEP_INSTALLATION_DOMAIN=SYSTEM install
+gnumake 2> ${INSTALL_PREFIX}/logs/make_build_error.log install
 if [ "$?" != "0" ]; then
     echo "### MAKE BUILD FAILED!!!"
     exit 0
@@ -158,7 +158,7 @@ sed 's/SUBPROJECTS += Tools NSTimeZones Resources Tests//' GNUmakefile > GNUmake
 echo " "
 echo "### Build base..."
 
-gnumake 2> ${INSTALL_PREFIX}/logs/base_build_error.log LD="${LD}" LDFLAGS="${LDFLAGS} -nopie" -j6 GNUSTEP_INSTALLATION_DOMAIN=SYSTEM install messages=no
+gnumake 2> ${INSTALL_PREFIX}/logs/base_build_error.log LD="${LD}" LDFLAGS="${LDFLAGS} -nopie" -j6 install messages=no
 
 if [ "$?" != "0" ]; then
     echo "### BASE BUILD FAILED!!!"
