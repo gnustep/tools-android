@@ -1,6 +1,6 @@
 #!/bin/sh
 
-echo "### Set toolchain vars..."
+echo "### Set toolchain vars"
 export TOOLCHAIN="${ANDROID_NDK_HOME}"/toolchains/llvm/prebuilt/darwin-x86_64
 export CC="${TOOLCHAIN}"/bin/clang
 export CXX="${TOOLCHAIN}"/bin/clang++
