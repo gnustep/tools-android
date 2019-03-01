@@ -25,3 +25,6 @@ for PHASE in "${ROOT_DIR}"/phases/*.sh; do
     exit $?
   fi
 done
+
+# create makeenv.conf
+perl -pe 's/\${(\w+)}/$ENV{$1}/g' "${ROOT_DIR}"/env/makeenv.sh > "${INSTALL_PREFIX}"/etc/makeenv.conf
