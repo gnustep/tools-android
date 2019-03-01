@@ -1,0 +1,46 @@
+Fix using nl_langinfo() when not available.
+
+nl_langinfo() is not available on Android prior to API 26, but the header file is always present.
+
+This should be fixed more correctly via a new Autoconf compile check for nl_langinfo(), instead of using HAVE_LANGINFO_CODESET even though GSLocale.m is not using CODESET.
+
+diff --git a/Source/GSLocale.m b/Source/GSLocale.m
+index 43d013052..b2b994789 100644
+--- a/Source/GSLocale.m
++++ b/Source/GSLocale.m
+@@ -50,7 +50,7 @@
+    is exposed through struct lconv. An example platform is Android. */
+ 
+ #include <locale.h>
+-#ifdef HAVE_LANGINFO_H
++#ifdef HAVE_LANGINFO_CODESET
+ #include <langinfo.h>
+ #endif
+ #import "Foundation/NSUserDefaults.h"
+@@ -95,7 +95,7 @@
+   NSMutableDictionary	*dict;
+   NSString		*str1;
+   NSString		*str2;
+-#ifdef HAVE_LANGINFO_H
++#ifdef HAVE_LANGINFO_CODESET
+   int			i;
+   NSMutableArray	*arr;
+ #endif
+@@ -118,7 +118,7 @@
+   backupLocale = privateSetLocale(LC_ALL, nil);
+   privateSetLocale(LC_ALL, @"");
+ 
+-#ifdef HAVE_LANGINFO_H
++#ifdef HAVE_LANGINFO_CODESET
+   /* Time/Date Information */
+   arr = [NSMutableArray arrayWithCapacity: 7];
+   for (i = 0; i < 7; i++)
+@@ -162,7 +162,7 @@
+ 	   forKey: NSShortDateFormatString];
+   [dict setObject: GSLanginfo(T_FMT)
+ 	   forKey: NSTimeFormatString];
+-#endif /* HAVE_LANGINFO_H */
++#endif /* HAVE_LANGINFO_CODESET */
+ 
+   lconv = localeconv();
+ 
