@@ -23,12 +23,18 @@ for patch in "${ROOT_DIR}"/patches/${PROJECT}-*.patch; do
   fi
 done
 
+# copy user config file
+mkdir -p "${INSTALL_PREFIX}"/etc/GNUstep
+GNUSTEP_USER_CONFIG_FILE="${INSTALL_PREFIX}"/etc/GNUstep/GNUstep-user.conf
+cp "${ROOT_DIR}"/patches/gnustep-make-user.config "${GNUSTEP_USER_CONFIG_FILE}"
+
 echo -e "\n### Running configure"
 ./configure \
   --host=${ANDROID_TARGET} \
   --prefix="${INSTALL_PREFIX}" \
   --with-library-combo=ng-gnu-gnu \
   --with-layout=fhs \
+  --with-user-config-file="${GNUSTEP_USER_CONFIG_FILE}" \
   --enable-objc-arc \
   --enable-native-objc-exceptions
 

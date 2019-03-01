@@ -25,9 +25,6 @@ export INSTALL_PREFIX=${ANDROID_ROOT}/GNUstep
 export SYSTEM_LIBRARY_DIR=${INSTALL_PREFIX}/lib
 export SYSTEM_HEADERS_DIR=${INSTALL_PREFIX}/include
 
-# GNUstep
-export RUNTIME_VERSION=gnustep-2.0
-
 # Target
 export HOST_TAG=darwin-x86_64
 export ABI_NAME=armeabi-v7a
