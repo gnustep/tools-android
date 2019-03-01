@@ -9,7 +9,7 @@ As a general goal, the project aims to use the most recent versions of the inclu
 * Blocks
 * Synthesised property accessors
 
-The toolchain is built using the compiler and tools provided by the standard Android SDK and NDK (installed e.g. via [Android Studio](https://developer.android.com/studio)).
+The toolchain is built using the compiler and tools provided by the standard Android SDK and NDK (installed e.g. via [Android Studio](https://developer.android.com/studio)). It is currently set up to target `armeabi-v7a` and Android API level 21 (5.0 / Lollipop).
 
 ## Libraries
 
@@ -35,11 +35,9 @@ The following options need to be installed via the Android SDK Manager (e.g. via
 
 ## Usage
 
-To build the toolchain simply run the [build.sh](build.sh) script.
+Run the [build.sh](build.sh) script to build the toolchain. It is installed into `~/Library/Android/GNUstep`.
 
-The toolchain is placed in `~/Library/Android/GNUstep`.
-
-To use the toolchain from an Android project, you can source `~/Library/Android/GNUstep/etc/makeenv.conf` set various environment variables for building. Most notably, this defines `$GSCONFIG` for calling _gnustep-config_ to obtain various flags that should be used to compile and link Objective-C files, e.g.
+To use the toolchain from an Android project, you can source `~/Library/Android/GNUstep/etc/makeenv.conf` to set various environment variables for building. Most notably, this defines `$GSCONFIG` for calling _gnustep-config_ to obtain various flags that should be used to compile and link Objective-C files, e.g.
 
 * `$GSCONFIG --variable=CC`
 * `$GSCONFIG --variable=LDFLAGS`
@@ -47,3 +45,13 @@ To use the toolchain from an Android project, you can source `~/Library/Android/
 * `$GSCONFIG --base-libs`
 
 Call `$GSCONFIG --help` to obtain the full list of available variables.
+
+## Future work
+
+The following is an (incomplete) list of open work items:
+
+* Add [libxml2](https://github.com/GNOME/libxml2) for GNUstep Base
+* Add [libxlst](https://github.com/GNOME/libxslt) for GNUstep Base
+* Add [libffi](https://github.com/libffi/libffi) for GNUstep Base
+* Add support for arm64 architecture
+* Add support for x86 architecture
