@@ -1,12 +1,17 @@
+Disable Tools subproject.
+
+This currently won't compile for Android due to errors in gdomap.c.
+
 diff --git a/GNUmakefile b/GNUmakefile
-index cb49c52aa..c17cde533 100644
+index cb49c52aa..73cf3b786 100644
 --- a/GNUmakefile
 +++ b/GNUmakefile
-@@ -71,7 +71,6 @@ _have_makefiles := $(shell test -f config.mak -o -f base.make && echo yes)
+@@ -71,7 +71,7 @@ _have_makefiles := $(shell test -f config.mak -o -f base.make && echo yes)
  #
  ifeq ($(_have_makefiles),yes)
  SUBPROJECTS = Source
 -SUBPROJECTS += Tools NSTimeZones Resources Tests
++SUBPROJECTS += NSTimeZones Resources Tests
  endif
  
  -include Makefile.preamble
