@@ -37,6 +37,7 @@ ${CMAKE} \
   -DANDROID_ABI=${ABI_NAME} \
   -DANDROID_NDK=${ANDROID_NDK_HOME} \
   -DANDROID_NATIVE_API_LEVEL=${ANDROID_API_LEVEL} \
+  -DOLDABI_COMPAT=false `# we're using gnustep-2.0 ABI, which may not be mixed with earlier versions'` \
   -DGNUSTEP_CONFIG= `# prevent cmake from finding gnustep-config in install root` \
   -DCMAKE_C_FLAGS="-DDEBUG_EXCEPTIONS=1" `# debug exception throwing`
 
