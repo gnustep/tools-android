@@ -26,7 +26,7 @@ done
 echo -e "\n### Running configure"
 ./configure \
   --host=${ANDROID_TARGET} \
-  --prefix="${ANDROID_GNUSTEP_INSTALL_ROOT}" \
+  --prefix="${INSTALL_PREFIX}" \
   --with-library-combo=ng-gnu-gnu \
   --with-layout=fhs \
   --enable-objc-arc \

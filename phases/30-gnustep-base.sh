@@ -11,7 +11,7 @@ export ROOT_DIR=`pwd`
 . "${ROOT_DIR}"/env/toolchain.sh
 
 echo "### Source GNUstep.sh"
-. "${ANDROID_GNUSTEP_INSTALL_ROOT}"/share/GNUstep/Makefiles/GNUstep.sh
+. "${INSTALL_PREFIX}"/share/GNUstep/Makefiles/GNUstep.sh
 
 echo -e "\n### Cloning project"
 cd "${SRCROOT}"
