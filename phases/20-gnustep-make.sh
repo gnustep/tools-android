@@ -26,7 +26,7 @@ done
 # copy user config file
 mkdir -p "${INSTALL_PREFIX}"/etc/GNUstep
 GNUSTEP_USER_CONFIG_FILE="${INSTALL_PREFIX}"/etc/GNUstep/GNUstep-user.conf
-cp "${ROOT_DIR}"/patches/gnustep-make-user.config "${GNUSTEP_USER_CONFIG_FILE}"
+cp "${ROOT_DIR}"/config/gnustep-make-user.config "${GNUSTEP_USER_CONFIG_FILE}"
 
 echo -e "\n### Running configure"
 ./configure \

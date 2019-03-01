@@ -37,7 +37,7 @@ echo -e "\n### Running configure"
   --disable-xml \
   --disable-mixedabi \
   --disable-gdomap \
-  --with-cross-compilation-info=${ROOT_DIR}/patches/gnustep-base-cross.config
+  --with-cross-compilation-info=${ROOT_DIR}/config/gnustep-base-cross.config
 
 echo -e "\n### Building"
 # use -nopie to avoid ld error: https://lists.gnu.org/archive/html/discuss-gnustep/2015-09/msg00057.html
