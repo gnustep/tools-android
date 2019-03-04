@@ -30,5 +30,5 @@ export HOST_TAG=darwin-x86_64
 export ABI_NAME=armeabi-v7a
 export ANDROID_API_LEVEL=21
 export ANDROID_TARGET=armv7a-linux-androideabi
-export BUILD_TYPE=Release
 export ANDROID_TARGET_BINUTILS=arm-linux-androideabi
+export BUILD_TYPE=Debug
