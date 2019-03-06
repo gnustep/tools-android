@@ -31,6 +31,7 @@ echo -e "\n### Running configure"
   --host=${ANDROID_TARGET} \
   --enable-nxconstantstring \
   --enable-pass-arguments `# disable fake main function and require calling of GSInitializeProcess() instead'` \
+  --enable-libdispatch \
   --disable-invocations \
   --disable-iconv \
   --disable-tls \
