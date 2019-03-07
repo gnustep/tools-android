@@ -1,0 +1,17 @@
+Disable deprecated KVC compatibility.
+
+This should not be used by projects any longer and will speed up KVC.
+
+diff --git a/Source/NSKeyValueCoding.m b/Source/NSKeyValueCoding.m
+index 0713f51f4..7e39bf524 100644
+--- a/Source/NSKeyValueCoding.m
++++ b/Source/NSKeyValueCoding.m
+@@ -49,7 +49,7 @@
+ 
+ 
+ /* this should move into autoconf once it's accepted */
+-#define WANT_DEPRECATED_KVC_COMPAT 1
++#define WANT_DEPRECATED_KVC_COMPAT 0
+ 
+ #ifdef WANT_DEPRECATED_KVC_COMPAT
+ 
