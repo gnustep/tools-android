@@ -1,15 +1,19 @@
-Add various includes from Apple CoreFoundation.h to Foundation.h
+Add various includes to Foundation.h
 
-This should more closely match the resulting includes on Apple platforms, as Apple's Foundation includes CoreFoundation.
+This should more closely match the resulting includes on Apple platforms.
 
 diff --git a/Headers/Foundation/Foundation.h b/Headers/Foundation/Foundation.h
-index b08ea58c8..a01724b39 100644
+index b08ea58c8..ba9b9d46b 100644
 --- a/Headers/Foundation/Foundation.h
 +++ b/Headers/Foundation/Foundation.h
-@@ -150,4 +150,29 @@
+@@ -150,4 +150,33 @@
  #import	<Foundation/NSXMLParser.h>
  #import	<Foundation/NSZone.h>
  
++// libdispatch
++
++#include <dispatch/dispatch.h>
++
 +// CoreFoundation.h
 +
 +#include <sys/types.h>
