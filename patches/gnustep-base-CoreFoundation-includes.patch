@@ -1,0 +1,38 @@
+Add various includes from Apple CoreFoundation.h to Foundation.h
+
+This should more closely match the resulting includes on Apple platforms, as Apple's Foundation includes CoreFoundation.
+
+diff --git a/Headers/Foundation/Foundation.h b/Headers/Foundation/Foundation.h
+index b08ea58c8..a01724b39 100644
+--- a/Headers/Foundation/Foundation.h
++++ b/Headers/Foundation/Foundation.h
+@@ -150,4 +150,29 @@
+ #import	<Foundation/NSXMLParser.h>
+ #import	<Foundation/NSZone.h>
+ 
++// CoreFoundation.h
++
++#include <sys/types.h>
++#include <stdarg.h>
++#include <assert.h>
++#include <ctype.h>
++#include <errno.h>
++#include <float.h>
++#include <limits.h>
++#include <locale.h>
++#include <math.h>
++#include <setjmp.h>
++#include <signal.h>
++#include <stddef.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <time.h>
++
++#include <inttypes.h>
++#include <stdbool.h>
++#include <stdint.h>
++
++#include <strings.h>
++
+ #endif /* __Foundation_h_GNUSTEP_BASE_INCLUDE */
