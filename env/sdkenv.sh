@@ -22,8 +22,6 @@ export NINJA=${ANDROID_CMAKE_ROOT}/bin/ninja
 # Directories
 export SRCROOT=${ROOT_DIR}/src
 export INSTALL_PREFIX=${ANDROID_ROOT}/GNUstep
-export SYSTEM_LIBRARY_DIR=${INSTALL_PREFIX}/lib
-export SYSTEM_HEADERS_DIR=${INSTALL_PREFIX}/include
 
 # Target
 export HOST_TAG=darwin-x86_64
