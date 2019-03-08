@@ -2,6 +2,7 @@ Fixed printf format macro for intptr_t arguments.
 
 Was using PRId64 instead of PRIdPTR, which would be incorrect when compiling for 32-bit.
 
+https://github.com/apple/swift-corelibs-libdispatch/pull/448
 diff --git a/src/semaphore.c b/src/semaphore.c
 index 5fea9426..738a3a50 100644
 --- a/src/semaphore.c
