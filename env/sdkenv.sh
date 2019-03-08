@@ -23,10 +23,10 @@ export NINJA=${ANDROID_CMAKE_ROOT}/bin/ninja
 export SRCROOT=${ROOT_DIR}/src
 export INSTALL_PREFIX=${ANDROID_ROOT}/GNUstep
 
-# Target
-export HOST_TAG=darwin-x86_64
-export ABI_NAME=armeabi-v7a
-export ANDROID_API_LEVEL=21
-export ANDROID_TARGET=armv7a-linux-androideabi
-export ANDROID_TARGET_BINUTILS=arm-linux-androideabi
-export BUILD_TYPE=Debug
+# Target (allow overrides)
+export HOST_TAG=${HOST_TAG:-darwin-x86_64}
+export ABI_NAME=${ABI_NAME:-armeabi-v7a}
+export ANDROID_API_LEVEL=${ANDROID_API_LEVEL:-21}
+export ANDROID_TARGET=${ANDROID_TARGET:-armv7a-linux-androideabi}
+export ANDROID_TARGET_BINUTILS=${ANDROID_TARGET_BINUTILS:-arm-linux-androideabi}
+export BUILD_TYPE=${BUILD_TYPE:-Debug}
