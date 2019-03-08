@@ -28,9 +28,15 @@ The following options need to be installed via the Android SDK Manager (e.g. via
 
 ## Usage
 
-Run the [build.sh](build.sh) script to build the toolchain. It is installed into `~/Library/Android/GNUstep`.
+Run the [build.sh](build.sh) script to build the toolchain:
 
-To use the toolchain from an Android project, you should use `~/Library/Android/GNUstep/bin/gnustep-config` to obtain various flags that should be used to compile and link Objective-C files, e.g.
+```
+./build.sh
+```
+
+The toolchain is installed into `~/Library/Android/GNUstep` (`$GNUSTEP_HOME`).
+
+To use the toolchain from an Android project, you can use `$GNUSTEP_HOME/bin/gnustep-config` to obtain various flags that should be used to compile and link Objective-C files, e.g.
 
 * `gnustep-config --variable=CC`
 * `gnustep-config --objc-flags` (or `--debug-flags`)
