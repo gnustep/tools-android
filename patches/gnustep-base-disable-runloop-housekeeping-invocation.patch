@@ -1,24 +1,20 @@
-Disabled housekeeping timer until we have libffi on Android.
-
-Otherwise causes crash due to NSInvocation requiring libffi/libcall.
-
 diff --git a/Source/NSRunLoop.m b/Source/NSRunLoop.m
-index 1746fa3d0..c85703bac 100644
+index 1746fa3d0..76f2ba7af 100644
 --- a/Source/NSRunLoop.m
 +++ b/Source/NSRunLoop.m
-@@ -744,6 +744,7 @@ + (NSRunLoop*) _runLoopForThread: (NSThread*) aThread
-   if (nil == current)
-     {
-       current = info->loop = [[self alloc] _init];
-+#if 0 // disabled housekeeping timer until we have libffi on Android
-       /* If this is the main thread, set up a housekeeping timer.
-        */
+@@ -749,6 +749,7 @@ + (NSRunLoop*) _runLoopForThread: (NSThread*) aThread
        if (nil != current && [GSCurrentThread() isMainThread] == YES)
-@@ -788,6 +789,7 @@ + (NSRunLoop*) _runLoopForThread: (NSThread*) aThread
-           #endif
-           [arp drain];
-         }
+         {
+           NSAutoreleasePool		*arp = [NSAutoreleasePool new];
++#if 0 // disabled housekeeping timer until we have libffi on Android
+           NSNotificationCenter	        *ctr;
+           NSNotification		*not;
+           NSInvocation		        *inv;
+@@ -774,6 +775,7 @@ + (NSRunLoop*) _runLoopForThread: (NSThread*) aThread
+                                            userInfo: nil
+                                             repeats: YES];
+           [current addTimer: timer forMode: NSDefaultRunLoopMode];
 +#endif
-     }
-   return current;
- }
+ 
+           #ifdef RL_INTEGRATE_DISPATCH
+           // We leak the queue drainer, because it's integral part of RL
