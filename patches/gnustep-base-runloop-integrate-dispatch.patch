@@ -1,0 +1,146 @@
+Integrate NSRunLoop with libdispatch main queue.
+
+This basically replaces using:
+dispatch_main_queue_drain_np()
+dispatch_get_main_queue_handle_np()
+
+with the new _4CF variants provided by the Swift libdispatch:
+_dispatch_main_queue_callback_4CF()
+_dispatch_get_main_queue_handle_4CF()
+
+Also fixes an Autoconf issue where passing --enable-libdispatch would disable it.
+
+diff --git a/Headers/GNUstepBase/config.h.in b/Headers/GNUstepBase/config.h.in
+index 390b53603..dbda58fe9 100644
+--- a/Headers/GNUstepBase/config.h.in
++++ b/Headers/GNUstepBase/config.h.in
+@@ -206,16 +206,9 @@
+ /* Define to 1 if you have the <dispatch/dispatch.h> header file. */
+ #undef HAVE_DISPATCH_DISPATCH_H
+ 
+-/* Define to 1 if you have the `dispatch_get_main_queue_handle_np' function.
+-   */
+-#undef HAVE_DISPATCH_GET_MAIN_QUEUE_HANDLE_NP
+-
+ /* Define to 1 if you have the <dispatch.h> header file. */
+ #undef HAVE_DISPATCH_H
+ 
+-/* Define to 1 if you have the `dispatch_main_queue_drain_np' function. */
+-#undef HAVE_DISPATCH_MAIN_QUEUE_DRAIN_NP
+-
+ /* Define to 1 if you have the `dladdr' function. */
+ #undef HAVE_DLADDR
+ 
+@@ -767,6 +760,14 @@
+ /* Define to 1 if you have the `_Block_copy' function. */
+ #undef HAVE__BLOCK_COPY
+ 
++/* Define to 1 if you have the `_dispatch_get_main_queue_handle_4CF' function.
++   */
++#undef HAVE__DISPATCH_GET_MAIN_QUEUE_HANDLE_4CF
++
++/* Define to 1 if you have the `_dispatch_main_queue_callback_4CF' function.
++   */
++#undef HAVE__DISPATCH_MAIN_QUEUE_CALLBACK_4CF
++
+ /* Define to 1 if you have the `__builtin_extract_return_address' function. */
+ #undef HAVE___BUILTIN_EXTRACT_RETURN_ADDRESS
+ 
+diff --git a/Source/NSRunLoop.m b/Source/NSRunLoop.m
+index 1746fa3d0..5c32a450b 100644
+--- a/Source/NSRunLoop.m
++++ b/Source/NSRunLoop.m
+@@ -62,12 +62,12 @@
+ #include <math.h>
+ #include <time.h>
+ 
+-#if HAVE_DISPATCH_GET_MAIN_QUEUE_HANDLE_NP && HAVE_DISPATCH_MAIN_QUEUE_DRAIN_NP
++#if HAVE__DISPATCH_GET_MAIN_QUEUE_HANDLE_4CF && HAVE__DISPATCH_MAIN_QUEUE_CALLBACK_4CF
+ #  define RL_INTEGRATE_DISPATCH 1
+ #  ifdef HAVE_DISPATCH_H
+ #    include <dispatch.h>
+ #  elif HAVE_DISPATCH_DISPATCH_H
+-#    include <dispatch/dispatch.h>
++#    include <dispatch/private.h>
+ #  endif
+ #endif
+ 
+@@ -398,7 +398,7 @@ + (void*) mainQueueFileDescriptor;
+ @implementation GSMainQueueDrainer
+ + (void*) mainQueueFileDescriptor
+ {
+-  return (void*)(uintptr_t)dispatch_get_main_queue_handle_np();
++  return (void*)_dispatch_get_main_queue_handle_4CF();
+ }
+ 
+ - (void) receivedEvent: (void*)data
+@@ -406,7 +406,7 @@ - (void) receivedEvent: (void*)data
+ 		             extra: (void*)extra
+ 	             forMode: (NSString*)mode
+ {
+-  dispatch_main_queue_drain_np();
++  _dispatch_main_queue_callback_4CF(NULL);
+ }
+ @end
+ #endif
+diff --git a/configure b/configure
+index 374193d8e..8b8c03fb3 100755
+--- a/configure
++++ b/configure
+@@ -12376,7 +12376,7 @@ fi
+ HAVE_LIBDISPATCH=0
+ # Check whether --enable-libdispatch was given.
+ if test "${enable_libdispatch+set}" = set; then :
+-  enableval=$enable_libdispatch; enable_libdispatch=no
++  enableval=$enable_libdispatch; enable_libdispatch=$enableval
+ else
+   enable_libdispatch=yes
+ fi
+@@ -12503,7 +12503,7 @@ HAVE_LIBDISPATCH_RUNLOOP=0
+ if test $HAVE_LIBDISPATCH = 1; then
+   # We check whether we have a variant of libdispatch that allows runloop
+   # integration
+-  for ac_func in dispatch_main_queue_drain_np dispatch_get_main_queue_handle_np
++  for ac_func in _dispatch_main_queue_callback_4CF _dispatch_get_main_queue_handle_4CF
+ do :
+   as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
+ ac_fn_c_check_func "$LINENO" "$ac_func" "$as_ac_var"
+@@ -12515,10 +12515,7 @@ _ACEOF
+ fi
+ done
+ 
+-  if test "$ac_cv_func_dispatch_main_queue_drain_np" = "no"; then
+-    HAVE_LIBDISPATCH_RUNLOOP=1
+-  fi
+-  if test "$ac_cv_func_dispatch_get_main_queue_handle_np" = "no"; then
++  if test "$ac_cv_func__dispatch_main_queue_callback_4CF" = "yes" && test "$ac_cv_func__dispatch_get_main_queue_handle_4CF" = "yes"; then
+     HAVE_LIBDISPATCH_RUNLOOP=1
+   fi
+ fi
+diff --git a/configure.ac b/configure.ac
+index 94f75c38a..e7e0e4c9e 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -3350,7 +3350,7 @@ AC_SUBST(HAVE_ICU)
+ HAVE_LIBDISPATCH=0
+ AC_ARG_ENABLE(libdispatch,
+   [  --disable-libdispatch		Disable dispatching blocks via libdispatch],
+-  enable_libdispatch=no,
++  enable_libdispatch=$enableval,
+   enable_libdispatch=yes)
+ 
+ if test $enable_libdispatch = yes; then
+@@ -3387,11 +3387,8 @@ HAVE_LIBDISPATCH_RUNLOOP=0
+ if test $HAVE_LIBDISPATCH = 1; then
+   # We check whether we have a variant of libdispatch that allows runloop
+   # integration
+-  AC_CHECK_FUNCS(dispatch_main_queue_drain_np dispatch_get_main_queue_handle_np)
+-  if test "$ac_cv_func_dispatch_main_queue_drain_np" = "no"; then
+-    HAVE_LIBDISPATCH_RUNLOOP=1
+-  fi
+-  if test "$ac_cv_func_dispatch_get_main_queue_handle_np" = "no"; then
++  AC_CHECK_FUNCS(_dispatch_main_queue_callback_4CF _dispatch_get_main_queue_handle_4CF)
++  if test "$ac_cv_func__dispatch_main_queue_callback_4CF" = "yes" && test "$ac_cv_func__dispatch_get_main_queue_handle_4CF" = "yes"; then
+     HAVE_LIBDISPATCH_RUNLOOP=1
+   fi
+ fi
