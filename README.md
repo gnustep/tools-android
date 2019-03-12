@@ -52,3 +52,7 @@ The following is an (incomplete) list of open work items:
 * Add [libxml2](https://github.com/GNOME/libxml2) for NSXMLParser support in GNUstep Base
 * Add support for arm64 architecture
 * Add support for x86 architecture
+
+## Acknowledgements
+
+Based on original work by Ivan Vučica.
