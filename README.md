@@ -48,6 +48,11 @@ To use the toolchain from an Android project, you can use `$GNUSTEP_HOME/bin/gnu
 
 Call `gnustep-config --help` to obtain the full list of available variables.
 
+Examples
+--------
+
+The [android-examples](https://github.com/gnustep/android-examples) repository contains example projects using this project.
+
 Future work
 -----------
 
