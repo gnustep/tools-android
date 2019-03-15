@@ -39,4 +39,4 @@ echo -e "\n### Running configure"
   --enable-native-objc-exceptions
 
 echo -e "\n### Installing"
-gnumake install
+${MAKE} install

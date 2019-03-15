@@ -42,7 +42,7 @@ echo -e "\n### Running configure"
 
 echo -e "\n### Building"
 # use -nopie to avoid ld error: https://lists.gnu.org/archive/html/discuss-gnustep/2015-09/msg00057.html
-gnumake LDFLAGS="${LDFLAGS} -nopie" -j8 debug=yes
+${MAKE} LDFLAGS="${LDFLAGS} -nopie" -j8 debug=yes
 
 echo -e "\n### Installing"
-gnumake install
+${MAKE} install
