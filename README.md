@@ -17,8 +17,6 @@ The toolchain currently compiles the following libraries for Android:
 Requirements
 ------------
 
-The project currently requires using macOS to compile the toolchain, but adapting it for other platforms should be relatively straightforward (contributions welcome).
-
 The following options need to be installed via the Android SDK Manager (e.g. via Android Studio):
 
 * Android 5.0 (Lollipop / API level 21) SDK Platform _– or other SDK Platform as specified in [sdkenv.sh](env/sdkenv.sh)_
@@ -28,6 +26,8 @@ The following options need to be installed via the Android SDK Manager (e.g. via
 * Android SDK Platform-Tools
 * Android SDK Tools
 * NDK
+
+Currently supported platforms are: macOS and Linux.  Other platforms to come.
 
 Usage
 -----
