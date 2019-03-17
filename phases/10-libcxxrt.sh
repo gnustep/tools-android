@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PROJECT=libobjc2
+PROJECT=libcxxrt
 
 set -e # make any subsequent failing command exit the script
 
@@ -12,7 +12,7 @@ export ROOT_DIR=`pwd`
 echo -e "\n### Cloning project"
 cd "${SRCROOT}"
 rm -rf ${PROJECT}
-git clone https://github.com/gnustep/libobjc2 ${PROJECT}
+git clone https://github.com/pathscale/libcxxrt.git ${PROJECT}
 cd ${PROJECT}
 
 for patch in "${ROOT_DIR}"/patches/${PROJECT}-*.patch; do
@@ -32,15 +32,10 @@ ${CMAKE} \
   -G"Ninja" \
   -DCMAKE_MAKE_PROGRAM=${NINJA} \
   -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
-  -DCMAKE_INSTALL_PREFIX="${INSTALL_PREFIX}" \
   -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE} \
   -DANDROID_ABI=${ABI_NAME} \
   -DANDROID_NDK=${ANDROID_NDK_HOME} \
   -DANDROID_PLATFORM=android-${ANDROID_API_LEVEL} \
-  -DGNUSTEP_CONFIG= `# prevent cmake from finding gnustep-config in install root` \
-  -DCMAKE_C_FLAGS="-DDEBUG_EXCEPTIONS=1" `# debug exception throwing` \
-  -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY="BOTH" \
-  -DCMAKE_LIBRARY_PATH="${INSTALL_PREFIX}"/lib \
 
 cd ${PROJECT}/build
 
@@ -48,4 +43,6 @@ echo -e "\n### Building"
 ${NINJA}
 
 echo -e "\n### Installing"
-${NINJA} install
+INSTALL_DIR="${INSTALL_PREFIX}/lib"
+mkdir -p "${INSTALL_PREFIX}/lib"
+cp "${SRCROOT}"/${PROJECT}/build/lib/libcxxrt.so ${INSTALL_DIR}
