@@ -1,0 +1,123 @@
+Various fixes for building libdispatch on Android.
+
+These have been submitted as separate PRs:
+https://github.com/apple/swift-corelibs-libdispatch/pull/448
+https://github.com/apple/swift-corelibs-libdispatch/pull/457
+https://github.com/apple/swift-corelibs-libdispatch/pull/458
+https://github.com/apple/swift-corelibs-libdispatch/pull/459
+diff --git a/private/CMakeLists.txt b/private/CMakeLists.txt
+index a2ee9bd..f77a92d 100644
+--- a/private/CMakeLists.txt
++++ b/private/CMakeLists.txt
+@@ -14,6 +14,8 @@ if (INSTALL_PRIVATE_HEADERS)
+             private.h
+             queue_private.h
+             source_private.h
++            time_private.h
++            workloop_private.h
+           DESTINATION
+             "${INSTALL_DISPATCH_HEADERS_DIR}")
+ endif()
+diff --git a/private/queue_private.h b/private/queue_private.h
+index 60ae96e..c162836 100644
+--- a/private/queue_private.h
++++ b/private/queue_private.h
+@@ -493,7 +493,7 @@ dispatch_async_enforce_qos_class_f(dispatch_queue_t queue,
+  * "detached" before the thread exits or the application will crash.
+  */
+ DISPATCH_EXPORT
+-void _dispatch_install_thread_detach_callback(void (*cb)(void));
++void _dispatch_install_thread_detach_callback(dispatch_function_t cb);
+ #endif
+ 
+ __END_DECLS
+diff --git a/src/internal.h b/src/internal.h
+index c5eff33..8a2a04c 100644
+--- a/src/internal.h
++++ b/src/internal.h
+@@ -463,6 +463,24 @@ DISPATCH_EXPORT DISPATCH_NOTHROW void dispatch_atfork_child(void);
+ 			TRASHIT((head)->tqh_last); \
+ 		} while (0)
+ 
++#ifndef TAILQ_CONCAT
++#define	TAILQ_CONCAT(head1, head2, field) do {				\
++	if (!TAILQ_EMPTY(head2)) {					\
++		*(head1)->tqh_last = (head2)->tqh_first;		\
++		(head2)->tqh_first->field.tqe_prev = (head1)->tqh_last;	\
++		(head1)->tqh_last = (head2)->tqh_last;			\
++		TAILQ_INIT((head2));					\
++	}								\
++} while (0)
++#endif
++
++#ifndef LIST_FOREACH_SAFE
++#define	LIST_FOREACH_SAFE(var, head, field, tvar)			\
++	for ((var) = LIST_FIRST((head));				\
++	    (var) && ((tvar) = LIST_NEXT((var), field), 1);		\
++	    (var) = (tvar))
++#endif
++
+ #define DISPATCH_MODE_STRICT    (1U << 0)
+ #define DISPATCH_MODE_NO_FAULTS (1U << 1)
+ extern uint8_t _dispatch_mode;
+diff --git a/src/queue.c b/src/queue.c
+index 83aa8ec..aeccdba 100644
+--- a/src/queue.c
++++ b/src/queue.c
+@@ -571,7 +571,7 @@ dispatch_block_testcancel(dispatch_block_t db)
+ 	return (bool)(dbpd->dbpd_atomic_flags & DBF_CANCELED);
+ }
+ 
+-long
++intptr_t
+ dispatch_block_wait(dispatch_block_t db, dispatch_time_t timeout)
+ {
+ 	dispatch_block_private_data_t dbpd = _dispatch_block_get_data(db);
+@@ -617,7 +617,7 @@ dispatch_block_wait(dispatch_block_t db, dispatch_time_t timeout)
+ 				"run more than once and waited for");
+ 	}
+ 
+-	long ret = dispatch_group_wait(dbpd->dbpd_group, timeout);
++	intptr_t ret = dispatch_group_wait(dbpd->dbpd_group, timeout);
+ 
+ 	if (boost_th) {
+ 		_dispatch_thread_override_end(boost_th, dbpd);
+diff --git a/src/semaphore.c b/src/semaphore.c
+index 73acbe8..610f728 100644
+--- a/src/semaphore.c
++++ b/src/semaphore.c
+@@ -76,7 +76,7 @@ _dispatch_semaphore_debug(dispatch_object_t dou, char *buf, size_t bufsiz)
+ 			dsema->dsema_sema);
+ #endif
+ 	offset += dsnprintf(&buf[offset], bufsiz - offset,
+-			"value = %" PRId64 ", orig = %" PRId64 " }", dsema->dsema_value, dsema->dsema_orig);
++			"value = %ld, orig = %" PRIdPTR " }", dsema->dsema_value, dsema->dsema_orig);
+ 	return offset;
+ }
+ 
+diff --git a/src/shims/yield.h b/src/shims/yield.h
+index fc1b9fc..5b5f5df 100644
+--- a/src/shims/yield.h
++++ b/src/shims/yield.h
+@@ -148,7 +148,7 @@ void *_dispatch_wait_for_enqueuer(void **ptr);
+ #elif HAVE_PTHREAD_YIELD_NP
+ #define _dispatch_preemption_yield(n) { (void)n; pthread_yield_np(); }
+ #define _dispatch_preemption_yield_to(th, n) { (void)n; pthread_yield_np(); }
+-#elif defined(_WIN32)
++#elif defined(_WIN32) || defined (__ANDROID__)
+ #define _dispatch_preemption_yield(n) { (void)n; sched_yield(); }
+ #define _dispatch_preemption_yield_to(th, n) { (void)n; sched_yield(); }
+ #else 
+diff --git a/src/source.c b/src/source.c
+index 9335484..1010da1 100644
+--- a/src/source.c
++++ b/src/source.c
+@@ -197,7 +197,7 @@ dispatch_source_get_extended_data(dispatch_source_t ds,
+ }
+ 
+ void
+-dispatch_source_merge_data(dispatch_source_t ds, unsigned long val)
++dispatch_source_merge_data(dispatch_source_t ds, uintptr_t val)
+ {
+ 	dispatch_queue_flags_t dqf = _dispatch_queue_atomic_flags(ds);
+ 	dispatch_source_refs_t dr = ds->ds_refs;
