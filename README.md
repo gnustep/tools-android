@@ -58,7 +58,6 @@ Future work
 
 The following is an (incomplete) list of open work items:
 
-* Add [libffi](https://github.com/libffi/libffi) for NSInvocation support in GNUstep Base
 * Add [libxml2](https://github.com/GNOME/libxml2) for NSXMLParser support in GNUstep Base
 * Add support for arm64 architecture
 * Add support for x86 architecture
