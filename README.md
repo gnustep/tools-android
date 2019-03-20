@@ -38,7 +38,10 @@ Run the [build.sh](build.sh) script to build the toolchain:
 ./build.sh
 ```
 
-The toolchain is installed into `~/Library/Android/GNUstep` (`$GNUSTEP_HOME`).
+The toolchain is installed into the following location (`$GNUSTEP_HOME`):
+
+* macOS: `~/Library/Android/GNUstep`
+* Linux: `~/Android/GNUstep`
 
 To use the toolchain from an Android project, you can use `$GNUSTEP_HOME/bin/gnustep-config` to obtain various flags that should be used to compile and link Objective-C files, e.g.
 
