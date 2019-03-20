@@ -13,6 +13,10 @@ The toolchain currently compiles the following libraries for Android:
 * [GNUstep Base Library](https://github.com/gnustep/libs-base)
 * [libobjc2](https://github.com/gnustep/libobjc2)
 * [libdispatch](https://github.com/apple/swift-corelibs-libdispatch) (official Apple release from the Swift Core Libraries)
+* [libcxxrt](https://github.com/pathscale/libcxxrt) (for Objective-C++ exception support)
+* [libffi](https://github.com/libffi/libffi)
+* [libxml2](https://github.com/GNOME/libxml2)
+* [libxslt](https://github.com/GNOME/libxslt)
 
 Requirements
 ------------
