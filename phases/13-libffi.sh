@@ -30,13 +30,10 @@ echo -e "\n### Running configure"
 ./configure \
   --host=${ANDROID_TARGET} \
   --prefix="${INSTALL_PREFIX}" \
+  --disable-shared \
 
 echo -e "\n### Building"
 make
 
 echo -e "\n### Installing"
-# install headers
-make install-data
-# install library manually, as `make install` will try to install non-existant libffi.so
-mkdir -p "${INSTALL_PREFIX}"/lib
-cp */.libs/libffi.a ${INSTALL_PREFIX}/lib
+make install
