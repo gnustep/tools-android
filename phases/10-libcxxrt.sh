@@ -18,7 +18,7 @@ cd ${PROJECT}
 for patch in "${ROOT_DIR}"/patches/${PROJECT}-*.patch; do
   if [ -f $patch ] ; then
     echo -e "\n### Applying `basename "$patch"`"
-    patch -p1 < "$patch"
+    patch -p1 --forward < "$patch" || [ $? -eq 1 ]
   fi
 done
 
