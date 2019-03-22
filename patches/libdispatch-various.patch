@@ -1,87 +1,24 @@
 Various fixes for building libdispatch on Android.
 
 These have been submitted as separate PRs:
-https://github.com/apple/swift-corelibs-libdispatch/pull/458
-https://github.com/apple/swift-corelibs-libdispatch/pull/459
-diff --git a/src/internal.h b/src/internal.h
-index 29e451e..92142fb 100644
---- a/src/internal.h
-+++ b/src/internal.h
-@@ -269,12 +269,12 @@ upcast(dispatch_object_t dou)
- #if defined(_WIN32)
- #include <time.h>
+https://github.com/apple/swift-corelibs-libdispatch/pull/465
+diff --git a/src/queue.c b/src/queue.c
+index 44cb655..90f3cfa 100644
+--- a/src/queue.c
++++ b/src/queue.c
+@@ -7296,7 +7296,6 @@ libdispatch_init(void)
+ #include <sys/syscall.h>
+ #endif
+ 
+-#ifndef __ANDROID__
+ #ifdef SYS_gettid
+ DISPATCH_ALWAYS_INLINE
+ static inline pid_t
+@@ -7321,7 +7320,6 @@ _gettid(void)
  #else
--#include <sys/queue.h>
- #include <sys/mount.h>
- #ifdef __ANDROID__
- #include <linux/sysctl.h>
- #else
- #include <sys/sysctl.h>
-+#include <sys/queue.h>
- #endif /* __ANDROID__ */
- #include <sys/socket.h>
- #include <sys/time.h>
-diff --git a/src/shims.h b/src/shims.h
-index ea5e098..22aa486 100644
---- a/src/shims.h
-+++ b/src/shims.h
-@@ -31,9 +31,12 @@
- #include <pthread.h>
- #else // defined(_WIN32)
- #include "shims/generic_win_stubs.h"
--#include "shims/generic_sys_queue.h"
- #endif // defined(_WIN32)
+ #error "SYS_gettid unavailable on this system"
+ #endif /* SYS_gettid */
+-#endif /* ! __ANDROID__ */
  
-+#if defined(_WIN32) || defined(__ANDROID__)
-+#include "shims/generic_sys_queue.h"
-+#endif
-+
- #ifdef __ANDROID__
- #include "shims/android_stubs.h"
- #endif // __ANDROID__
-diff --git a/src/shims/generic_sys_queue.h b/src/shims/generic_sys_queue.h
-index c6c6587..fd4ac1d 100644
---- a/src/shims/generic_sys_queue.h
-+++ b/src/shims/generic_sys_queue.h
-@@ -110,6 +110,8 @@
- 		struct type *le_prev; \
- 	}
- 
-+#define	LIST_EMPTY(head) ((head)->lh_first == NULL)
-+
- #define LIST_FIRST(head) ((head)->lh_first)
- 
- #define LIST_FOREACH(var, head, field) \
-@@ -117,6 +119,15 @@
- 		(var); \
- 		(var) = LIST_NEXT((var), field))
- 
-+#define	LIST_FOREACH_SAFE(var, head, field, tvar) \
-+	for ((var) = LIST_FIRST((head)); \
-+		(var) && ((tvar) = LIST_NEXT((var), field), 1); \
-+		(var) = (tvar))
-+
-+#define	LIST_INIT(head) do { \
-+	LIST_FIRST((head)) = NULL; \
-+} while (0)
-+
- #define LIST_NEXT(elm, field) ((elm)->field.le_next)
- 
- #define LIST_REMOVE(elm, field) do { \
-diff --git a/src/shims/yield.h b/src/shims/yield.h
-index 7e599cb..53eb800 100644
---- a/src/shims/yield.h
-+++ b/src/shims/yield.h
-@@ -156,9 +156,9 @@ void *_dispatch_wait_for_enqueuer(void **ptr);
- #elif defined(_WIN32)
- #define _dispatch_preemption_yield(n) { (void)n; Sleep(0); }
- #define _dispatch_preemption_yield_to(th, n) { (void)n; Sleep(0); }
--#else 
--#define _dispatch_preemption_yield(n) { (void)n; pthread_yield(); }
--#define _dispatch_preemption_yield_to(th, n) { (void)n; pthread_yield(); }
-+#else
-+#define _dispatch_preemption_yield(n) { (void)n; sched_yield(); }
-+#define _dispatch_preemption_yield_to(th, n) { (void)n; sched_yield(); }
- #endif // HAVE_MACH
- 
- #pragma mark -
+ #define _tsd_call_cleanup(k, f)  do { \
+ 		if ((f) && tsd->k) ((void(*)(void*))(f))(tsd->k); \
