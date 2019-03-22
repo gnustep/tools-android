@@ -23,8 +23,9 @@ for PHASE in "${ROOT_DIR}"/phases/[0-9][0-9]-*.sh; do
   echo -e "\n###### ${PHASE_NAME} ######"
   
   ${PHASE}
+  PHASE_RESULT=$?
   
-  if [ $? -ne 0 ]; then
+  if [ $PHASE_RESULT -ne 0 ]; then
     echo -e "\n### phases/`basename $PHASE` failed"
     
     if [ -d "${INSTALL_PREFIX}.bak" ]; then
@@ -33,7 +34,7 @@ for PHASE in "${ROOT_DIR}"/phases/[0-9][0-9]-*.sh; do
       echo "The previous toolchain build has been restored."
     fi
     
-    exit $?
+    exit $PHASE_RESULT
   fi
 done
 
