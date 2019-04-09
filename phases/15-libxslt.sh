@@ -32,6 +32,7 @@ echo -e "\n### Running configure"
   --prefix="${INSTALL_PREFIX}" \
   --with-libxml-prefix="${INSTALL_PREFIX}" \
   --disable-shared \
+  --without-crypto \
   CFLAGS="${CFLAGS} -fPIC" `# required to remove unsupported text relocations` \
 
 echo -e "\n### Building"
