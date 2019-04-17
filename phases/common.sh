@@ -26,10 +26,15 @@ prepare_project () {
     git pull
   fi
 
+  REV=`git rev-parse HEAD`
+  echo -e "${PROJECT}\t${REV}" >> "${BUILD_TXT}"
+
   for patch in "${ROOT_DIR}"/patches/${PROJECT}-*.patch; do
     if [ -f $patch ] ; then
-      echo -e "\n### Applying `basename "$patch"`"
+      patch_name=`basename "$patch"`
+      echo -e "\n### Applying $patch_name"
       patch -p1 --forward < "$patch" || [ $? -eq 1 ]
+      echo -e "- $patch_name" >> "${BUILD_TXT}"
     fi
   done
 }

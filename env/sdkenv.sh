@@ -27,6 +27,7 @@ export NINJA=${ANDROID_CMAKE_ROOT}/bin/ninja
 # Directories
 export SRCROOT=${ROOT_DIR}/src
 export INSTALL_PREFIX=${ANDROID_ROOT}/GNUstep
+export BUILD_TXT=${INSTALL_PREFIX}/build.txt
 
 # Target (allow overrides)
 if [[ "$OSTYPE" == "linux-gnu" ]]; then
