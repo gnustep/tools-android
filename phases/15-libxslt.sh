@@ -1,27 +1,15 @@
 #!/bin/bash
 
-PROJECT=libxslt
-
 set -e # make any subsequent failing command exit the script
 
 cd `dirname $0`/..
 export ROOT_DIR=`pwd`
 
-. "${ROOT_DIR}"/env/sdkenv.sh
+. `dirname $0`/common.sh
+
+prepare_project "libxslt" "https://github.com/GNOME/libxslt.git"
+
 . "${ROOT_DIR}"/env/toolchain.sh
-
-echo -e "\n### Cloning project"
-cd "${SRCROOT}"
-rm -rf ${PROJECT}
-git clone https://github.com/GNOME/libxslt.git ${PROJECT}
-cd ${PROJECT}
-
-for patch in "${ROOT_DIR}"/patches/${PROJECT}-*.patch; do
-  if [ -f $patch ] ; then
-    echo -e "\n### Applying `basename "$patch"`"
-    patch -p1 --forward < "$patch" || [ $? -eq 1 ]
-  fi
-done
 
 echo -e "\n### Running autogen"
 NOCONFIGURE=1 ./autogen.sh
