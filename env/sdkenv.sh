@@ -1,47 +1,72 @@
 #!/bin/sh
 
-echo "### Setting SDK environment"
-
 # Host
 case "$OSTYPE" in
   darwin*)
-    export ANDROID_ROOT=${HOME}/Library/Android
-    export ANDROID_HOME=${ANDROID_ROOT}/sdk
-    export HOST_TAG=${HOST_TAG:-darwin-x86_64}
+    ANDROID_ROOT=${HOME}/Library/Android
+    ANDROID_HOME=${ANDROID_ROOT}/sdk
+    HOST_TAG=${HOST_TAG:-darwin-x86_64}
     ;;
   linux*)
-    export ANDROID_ROOT=${HOME}/Android
-    export ANDROID_HOME=${ANDROID_ROOT}/Sdk
-    export HOST_TAG=${HOST_TAG:-linux-x86_64}
+    ANDROID_ROOT=${HOME}/Android
+    ANDROID_HOME=${ANDROID_ROOT}/Sdk
+    HOST_TAG=${HOST_TAG:-linux-x86_64}
     ;;
   *)
     echo "Error: Unsupported OS \"$OSTYPE\"."
     exit 1
 esac
 
+# Target (allow overrides)
+ABI_NAMES=${ABI_NAMES:-armeabi-v7a arm64-v8a x86 x86_64}
+ABI_NAME=${ABI_NAME:-armeabi-v7a}
+ANDROID_API_LEVEL=${ANDROID_API_LEVEL:-21}
+BUILD_TYPE=${BUILD_TYPE:-Debug}
+
+# ABI-dependant properties
+case $ABI_NAME in
+  armeabi)
+    ANDROID_TARGET=arm-linux-androideabi
+    ;;
+  armeabi-v7a)
+    ANDROID_TARGET=armv7a-linux-androideabi
+    ANDROID_TARGET_BINUTILS=arm-linux-androideabi
+    ;;
+  arm64-v8a)
+    ANDROID_TARGET=aarch64-linux-android
+    ;;
+  x86)
+    ANDROID_TARGET=i686-linux-android
+    ;;
+  x86_64)
+    ANDROID_TARGET=x86_64-linux-android
+    ;;
+  *)
+    echo "Error: Unsupported ABI \"$ABI_NAME\"."
+    exit 1
+esac
+
+if [ -z "$ANDROID_TARGET_BINUTILS" ]; then
+  ANDROID_TARGET_BINUTILS=$ANDROID_TARGET
+fi
+
 # Directories
-export SRCROOT=${ROOT_DIR}/src
-export INSTALL_PREFIX=${ANDROID_ROOT}/GNUstep
-export BUILD_TXT=${INSTALL_PREFIX}/build.txt
+SRCROOT=${ROOT_DIR}/src
+INSTALL_ROOT=${ANDROID_ROOT}/GNUstep
+INSTALL_PREFIX=${INSTALL_ROOT}/${ABI_NAME}
+BUILD_TXT=${INSTALL_ROOT}/build.txt
 
 # Android SDK
-export ANDROID_NDK_HOME=${ANDROID_HOME}/ndk-bundle
-export ANDROID_SYSROOT=${ANDROID_NDK_HOME}/sysroot
-export ANDROID_INCLUDE=${ANDROID_SYSROOT}/usr/include
-export ANDROID_LIB=${ANDROID_SYSROOT}/usr/lib
-export ANDROID_CMAKE_ROOT=${ANDROID_HOME}/cmake/3.10.2.4988404
-export ANDROID_PLATFORM_TOOLS=${ANDROID_HOME}/platform-tools
+ANDROID_NDK_HOME=${ANDROID_HOME}/ndk-bundle
+ANDROID_SYSROOT=${ANDROID_NDK_HOME}/sysroot
+ANDROID_INCLUDE=${ANDROID_SYSROOT}/usr/include
+ANDROID_LIB=${ANDROID_SYSROOT}/usr/lib
+ANDROID_CMAKE_ROOT=${ANDROID_HOME}/cmake/3.10.2.4988404
+ANDROID_PLATFORM_TOOLS=${ANDROID_HOME}/platform-tools
 
 # CMake
-export CMAKE=${ANDROID_CMAKE_ROOT}/bin/cmake
-export CMAKE_TOOLCHAIN_FILE=${ANDROID_NDK_HOME}/build/cmake/android.toolchain.cmake
+CMAKE=${ANDROID_CMAKE_ROOT}/bin/cmake
+CMAKE_TOOLCHAIN_FILE=${ANDROID_NDK_HOME}/build/cmake/android.toolchain.cmake
 
 # Ninja
-export NINJA=${ANDROID_CMAKE_ROOT}/bin/ninja
-
-# Target (allow overrides)
-export ABI_NAME=${ABI_NAME:-armeabi-v7a}
-export ANDROID_API_LEVEL=${ANDROID_API_LEVEL:-21}
-export ANDROID_TARGET=${ANDROID_TARGET:-armv7a-linux-androideabi}
-export ANDROID_TARGET_BINUTILS=${ANDROID_TARGET_BINUTILS:-arm-linux-androideabi}
-export BUILD_TYPE=${BUILD_TYPE:-Debug}
+NINJA=${ANDROID_CMAKE_ROOT}/bin/ninja

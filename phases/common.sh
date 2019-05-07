@@ -18,26 +18,23 @@ prepare_project () {
 
   cd ${PROJECT}
 
-  if [ ! -n "$NO_CLEAN" ]; then
+  if [ "$NO_CLEAN" != true ]; then
     echo -e "\n### Cleaning project"
     git reset --hard
     git clean -qfdx
   fi
 
-  if [ ! -n "$NO_UPDATE" ]; then
+  if [ "$NO_UPDATE" != true ]; then
     echo -e "\n### Updating project"
     git pull
   fi
 
-  REV=`git rev-parse HEAD`
-  echo -e "${PROJECT}\t${REV}" >> "${BUILD_TXT}"
-
   for patch in "${ROOT_DIR}"/patches/${PROJECT}-*.patch; do
     if [ -f $patch ] ; then
-      patch_name=`basename "$patch"`
       echo -e "\n### Applying $patch_name"
       patch -p1 --forward < "$patch" || [ $? -eq 1 ]
-      echo -e "- $patch_name" >> "${BUILD_TXT}"
     fi
   done
+  
+  mkdir -p "${INSTALL_PREFIX}"
 }

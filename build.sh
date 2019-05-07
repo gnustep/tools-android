@@ -3,6 +3,8 @@
 cd `dirname $0`
 export ROOT_DIR=`pwd`
 
+. "${ROOT_DIR}"/env/sdkenv.sh
+
 # handle command-line options
 # adapted from https://stackoverflow.com/a/31024664/1534401
 while [[ $# > 0 ]]
@@ -11,18 +13,33 @@ do
   while [[ ${key+x} ]]
   do
     case $key in
+      -a|--abis)
+        export ABI_NAMES=$2
+        shift # option has parameter
+        ;;
+      -l|--level)
+        export ANDROID_API_LEVEL=$2
+        shift # option has parameter
+        ;;
+      -b|--build)
+        export BUILD_TYPE=$2
+        shift # option has parameter
+        ;;
       -u|--no-update)
         echo "### Not updating projects"
-        export NO_UPDATE=1
+        export NO_UPDATE=true
         ;;
-      -n|--no-clean)
+      -c|--no-clean)
         echo "### Not cleaning projects"
-        export NO_CLEAN=1
+        export NO_CLEAN=true
         ;;
       -h|--help)
         echo "Usage: $0"
-        echo -e "\t-u, --no-update\tDon't update projects to latest version from GitHub"
-        echo -e "\t-n, --no-clean\tDon't clean projects during build (e.g. for building local changes)"
+        echo -e "  -a, --abis ABI_NAMES    ABIs being targeted (default: \"${ABI_NAMES}\")"
+        echo -e "  -l, --level API_LEVEL   Android API level being targeted (default: ${ANDROID_API_LEVEL})"
+        echo -e "  -b, --build BUILD_TYPE  Build type \"Debug\" or \"Release\" (default: ${BUILD_TYPE})"
+        echo -e "  -u, --no-update         Don't update projects to latest version from GitHub"
+        echo -e "  -c, --no-clean          Don't clean projects during build (e.g. for building local changes, only applies to first ABI being built)"
         exit 0
         ;;
       *)
@@ -37,38 +54,76 @@ do
   shift # option(s) fully processed, proceed to next input argument
 done
 
-. "${ROOT_DIR}"/env/sdkenv.sh
+echo "### Build type: ${BUILD_TYPE}"
+echo "### ABIs: ${ABI_NAMES}"
+echo "### Android API level: ${ANDROID_API_LEVEL}"
+
+# keep backup of previous build if any
+if [ -d "${INSTALL_ROOT}" ]; then
+  rm -rf "${INSTALL_ROOT}.bak"
+  mv "${INSTALL_ROOT}" "${INSTALL_ROOT}.bak"
+fi
+
+# remove previous failed build if any
+rm -rf "${INSTALL_ROOT}.failed"
 
 mkdir -p "${SRCROOT}"
 
-# keep backup of previous build if any
-if [ -d "${INSTALL_PREFIX}" ]; then
-  mv "${INSTALL_PREFIX}" "${INSTALL_PREFIX}.bak"
-fi
-mkdir -p "${INSTALL_PREFIX}"
-
-# run phases
-for PHASE in "${ROOT_DIR}"/phases/[0-9][0-9]-*.sh; do
-  PHASE_NAME=`basename -s .sh $PHASE`
-  PHASE_NAME=${PHASE_NAME/[0-9][0-9]-/}
+# build toolchain for each ABI
+for ABI_NAME in $ABI_NAMES; do
+  echo -e "\n######## Building for ${ABI_NAME} ########"
   
-  echo -e "\n###### ${PHASE_NAME} ######"
-  
-  ${PHASE}
-  PHASE_RESULT=$?
-  
-  if [ $PHASE_RESULT -ne 0 ]; then
-    echo -e "\n### phases/`basename $PHASE` failed"
+  # run phases
+  for PHASE in "${ROOT_DIR}"/phases/[0-9][0-9]-*.sh; do
+    PHASE_NAME=`basename -s .sh $PHASE`
+    PHASE_NAME=${PHASE_NAME/[0-9][0-9]-/}
     
-    if [ -d "${INSTALL_PREFIX}.bak" ]; then
-      rm -rf "${INSTALL_PREFIX}"
-      mv "${INSTALL_PREFIX}.bak" "${INSTALL_PREFIX}"
-      echo "The previous toolchain build has been restored."
+    echo -e "\n###### ${PHASE_NAME} ######"
+    
+    # execute phase for ABI
+    ABI_NAME=$ABI_NAME ${PHASE}
+    PHASE_RESULT=$?
+  
+    if [ $PHASE_RESULT -ne 0 ]; then
+      echo -e "\n### phases/`basename $PHASE` failed"
+    
+      if [ -d "${INSTALL_ROOT}.bak" ]; then
+        mv "${INSTALL_ROOT}" "${INSTALL_ROOT}.failed"
+        mv "${INSTALL_ROOT}.bak" "${INSTALL_ROOT}"
+        echo -e "\nThe previous toolchain build has been restored. The failed build can be found at:\n${INSTALL_ROOT}.failed"
+      fi
+    
+      exit $PHASE_RESULT
     fi
-    
-    exit $PHASE_RESULT
-  fi
+  done
+  
+  # don't update projects for subsequent ABIs to avoid mismatching builds
+  export NO_UPDATE=true
+  
+  # always clean projects for subsequent ABIs
+  export NO_CLEAN=false
+  
+done
+
+# write build.txt
+echo "Build type: ${BUILD_TYPE}" >> "${BUILD_TXT}"
+echo "Android API level: ${ANDROID_API_LEVEL}" >> "${BUILD_TXT}"
+echo "" >> "${BUILD_TXT}"
+
+for src in "${SRCROOT}"/*; do
+  cd "${src}"
+  PROJECT=`basename "${src}"`
+  
+  project_rev=`git rev-parse HEAD`
+  echo -e "${PROJECT}\t${project_rev}" >> "${BUILD_TXT}"
+  
+  for patch in "${ROOT_DIR}"/patches/${PROJECT}-*.patch; do
+    if [ -f $patch ] ; then
+      patch_name=`basename "$patch"`
+      echo -e "- $patch_name" >> "${BUILD_TXT}"
+    fi
+  done
 done
 
 # remove backup if all went well
-rm -rf "${INSTALL_PREFIX}.bak"
+rm -rf "${INSTALL_ROOT}.bak"

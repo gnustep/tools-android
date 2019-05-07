@@ -3,7 +3,7 @@ GNUstep Android Toolchain
 
 This project comprises a collection of scripts to build a GNUstep toolchain for Android. The toolchain can then be used in an Android project to compile and run Objective-C code using the Foundation library.
 
-The toolchain is built using the compiler and tools provided by the standard Android SDK and NDK (installed e.g. via [Android Studio](https://developer.android.com/studio)). It is currently set up to target `armeabi-v7a` and Android API level 21 (5.0 / Lollipop).
+The toolchain is built using the compiler and tools provided by the standard Android SDK and NDK (installed e.g. via [Android Studio](https://developer.android.com/studio)). It is currently set up to target Android API level 21 (5.0 / Lollipop) and supports all common Android ABIs (armeabi-v7a, arm64-v8a, x86, x86_64).
 
 Libraries
 ---------
@@ -21,6 +21,8 @@ The toolchain currently compiles the following libraries for Android:
 Requirements
 ------------
 
+Supported host platforms are macOS and Linux.
+
 The following options need to be installed via the Android SDK Manager (e.g. via Android Studio):
 
 * Android 5.0 (Lollipop / API level 21) SDK Platform _– or other SDK Platform as specified in [sdkenv.sh](env/sdkenv.sh)_
@@ -31,15 +33,18 @@ The following options need to be installed via the Android SDK Manager (e.g. via
 * Android SDK Tools
 * NDK
 
-Currently supported platforms are: macOS and Linux.  Other platforms to come.
-
 Usage
 -----
 
 Run the [build.sh](build.sh) script to build the toolchain:
 
 ```
-./build.sh
+Usage: ./build.sh
+  -a, --abis ABI_NAMES    ABIs being targeted (default: "armeabi-v7a arm64-v8a x86 x86_64")
+  -l, --level API_LEVEL   Android API level being targeted (default: 21)
+  -b, --build BUILD_TYPE  Build type "Debug" or "Release" (default: Debug)
+  -u, --no-update         Don't update projects to latest version from GitHub
+  -c, --no-clean          Don't clean projects during build (e.g. for building local changes, only applies to first ABI being built)
 ```
 
 The toolchain is installed into the following location (`$GNUSTEP_HOME`):
@@ -47,7 +52,9 @@ The toolchain is installed into the following location (`$GNUSTEP_HOME`):
 * macOS: `~/Library/Android/GNUstep`
 * Linux: `~/Android/GNUstep`
 
-To use the toolchain from an Android project, you can use `$GNUSTEP_HOME/bin/gnustep-config` to obtain various flags that should be used to compile and link Objective-C files, e.g.
+The build for each supported ABI is installed into its separate subfolder at that location (both libraries and header files differ per ABI).
+
+To use the toolchain from an Android project, you can use `$GNUSTEP_HOME/$ABI_NAME/bin/gnustep-config` to obtain various flags that should be used to compile and link Objective-C files, e.g.
 
 * `gnustep-config --variable=CC`
 * `gnustep-config --objc-flags` (or `--debug-flags`)
@@ -59,14 +66,6 @@ Examples
 --------
 
 The [android-examples](https://github.com/gnustep/android-examples) repository contains example projects using this project.
-
-Future work
------------
-
-The following is an (incomplete) list of open work items:
-
-* Add support for arm64 architecture
-* Add support for x86 architecture
 
 Acknowledgements
 ----------------
