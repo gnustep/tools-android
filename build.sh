@@ -35,11 +35,12 @@ do
         ;;
       -h|--help)
         echo "Usage: $0"
-        echo -e "  -a, --abis ABI_NAMES    ABIs being targeted (default: \"${ABI_NAMES}\")"
-        echo -e "  -l, --level API_LEVEL   Android API level being targeted (default: ${ANDROID_API_LEVEL})"
-        echo -e "  -b, --build BUILD_TYPE  Build type \"Debug\" or \"Release\" (default: ${BUILD_TYPE})"
-        echo -e "  -u, --no-update         Don't update projects to latest version from GitHub"
-        echo -e "  -c, --no-clean          Don't clean projects during build (e.g. for building local changes, only applies to first ABI being built)"
+        echo "  -a, --abis ABI_NAMES    ABIs being targeted (default: \"${ABI_NAMES}\")"
+        echo "  -l, --level API_LEVEL   Android API level being targeted (default: ${ANDROID_API_LEVEL})"
+        echo "  -b, --build BUILD_TYPE  Build type \"Debug\" or \"Release\" (default: ${BUILD_TYPE})"
+        echo "  -u, --no-update         Don't update projects to latest version from GitHub"
+        echo "  -c, --no-clean          Don't clean projects during build (e.g. for building local changes, only applies to first ABI being built)"
+        echo "  -h, --help              Print usage information and exit"
         exit 0
         ;;
       *)

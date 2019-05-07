@@ -25,7 +25,7 @@ Supported host platforms are macOS and Linux.
 
 The following options need to be installed via the Android SDK Manager (e.g. via Android Studio):
 
-* Android 5.0 (Lollipop / API level 21) SDK Platform _– or other SDK Platform as specified in [sdkenv.sh](env/sdkenv.sh)_
+* Android 5.0 (Lollipop / API level 21) SDK Platform _– or other SDK Platform as specified using `--level` option_
 * Android SDK Build-Tools
 * LLDB
 * CMake _– version 3.10.2.4988404 as specified in [sdkenv.sh](env/sdkenv.sh)_
