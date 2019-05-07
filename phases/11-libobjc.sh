@@ -2,9 +2,6 @@
 
 set -e # make any subsequent failing command exit the script
 
-cd `dirname $0`/..
-export ROOT_DIR=`pwd`
-
 . `dirname $0`/common.sh
 
 prepare_project "libobjc2" "https://github.com/gnustep/libobjc2.git"

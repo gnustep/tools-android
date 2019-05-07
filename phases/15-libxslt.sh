@@ -2,9 +2,6 @@
 
 set -e # make any subsequent failing command exit the script
 
-cd `dirname $0`/..
-export ROOT_DIR=`pwd`
-
 . `dirname $0`/common.sh
 
 prepare_project "libxslt" "https://github.com/GNOME/libxslt.git"

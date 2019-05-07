@@ -1,5 +1,8 @@
 #!/bin/bash
 
+cd `dirname $0`/..
+export ROOT_DIR=`pwd`
+
 . "${ROOT_DIR}"/env/sdkenv.sh
 
 prepare_project () {
