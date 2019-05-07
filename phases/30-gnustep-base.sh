@@ -25,7 +25,7 @@ echo -e "\n### Running configure"
 
 echo -e "\n### Building"
 # use -nopie to avoid ld error: https://lists.gnu.org/archive/html/discuss-gnustep/2015-09/msg00057.html
-${MAKE} LDFLAGS="${LDFLAGS} -nopie -static-libstdc++" -j8 debug=yes
+make LDFLAGS="${LDFLAGS} -nopie -static-libstdc++" -j8 debug=yes
 
 echo -e "\n### Installing"
-${MAKE} install
+make install

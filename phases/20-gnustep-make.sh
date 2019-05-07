@@ -24,4 +24,4 @@ echo -e "\n### Running configure"
   --enable-native-objc-exceptions
 
 echo -e "\n### Installing"
-${MAKE} install
+make install
