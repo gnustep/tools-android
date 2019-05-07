@@ -45,6 +45,7 @@ Usage: ./build.sh
   -b, --build BUILD_TYPE  Build type "Debug" or "Release" (default: Debug)
   -u, --no-update         Don't update projects to latest version from GitHub
   -c, --no-clean          Don't clean projects during build (e.g. for building local changes, only applies to first ABI being built)
+  -h, --help              Print usage information and exit
 ```
 
 The toolchain is installed into the following location (`$GNUSTEP_HOME`):
