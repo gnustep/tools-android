@@ -31,6 +31,7 @@ prepare_project () {
 
   for patch in "${ROOT_DIR}"/patches/${PROJECT}-*.patch; do
     if [ -f $patch ] ; then
+      patch_name=`basename "$patch"`
       echo -e "\n### Applying $patch_name"
       patch -p1 --forward < "$patch" || [ $? -eq 1 ]
     fi
