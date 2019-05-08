@@ -29,13 +29,15 @@ prepare_project () {
     git pull
   fi
 
-  for patch in "${ROOT_DIR}"/patches/${PROJECT}-*.patch; do
-    if [ -f $patch ] ; then
-      patch_name=`basename "$patch"`
-      echo -e "\n### Applying $patch_name"
-      patch -p1 --forward < "$patch" || [ $? -eq 1 ]
-    fi
-  done
+  if [ "$NO_PATCHES" != true ]; then
+    for patch in "${ROOT_DIR}"/patches/${PROJECT}-*.patch; do
+      if [ -f $patch ] ; then
+        patch_name=`basename "$patch"`
+        echo -e "\n### Applying $patch_name"
+        patch -p1 --forward < "$patch" || [ $? -eq 1 ]
+      fi
+    done
+  fi
   
   mkdir -p "${INSTALL_PREFIX}"
 }
