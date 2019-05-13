@@ -42,7 +42,7 @@ prepare_project () {
   fi
 
   if [ "$NO_PATCHES" != true ]; then
-    for patch in "${ROOT_DIR}"/patches/${PROJECT}-*.patch; do
+    for patch in {"${ROOT_DIR}"/patches,${ADDITIONAL_PATCHES}}/${PROJECT}-*.patch; do
       if [ -f $patch ] ; then
         patch_name=`basename "$patch"`
         echo -e "\n### Applying $patch_name"
