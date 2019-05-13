@@ -11,6 +11,7 @@ Libraries
 The toolchain currently compiles the following libraries for Android:
 
 * [GNUstep Base Library](https://github.com/gnustep/libs-base) (with some [patches](patches))
+* [GNUstep CoreBase Library](https://github.com/gnustep/libs-corebase)
 * [libobjc2](https://github.com/gnustep/libobjc2) (using gnustep-1.9 runtime)
 * [libdispatch](https://github.com/apple/swift-corelibs-libdispatch) (official Apple release from the Swift Core Libraries)
 * [libcxxrt](https://github.com/pathscale/libcxxrt) (for Objective-C++ exception support)
