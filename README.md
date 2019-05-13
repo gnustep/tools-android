@@ -17,6 +17,7 @@ The toolchain currently compiles the following libraries for Android:
 * [libffi](https://github.com/libffi/libffi)
 * [libxml2](https://github.com/GNOME/libxml2)
 * [libxslt](https://github.com/GNOME/libxslt)
+* [ICU](https://github.com/unicode-org/icu)
 
 Requirements
 ------------

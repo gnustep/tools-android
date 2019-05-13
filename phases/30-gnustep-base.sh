@@ -18,7 +18,6 @@ echo -e "\n### Running configure"
   --enable-pass-arguments `# disable fake main function and require calling of GSInitializeProcess() instead'` \
   --disable-iconv \
   --disable-tls \
-  --disable-icu \
   --disable-mixedabi \
   --disable-gdomap \
   --with-cross-compilation-info=${ROOT_DIR}/config/gnustep-base-cross.config
