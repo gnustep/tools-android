@@ -73,55 +73,61 @@ mkdir -p "${SRCROOT}"
 # build toolchain for each ABI
 for ABI_NAME in $ABI_NAMES; do
   echo -e "\n######## Building for ${ABI_NAME} ########"
-  
+
   # run phases
   for PHASE in "${ROOT_DIR}"/phases/[0-9][0-9]-*.sh; do
     PHASE_NAME=`basename -s .sh $PHASE`
     PHASE_NAME=${PHASE_NAME/[0-9][0-9]-/}
-    
+
     echo -e "\n###### ${PHASE_NAME} ######"
-    
+
     # execute phase for ABI
     ABI_NAME=$ABI_NAME ${PHASE}
     PHASE_RESULT=$?
-  
+
     if [ $PHASE_RESULT -ne 0 ]; then
       echo -e "\n### phases/`basename $PHASE` failed"
-    
+
       if [ -d "${INSTALL_ROOT}.bak" ]; then
         mv "${INSTALL_ROOT}" "${INSTALL_ROOT}.failed"
         mv "${INSTALL_ROOT}.bak" "${INSTALL_ROOT}"
         echo -e "\nThe previous toolchain build has been restored. The failed build can be found at:\n${INSTALL_ROOT}.failed"
       fi
-    
+
       exit $PHASE_RESULT
     fi
   done
-  
+
   # don't update projects for subsequent ABIs to avoid mismatching builds
   export NO_UPDATE=true
-  
+
   # always clean projects for subsequent ABIs
   export NO_CLEAN=false
-  
+
 done
 
 # write build.txt
 echo "Build type: ${BUILD_TYPE}" >> "${BUILD_TXT}"
 echo "Android API level: ${ANDROID_API_LEVEL}" >> "${BUILD_TXT}"
-echo "" >> "${BUILD_TXT}"
 
 for src in "${SRCROOT}"/*; do
   cd "${src}"
   PROJECT=`basename "${src}"`
   
   project_rev=`git rev-parse HEAD`
-  echo -e "${PROJECT}\t${project_rev}" >> "${BUILD_TXT}"
+  echo -e "\n${PROJECT}" >> "${BUILD_TXT}"
+  echo -e "\tRevision: ${project_rev}" >> "${BUILD_TXT}"
+  
+  has_patches=false
   
   for patch in "${ROOT_DIR}"/patches/${PROJECT}-*.patch; do
     if [ -f $patch ] ; then
       patch_name=`basename "$patch"`
-      echo -e "- $patch_name" >> "${BUILD_TXT}"
+      if [ "$has_patches" != true ]; then
+        echo -e "\tPatches:" >> "${BUILD_TXT}"
+        has_patches=true
+      fi
+      echo -e "\t- $patch_name" >> "${BUILD_TXT}"
     fi
   done
 done
