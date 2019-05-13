@@ -1,37 +1,38 @@
-Integrate NSRunLoop with libdispatch main queue.
+Add compatibility for Swift corelibs libdispatch release
 
-This basically replaces using:
-dispatch_main_queue_drain_np()
-dispatch_get_main_queue_handle_np()
+This updates the libdispatch runloop integration to be compatible with the Swift corelibs libdispatch release:
+https://github.com/apple/swift-corelibs-libdispatch
 
-with the new _4CF variants provided by the Swift libdispatch:
-_dispatch_main_queue_callback_4CF()
-_dispatch_get_main_queue_handle_4CF()
+In that release, the main queue handle and drain functions have been renamed with a "_4CF" (for CoreFoundation) suffix and have moved to private.h, so we now check for the existance of this header and function names.
 
-Also fixes an Autoconf issue where passing --enable-libdispatch would disable it.
+Note that libdispatch must be compiled with INSTALL_PRIVATE_HEADERS=YES.
+
+Also fixes the check for the HAVE_LIBDISPATCH_RUNLOOP define.
+
+https://github.com/gnustep/libs-base/pull/41
+
+---
+ Headers/GNUstepBase/config.h.in | 11 +++++++++++
+ Source/NSRunLoop.m              | 16 +++++++++++++++-
+ configure                       | 32 ++++++++++++++++++++++++++++++--
+ configure.ac                    | 10 ++++++++--
+ 4 files changed, 64 insertions(+), 5 deletions(-)
 
 diff --git a/Headers/GNUstepBase/config.h.in b/Headers/GNUstepBase/config.h.in
-index 390b53603..dbda58fe9 100644
+index 390b53603..79896e758 100644
 --- a/Headers/GNUstepBase/config.h.in
 +++ b/Headers/GNUstepBase/config.h.in
-@@ -206,16 +206,9 @@
- /* Define to 1 if you have the <dispatch/dispatch.h> header file. */
- #undef HAVE_DISPATCH_DISPATCH_H
+@@ -216,6 +216,9 @@
+ /* Define to 1 if you have the `dispatch_main_queue_drain_np' function. */
+ #undef HAVE_DISPATCH_MAIN_QUEUE_DRAIN_NP
  
--/* Define to 1 if you have the `dispatch_get_main_queue_handle_np' function.
--   */
--#undef HAVE_DISPATCH_GET_MAIN_QUEUE_HANDLE_NP
--
- /* Define to 1 if you have the <dispatch.h> header file. */
- #undef HAVE_DISPATCH_H
- 
--/* Define to 1 if you have the `dispatch_main_queue_drain_np' function. */
--#undef HAVE_DISPATCH_MAIN_QUEUE_DRAIN_NP
--
++/* Define to 1 if you have the <dispatch/private.h> header file. */
++#undef HAVE_DISPATCH_PRIVATE_H
++
  /* Define to 1 if you have the `dladdr' function. */
  #undef HAVE_DLADDR
  
-@@ -767,6 +760,14 @@
+@@ -767,6 +770,14 @@
  /* Define to 1 if you have the `_Block_copy' function. */
  #undef HAVE__BLOCK_COPY
  
@@ -47,100 +48,133 @@ index 390b53603..dbda58fe9 100644
  #undef HAVE___BUILTIN_EXTRACT_RETURN_ADDRESS
  
 diff --git a/Source/NSRunLoop.m b/Source/NSRunLoop.m
-index 1746fa3d0..5c32a450b 100644
+index 1746fa3d0..03b2e11c3 100644
 --- a/Source/NSRunLoop.m
 +++ b/Source/NSRunLoop.m
-@@ -62,12 +62,12 @@
+@@ -62,10 +62,12 @@
  #include <math.h>
  #include <time.h>
  
 -#if HAVE_DISPATCH_GET_MAIN_QUEUE_HANDLE_NP && HAVE_DISPATCH_MAIN_QUEUE_DRAIN_NP
-+#if HAVE__DISPATCH_GET_MAIN_QUEUE_HANDLE_4CF && HAVE__DISPATCH_MAIN_QUEUE_CALLBACK_4CF
++#if HAVE_LIBDISPATCH_RUNLOOP
  #  define RL_INTEGRATE_DISPATCH 1
  #  ifdef HAVE_DISPATCH_H
  #    include <dispatch.h>
- #  elif HAVE_DISPATCH_DISPATCH_H
--#    include <dispatch/dispatch.h>
++#  elif HAVE_DISPATCH_PRIVATE_H
 +#    include <dispatch/private.h>
+ #  elif HAVE_DISPATCH_DISPATCH_H
+ #    include <dispatch/dispatch.h>
  #  endif
- #endif
- 
-@@ -398,7 +398,7 @@ + (void*) mainQueueFileDescriptor;
+@@ -398,7 +400,13 @@ + (void*) mainQueueFileDescriptor;
  @implementation GSMainQueueDrainer
  + (void*) mainQueueFileDescriptor
  {
--  return (void*)(uintptr_t)dispatch_get_main_queue_handle_np();
-+  return (void*)_dispatch_get_main_queue_handle_4CF();
++#if HAVE_DISPATCH_GET_MAIN_QUEUE_HANDLE_NP
+   return (void*)(uintptr_t)dispatch_get_main_queue_handle_np();
++#elif HAVE__DISPATCH_GET_MAIN_QUEUE_HANDLE_4CF
++	return (void*)_dispatch_get_main_queue_handle_4CF();
++#else
++#error libdispatch missing main queue handle function
++#endif
  }
  
  - (void) receivedEvent: (void*)data
-@@ -406,7 +406,7 @@ - (void) receivedEvent: (void*)data
+@@ -406,7 +414,13 @@ - (void) receivedEvent: (void*)data
  		             extra: (void*)extra
  	             forMode: (NSString*)mode
  {
--  dispatch_main_queue_drain_np();
-+  _dispatch_main_queue_callback_4CF(NULL);
++#if HAVE_DISPATCH_MAIN_QUEUE_DRAIN_NP
+   dispatch_main_queue_drain_np();
++#elif HAVE__DISPATCH_MAIN_QUEUE_CALLBACK_4CF
++	_dispatch_main_queue_callback_4CF(NULL)
++#else
++#error libdispatch missing main queue callback function
++#endif
  }
  @end
  #endif
 diff --git a/configure b/configure
-index 374193d8e..8b8c03fb3 100755
+index 57a45f06a..6ed306078 100755
 --- a/configure
 +++ b/configure
-@@ -12376,7 +12376,7 @@ fi
- HAVE_LIBDISPATCH=0
- # Check whether --enable-libdispatch was given.
- if test "${enable_libdispatch+set}" = set; then :
--  enableval=$enable_libdispatch; enable_libdispatch=no
-+  enableval=$enable_libdispatch; enable_libdispatch=$enableval
- else
-   enable_libdispatch=yes
+@@ -12410,6 +12410,20 @@ else
+   have_dispatch=no
  fi
-@@ -12503,7 +12503,7 @@ HAVE_LIBDISPATCH_RUNLOOP=0
- if test $HAVE_LIBDISPATCH = 1; then
-   # We check whether we have a variant of libdispatch that allows runloop
-   # integration
--  for ac_func in dispatch_main_queue_drain_np dispatch_get_main_queue_handle_np
-+  for ac_func in _dispatch_main_queue_callback_4CF _dispatch_get_main_queue_handle_4CF
- do :
-   as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
- ac_fn_c_check_func "$LINENO" "$ac_func" "$as_ac_var"
-@@ -12515,10 +12515,7 @@ _ACEOF
+ 
++done
++
++    # check for private header which includes runloop integration functions in
++    # the Swift corelibs libdispatch release
++    for ac_header in dispatch/private.h
++do :
++  ac_fn_c_check_header_mongrel "$LINENO" "dispatch/private.h" "ac_cv_header_dispatch_private_h" "$ac_includes_default"
++if test "x$ac_cv_header_dispatch_private_h" = xyes; then :
++  cat >>confdefs.h <<_ACEOF
++#define HAVE_DISPATCH_PRIVATE_H 1
++_ACEOF
++
++fi
++
+ done
+ 
+   fi
+@@ -12515,10 +12529,24 @@ _ACEOF
  fi
  done
  
 -  if test "$ac_cv_func_dispatch_main_queue_drain_np" = "no"; then
--    HAVE_LIBDISPATCH_RUNLOOP=1
--  fi
++  if test "$ac_cv_func_dispatch_main_queue_drain_np" = "yes" && test "$ac_cv_func_dispatch_get_main_queue_handle_np" = "yes"; then
+     HAVE_LIBDISPATCH_RUNLOOP=1
+   fi
 -  if test "$ac_cv_func_dispatch_get_main_queue_handle_np" = "no"; then
++  # Check for "_4CF" variants of runloop integration functions provided by the
++  # Swift corelibs libdispatch release
++  for ac_func in _dispatch_main_queue_callback_4CF _dispatch_get_main_queue_handle_4CF
++do :
++  as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
++ac_fn_c_check_func "$LINENO" "$ac_func" "$as_ac_var"
++if eval test \"x\$"$as_ac_var"\" = x"yes"; then :
++  cat >>confdefs.h <<_ACEOF
++#define `$as_echo "HAVE_$ac_func" | $as_tr_cpp` 1
++_ACEOF
++
++fi
++done
++
 +  if test "$ac_cv_func__dispatch_main_queue_callback_4CF" = "yes" && test "$ac_cv_func__dispatch_get_main_queue_handle_4CF" = "yes"; then
      HAVE_LIBDISPATCH_RUNLOOP=1
    fi
  fi
 diff --git a/configure.ac b/configure.ac
-index 94f75c38a..e7e0e4c9e 100644
+index 6231f8282..2d2ece164 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -3350,7 +3350,7 @@ AC_SUBST(HAVE_ICU)
- HAVE_LIBDISPATCH=0
- AC_ARG_ENABLE(libdispatch,
-   [  --disable-libdispatch		Disable dispatching blocks via libdispatch],
--  enable_libdispatch=no,
-+  enable_libdispatch=$enableval,
-   enable_libdispatch=yes)
- 
- if test $enable_libdispatch = yes; then
-@@ -3387,11 +3387,8 @@ HAVE_LIBDISPATCH_RUNLOOP=0
- if test $HAVE_LIBDISPATCH = 1; then
+@@ -3357,6 +3357,9 @@ if test $enable_libdispatch = yes; then
+   AC_CHECK_HEADERS(dispatch.h, have_dispatch=yes, have_dispatch=no)
+   if test "$have_dispatch" = "no"; then
+     AC_CHECK_HEADERS(dispatch/dispatch.h, have_dispatch=yes, have_dispatch=no)
++    # check for private header which includes runloop integration functions in
++    # the Swift corelibs libdispatch release
++    AC_CHECK_HEADERS(dispatch/private.h)
+   fi
+   if test "$have_dispatch" = "yes"; then
+     AC_CHECK_LIB(dispatch, dispatch_queue_create, have_dispatch=yes, have_dispatch=no)
+@@ -3388,10 +3391,13 @@ if test $HAVE_LIBDISPATCH = 1; then
    # We check whether we have a variant of libdispatch that allows runloop
    # integration
--  AC_CHECK_FUNCS(dispatch_main_queue_drain_np dispatch_get_main_queue_handle_np)
+   AC_CHECK_FUNCS(dispatch_main_queue_drain_np dispatch_get_main_queue_handle_np)
 -  if test "$ac_cv_func_dispatch_main_queue_drain_np" = "no"; then
--    HAVE_LIBDISPATCH_RUNLOOP=1
--  fi
++  if test "$ac_cv_func_dispatch_main_queue_drain_np" = "yes" && test "$ac_cv_func_dispatch_get_main_queue_handle_np" = "yes"; then
+     HAVE_LIBDISPATCH_RUNLOOP=1
+   fi
 -  if test "$ac_cv_func_dispatch_get_main_queue_handle_np" = "no"; then
++  # Check for "_4CF" variants of runloop integration functions provided by the
++  # Swift corelibs libdispatch release
 +  AC_CHECK_FUNCS(_dispatch_main_queue_callback_4CF _dispatch_get_main_queue_handle_4CF)
 +  if test "$ac_cv_func__dispatch_main_queue_callback_4CF" = "yes" && test "$ac_cv_func__dispatch_get_main_queue_handle_4CF" = "yes"; then
      HAVE_LIBDISPATCH_RUNLOOP=1
    fi
  fi
+-- 
+2.15.2 (Apple Git-101.1)
+

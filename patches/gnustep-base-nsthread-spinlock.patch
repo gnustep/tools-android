@@ -2,6 +2,8 @@ Add basic spinlock implementation using builtins.
 
 Implementation lifted from spinlock.h in libdispatch.
 
+https://github.com/gnustep/libs-base/pull/42
+
 diff --git a/Source/NSThread.m b/Source/NSThread.m
 index 9419e28b3..c7b35c7ff 100644
 --- a/Source/NSThread.m
