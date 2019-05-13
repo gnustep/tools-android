@@ -7,8 +7,7 @@ set -e # make any subsequent failing command exit the script
 prepare_project "libcxxrt" "https://github.com/pathscale/libcxxrt.git"
 
 echo -e "\n### Running cmake"
-cd "${SRCROOT}"
-mkdir -p ${PROJECT}/build
+mkdir -p build
 
 ${CMAKE} \
   -H"${SRCROOT}"/${PROJECT} \
@@ -21,7 +20,7 @@ ${CMAKE} \
   -DANDROID_NDK=${ANDROID_NDK_HOME} \
   -DANDROID_PLATFORM=android-${ANDROID_API_LEVEL} \
 
-cd ${PROJECT}/build
+cd build
 
 echo -e "\n### Building"
 ${NINJA}

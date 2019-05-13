@@ -7,8 +7,7 @@ set -e # make any subsequent failing command exit the script
 prepare_project "libdispatch" "https://github.com/apple/swift-corelibs-libdispatch.git"
 
 echo -e "\n### Running cmake"
-cd "${SRCROOT}"
-mkdir -p ${PROJECT}/build
+mkdir -p build
 
 ${CMAKE} \
   -H"${SRCROOT}"/${PROJECT} \
@@ -24,7 +23,7 @@ ${CMAKE} \
   -DBUILD_SHARED_LIBS=YES \
   -DINSTALL_PRIVATE_HEADERS=YES \
 
-cd ${PROJECT}/build
+cd build
 
 echo -e "\n### Building"
 ${NINJA}

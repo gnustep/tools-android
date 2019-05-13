@@ -7,8 +7,7 @@ set -e # make any subsequent failing command exit the script
 prepare_project "libobjc2" "https://github.com/gnustep/libobjc2.git"
 
 echo -e "\n### Running cmake"
-cd "${SRCROOT}"
-mkdir -p ${PROJECT}/build
+mkdir -p build
 
 ${CMAKE} \
   -H"${SRCROOT}"/${PROJECT} \
@@ -25,7 +24,7 @@ ${CMAKE} \
   -DCMAKE_C_FLAGS="-DDEBUG_EXCEPTIONS=1" `# debug exception throwing` \
   -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY="BOTH" \
 
-cd ${PROJECT}/build
+cd build
 
 echo -e "\n### Building"
 ${NINJA}
