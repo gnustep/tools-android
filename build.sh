@@ -173,3 +173,5 @@ done
 
 # remove backup if all went well
 rm -rf "${INSTALL_ROOT}.bak"
+
+echo -e "\n### Finished building GNUstep Android toolchain"
