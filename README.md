@@ -48,6 +48,7 @@ Usage: ./build.sh
   -u, --no-update         Don't update projects to latest version from GitHub
   -c, --no-clean          Don't clean projects during build (e.g. for building local changes, only applies to first ABI being built)
   -p, --patches DIR       Apply additional patches from given directory
+  -o, --only PHASE        Build only the given phase (e.g. "gnustep-base", requires previous build)
   -h, --help              Print usage information and exit
 ```
 

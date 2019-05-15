@@ -1,5 +1,8 @@
 #!/bin/bash
 
+cd `dirname $0`
+export ROOT_DIR=`pwd`
+
 display_usage() {
   echo "Usage: $0"
   echo "  -a, --abis ABI_NAMES    ABIs being targeted (default: \"${ABI_NAMES}\")"
@@ -8,11 +11,16 @@ display_usage() {
   echo "  -u, --no-update         Don't update projects to latest version from GitHub"
   echo "  -c, --no-clean          Don't clean projects during build (e.g. for building local changes, only applies to first ABI being built)"
   echo "  -p, --patches DIR       Apply additional patches from given directory"
+  echo "  -o, --only PHASE        Build only the given phase (e.g. \"gnustep-base\", requires previous build)"
   echo "  -h, --help              Print usage information and exit"
 }
 
-cd `dirname $0`
-export ROOT_DIR=`pwd`
+phase_name() {
+  name=`basename -s .sh $1`
+  echo ${name/[0-9][0-9]-/}
+}
+
+phase_glob="${ROOT_DIR}/phases/[0-9][0-9]-*.sh"
 
 . "${ROOT_DIR}"/env/sdkenv.sh
 
@@ -49,6 +57,21 @@ do
         echo "### Additional patches: ${ADDITIONAL_PATCHES}"
         shift # option has parameter
         ;;
+      -o|--only)
+        export ONLY_PHASE=$2
+        if [ ! -f "${ROOT_DIR}"/phases/[0-9][0-9]-${ONLY_PHASE}.sh ]; then
+          echo "Error: Unknown phase \"${ONLY_PHASE}\""
+          
+          for PHASE in ${phase_glob}; do
+            PHASES="${PHASES}$(phase_name $PHASE) "
+          done
+          
+          echo "Valid phases: ${PHASES}"
+          exit 1
+        fi
+        echo "### Building only ${ONLY_PHASE}"
+        shift # option has parameter
+        ;;
       -h|--help)
         display_usage
         exit 0
@@ -70,14 +93,16 @@ echo "### Build type: ${BUILD_TYPE}"
 echo "### ABIs: ${ABI_NAMES}"
 echo "### Android API level: ${ANDROID_API_LEVEL}"
 
-# keep backup of previous build if any
-if [ -d "${INSTALL_ROOT}" ]; then
-  rm -rf "${INSTALL_ROOT}.bak"
-  mv "${INSTALL_ROOT}" "${INSTALL_ROOT}.bak"
-fi
+if [ -z "${ONLY_PHASE}" ]; then
+  # keep backup of previous build if any
+  if [ -d "${INSTALL_ROOT}" ]; then
+    rm -rf "${INSTALL_ROOT}.bak"
+    mv "${INSTALL_ROOT}" "${INSTALL_ROOT}.bak"
+  fi
 
-# remove previous failed build if any
-rm -rf "${INSTALL_ROOT}.failed"
+  # remove previous failed build if any
+  rm -rf "${INSTALL_ROOT}.failed"
+fi
 
 mkdir -p "${SRCROOT}"
 
@@ -86,9 +111,12 @@ for ABI_NAME in $ABI_NAMES; do
   echo -e "\n######## Building for ${ABI_NAME} ########"
 
   # run phases
-  for PHASE in "${ROOT_DIR}"/phases/[0-9][0-9]-*.sh; do
-    PHASE_NAME=`basename -s .sh $PHASE`
-    PHASE_NAME=${PHASE_NAME/[0-9][0-9]-/}
+  for PHASE in ${phase_glob}; do
+    PHASE_NAME=$(phase_name $PHASE)
+    
+    if [[ ! -z "${ONLY_PHASE}" && "${ONLY_PHASE}" != "${PHASE_NAME}" ]]; then
+      continue
+    fi
 
     echo -e "\n###### ${PHASE_NAME} ######"
 
@@ -126,8 +154,8 @@ for src in "${SRCROOT}"/*; do
   PROJECT=`basename "${src}"`
   
   project_rev=`git rev-parse HEAD`
-  echo -e "\n${PROJECT}" >> "${BUILD_TXT}"
-  echo -e "\tRevision: ${project_rev}" >> "${BUILD_TXT}"
+  echo -e "\n* ${PROJECT}" >> "${BUILD_TXT}"
+  echo -e "\t- Revision: ${project_rev}" >> "${BUILD_TXT}"
   
   has_patches=false
   
@@ -135,10 +163,10 @@ for src in "${SRCROOT}"/*; do
     if [ -f $patch ] ; then
       patch_name=`basename "$patch"`
       if [ "$has_patches" != true ]; then
-        echo -e "\tPatches:" >> "${BUILD_TXT}"
+        echo -e "\t- Patches:" >> "${BUILD_TXT}"
         has_patches=true
       fi
-      echo -e "\t- $patch_name" >> "${BUILD_TXT}"
+      echo -e "\t\t$patch_name" >> "${BUILD_TXT}"
     fi
   done
 done
