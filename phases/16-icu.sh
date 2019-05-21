@@ -65,8 +65,8 @@ fi
 
 . "${ROOT_DIR}"/env/toolchain.sh
 
-mkdir -p build-$ABI_NAME
-cd build-$ABI_NAME
+mkdir -p build-${ABI_NAME}
+cd build-${ABI_NAME}
 
 echo -e "\n### Running configure"
 ../source/configure \
