@@ -28,4 +28,6 @@ ${NINJA}
 echo -e "\n### Installing"
 INSTALL_DIR="${INSTALL_PREFIX}/lib"
 mkdir -p "${INSTALL_PREFIX}/lib"
-cp "${SRCROOT}"/${PROJECT}/build/lib/libcxxrt.so ${INSTALL_DIR}
+cp -v "${SRCROOT}"/${PROJECT}/build-${ABI_NAME}/lib/libcxxrt.so ${INSTALL_DIR}
+cp -v "${SRCROOT}"/${PROJECT}/src/unwind*.h ${INSTALL_DIR}
+cp -v "${SRCROOT}"/${PROJECT}/src/cxxabi.h ${INSTALL_DIR}
