@@ -1,0 +1,815 @@
+From 3b60b1a8be2c9843f538051c11d257ea9bfa0431 Mon Sep 17 00:00:00 2001
+From: Frederik Seiffert <frederik@algoriddim.com>
+Date: Thu, 9 May 2019 20:16:18 +0200
+Subject: [PATCH] Added support for asset loading on Android.
+
+Requires passing the activity's AssetManager object from Java to GNUstep by calling +[NSBundle setJavaAssetManager:withJNIEnv:], which then enables the following features:
+
+- NSBundle main bundle resource paths support for Android assets, e.g. for pathForResource:ofType:, URLForResource:ofType: and related methods.
+- NSBundle main bundle info dictionary support if Info.plist exists in Android assets.
+- -initWithContentsOfFile: and related methods support for reading Android assets from main bundle in various classes (e.g. NSData, NSDictionary, NSArray, etc.).
+- NSFileManager fileExistsAtPath:(isDirectory:) and isReadableFileAtPath: return YES for main bundle asset / asset directory paths.
+- NSFileHandle support for reading Android assets from main bundle.
+- NSDirectoryEnumerator support for enumerating Android assets from main bundle. Note that recursion into subdirectories is currently not supported by the native Android asset manager API (see https://issuetracker.google.com/issues/37002833).
+
+Also adds support for automatic NSProcessInfo initialization on Android with a fake executable path "/data/data/<app identifier>/exe" (as Android apps don't have a real executable path), and tweaks main bundle initialization to allow that path. Main bundle resource paths are prefixed by "/data/data/<app identifier>/Resources".
+
+https://github.com/gnustep/libs-base/pull/45
+---
+ ChangeLog                     |  29 ++++++
+ Headers/Foundation/NSBundle.h |  36 ++++++++
+ Source/GSFileHandle.h         |   7 ++
+ Source/GSFileHandle.m         |  53 +++++++++++
+ Source/NSBundle.m             | 210 +++++++++++++++++++++++++++++++++++-------
+ Source/NSData.m               |  29 ++++++
+ Source/NSFileManager.m        |  91 +++++++++++++++---
+ Source/NSProcessInfo.m        |  25 +++++
+ configure                     |   3 +
+ configure.ac                  |   3 +
+ 10 files changed, 440 insertions(+), 46 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 4a854b93e..89da2480a 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,34 @@
++2019-05-23  Frederik Seiffert <frederik@algoriddim.com>
++
++	* configure:
++	* configure.ac:
++	Link against libandroid on Android.
++	* Headers/Foundation/NSBundle.h:
++	* Source/NSBundle.m:
++	Added methods for passing Android asset manager from Java to GNUstep
++	and for getting AAsset/AAssetDir for given path in main bundle.
++	Skip app bundle suffix check on Android. Extended bundle resource
++	paths backbone to check for known paths directly on Android as we
++	can't enumerate directories.
++	Extended -localizations method to check for known localizations
++	directly (requires setting userLanguages in NSUserDefaults).
++	Extracted path cache cleaning into separate method.
++	* Source/GSFileHandle.h:
++	* Source/GSFileHandle.m:
++	Added file handle support for reading Android assets from main bundle.
++	* Source/NSData.m:
++	Added support for reading Android assets from main bundle in
++	readContentsOfFile(). This is also used by all other
++	-initWithContentsOfFile: and related methods from other classes.
++	* Source/NSFileManager.m:
++	Added support for Android assets from main bundle in
++	fileExistsAtPath:isDirectory:, isReadableFileAtPath:, and
++	NSDirectoryEnumerator.
++	* Source/NSProcessInfo.m:
++	Added +initialize method to auto-initialize NSProcessInfo on Android
++	using fake executable path "/data/data/<app identifier>/exe" (Android
++	apps don't have a real executable path).
++
+ 2019-05-20  Frederik Seiffert <frederik@algoriddim.com>
+ 
+ 	* Source/NSLog.m: Have all logs go to syslog on android.
+diff --git a/Headers/Foundation/NSBundle.h b/Headers/Foundation/NSBundle.h
+index ef97f923e..1f1b067b3 100644
+--- a/Headers/Foundation/NSBundle.h
++++ b/Headers/Foundation/NSBundle.h
+@@ -36,6 +36,10 @@ extern "C" {
+ #import	<Foundation/NSObject.h>
+ #import	<Foundation/NSString.h>
+ 
++#ifdef __ANDROID__
++#include <android/asset_manager_jni.h>
++#endif
++
+ @class NSString;
+ @class NSArray;
+ @class NSDictionary;
+@@ -540,6 +544,47 @@ GS_EXPORT NSString* const NSLoadedClasses;
+ 			      ofType: (NSString*)extension
+ 			 inDirectory: (NSString*)bundlePath;
+ 
++/** Cleans up the path cache for the bundle. */
++- (void) cleanPathCache;
++
++#ifdef __ANDROID__
++
++/**
++ * Sets the Java Android asset manager.
++ * The developer can call this method to enable asset loading via NSBundle.
++ */
+++ (void) setJavaAssetManager:(jobject)jassetManager withJNIEnv:(JNIEnv *)env;
++
++/**
++ * Returns the native Android asset manager.
++ */
+++ (AAssetManager *) assetManager;
++
++/**
++ * Returns the Android asset for the given path if path is in main bundle
++ * resources and asset exists.
++ * Uses `AASSET_MODE_UNKNOWN` to open the asset if it exists.
++ * The returned object must be released using AAsset_close().
++ */
+++ (AAsset *)assetForPath:(NSString *)path;
++
++/**
++ * Returns the Android asset for the given path if path is in main bundle
++ * resources and asset exists.
++ * Uses the given mode to open the AAsset if it exists.
++ * The returned object must be released using AAsset_close().
++ */
+++ (AAsset *)assetForPath:(NSString *)path withMode:(int)mode;
++
++/**
++ * Returns the Android asset dir for the given path if path is in main bundle
++ * resources and the asset directory exists.
++ * The returned object must be released using AAssetDir_close().
++ */
+++ (AAssetDir *)assetDirForPath:(NSString *)path;
++
++#endif /* __ANDROID__ */
++
+ @end
+ 
+ #endif /* GNUSTEP */
+diff --git a/Source/GSFileHandle.h b/Source/GSFileHandle.h
+index 0db80e679..e4e507180 100644
+--- a/Source/GSFileHandle.h
++++ b/Source/GSFileHandle.h
+@@ -35,6 +35,10 @@
+ #include <zlib.h>
+ #endif
+ 
++#ifdef __ANDROID__
++#include <android/asset_manager_jni.h>
++#endif
++
+ struct sockaddr_in;
+ 
+ /**
+@@ -69,6 +73,9 @@ struct sockaddr_in;
+ #if	defined(_WIN32)
+   WSAEVENT  		event;
+ #endif
++#ifdef __ANDROID__
++  AAsset		*asset;
++#endif
+ #endif
+ }
+ 
+diff --git a/Source/GSFileHandle.m b/Source/GSFileHandle.m
+index 5b91f04ae..7823799b3 100644
+--- a/Source/GSFileHandle.m
++++ b/Source/GSFileHandle.m
+@@ -285,6 +285,13 @@ - (NSInteger) read: (void*)buf length: (NSUInteger)len
+ 
+   do
+     {
++#ifdef __ANDROID__
++      if (asset)
++      {
++        result = AAsset_read(asset, buf, len);
++      }
++      else
++#endif
+ #if	USE_ZLIB
+       if (gzDescriptor != 0)
+ 	{
+@@ -379,6 +386,14 @@ - (void) finalize
+   [self ignoreReadDescriptor];
+   [self ignoreWriteDescriptor];
+ 
++#ifdef __ANDROID__
++  if (asset)
++  {
++    AAsset_close(asset);
++    asset = NULL;
++  }
++  else
++#endif
+   if (closeOnDealloc == YES && descriptor != -1)
+     {
+       [self closeFile];
+@@ -1075,6 +1090,14 @@ - (id) initForReadingAtPath: (NSString*)path
+ 
+   if (d < 0)
+     {
++#ifdef __ANDROID__
++      asset = [NSBundle assetForPath:path withMode:AASSET_MODE_RANDOM];
++      if (asset) {
++        readOK = YES;
++        return self;
++      }
++#endif
++      
+       DESTROY(self);
+       return nil;
+     }
+@@ -1645,6 +1668,13 @@ - (unsigned long long) offsetInFile
+ {
+   off_t	result = -1;
+ 
++#ifdef __ANDROID__
++  if (asset)
++  {
++    result = AAsset_seek(asset, 0, SEEK_CUR);
++  }
++  else
++#endif
+   if (isStandardFile && descriptor >= 0)
+     {
+ #if	USE_ZLIB
+@@ -1669,6 +1699,13 @@ - (unsigned long long) seekToEndOfFile
+ {
+   off_t	result = -1;
+ 
++#ifdef __ANDROID__
++  if (asset)
++  {
++    result = AAsset_seek(asset, 0, SEEK_END);
++  }
++  else
++#endif
+   if (isStandardFile && descriptor >= 0)
+     {
+ #if	USE_ZLIB
+@@ -1693,6 +1730,13 @@ - (void) seekToFileOffset: (unsigned long long)pos
+ {
+   off_t	result = -1;
+ 
++#ifdef __ANDROID__
++  if (asset)
++  {
++    result = AAsset_seek(asset, (off_t)pos, SEEK_SET);
++  }
++  else
++#endif
+   if (isStandardFile && descriptor >= 0)
+     {
+ #if	USE_ZLIB
+@@ -1726,6 +1770,15 @@ - (void) closeFile
+   [self ignoreWriteDescriptor];
+ 
+   [self setNonBlocking: NO];
++  
++#ifdef __ANDROID__
++  if (asset)
++  {
++    AAsset_close(asset);
++    asset = NULL;
++  }
++  else
++#endif
+ #if	USE_ZLIB
+   if (gzDescriptor != 0)
+     {
+diff --git a/Source/NSBundle.m b/Source/NSBundle.m
+index 75528649e..5e5dd84a0 100644
+--- a/Source/NSBundle.m
++++ b/Source/NSBundle.m
+@@ -241,6 +241,11 @@ + (NSString**) frameworkClasses;
+   nil;
+ #endif
+ 
++#ifdef __ANDROID__
++static jobject _jassetManager = NULL;
++static AAssetManager *_assetManager = NULL;
++#endif
++
+ 
+ /*
+  * Try to find the absolute path of an executable.
+@@ -1382,6 +1387,7 @@ + (NSBundle *) mainBundle
+ 	  isNonInstalledTool = YES;
+ 	}
+ 
++#ifndef __ANDROID__ /* don't check suffix on Android's fake executable path */
+       if (isApplication == YES)
+ 	{
+ 	  s = [path lastPathComponent];
+@@ -1422,6 +1428,7 @@ + (NSBundle *) mainBundle
+ 		}
+ 	    }
+ 	}
++#endif /* !__ANDROID__ */
+ 
+       if (isApplication == NO)
+ 	{
+@@ -1805,9 +1812,6 @@ - (void) dealloc
+     {
+       NSString		*identifier = [self bundleIdentifier];
+       NSUInteger        count;
+-      NSUInteger	plen = [_path length];
+-      NSEnumerator	*enumerator;
+-      NSString		*path;
+ 
+       [load_lock lock];
+       if (_bundles != nil)
+@@ -1835,38 +1839,7 @@ - (void) dealloc
+ 
+       /* Clean up path cache for this bundle.
+        */
+-      [pathCacheLock lock];
+-      enumerator = [pathCache keyEnumerator];
+-      while (nil != (path = [enumerator nextObject]))
+-	{
+-	  if (YES == [path hasPrefix: _path])
+-	    {
+-	      if ([path length] == plen)
+-		{
+-		  /* Remove the bundle directory path from the cache.
+-		   */
+-		  [pathCache removeObjectForKey: path];
+-		}
+-	      else
+-		{
+-		  unichar	c = [path characterAtIndex: plen];
+-
+-		  /* if the directory is inside the bundle, remove from cache.
+-		   */
+-		  if ('/' == c)
+-		    {
+-		      [pathCache removeObjectForKey: path];
+-		    }
+-#if defined(_WIN32)
+-		  else if ('\\' == c)
+-		    {
+-		      [pathCache removeObjectForKey: path];
+-		    }
+-#endif
+-		}
+-	    }
+-	}
+-      [pathCacheLock unlock];
++      [self cleanPathCache];
+       RELEASE(_path);
+     }
+   TEST_RELEASE(_frameworkVersion);
+@@ -2144,6 +2117,48 @@ + (NSArray *) _bundleResourcePathsWithRootPath: (NSString*)rootPath
+ 	  addBundlePath(array, contents, primary, subPath, language);
+ 	}
+     }
++  
++#ifdef __ANDROID__
++  // Android: check subdir and localization directly, as AAssetDir and thereby
++  // NSDirectoryEnumerator doesn't list directories
++  NSString *originalPrimary = primary;
++  if (subPath) {
++    primary = [originalPrimary stringByAppendingPathComponent: subPath];
++    contents = bundle_directory_readable(primary);
++    addBundlePath(array, contents, primary, nil, nil);
++    
++    if (localization) {
++      primary = [primary stringByAppendingPathComponent:
++        [localization stringByAppendingPathExtension:@"lproj"]];
++      contents = bundle_directory_readable(primary);
++      addBundlePath(array, contents, primary, nil, nil);
++    } else {
++      NSString *subPathPrimary = primary;
++      enumerate = [languages objectEnumerator];
++      while ((language = [enumerate nextObject])) {
++        primary = [subPathPrimary stringByAppendingPathComponent:
++          [language stringByAppendingPathExtension:@"lproj"]];
++        contents = bundle_directory_readable(primary);
++        addBundlePath(array, contents, primary, nil, nil);
++      }
++    }
++  }
++  if (localization) {
++    primary = [originalPrimary stringByAppendingPathComponent:
++      [localization stringByAppendingPathExtension:@"lproj"]];
++    contents = bundle_directory_readable(primary);
++    addBundlePath(array, contents, primary, nil, nil);
++  } else {
++    enumerate = [languages objectEnumerator];
++    while ((language = [enumerate nextObject])) {
++      primary = [originalPrimary stringByAppendingPathComponent:
++        [language stringByAppendingPathExtension:@"lproj"]];
++      contents = bundle_directory_readable(primary);
++      addBundlePath(array, contents, primary, nil, nil);
++    }
++  }
++#endif /* __ANDROID__ */
++  
+   primary = rootPath;
+   contents = bundle_directory_readable(primary);
+   addBundlePath(array, contents, primary, subPath, nil);
+@@ -2525,6 +2540,23 @@ - (NSArray *) localizations
+       locale = [[locale lastPathComponent] stringByDeletingPathExtension];
+       [array addObject: locale];
+     }
++
++#ifdef __ANDROID__
++    // Android: Check known languages for localizations directly, as AAssetDir
++    // and thereby NSDirectoryEnumerator doesn't list directories and the above
++    // call to list lproj resources will therefore come up empty.
++    NSArray *languages = [[NSUserDefaults standardUserDefaults]
++      stringArrayForKey: @"NSLanguages"];
++    
++    for (locale in languages) {
++      NSString *path = [self pathForResource:@"Localizable" ofType:@"strings"
++        inDirectory:nil forLocalization:locale];
++      if (path) {
++        [array addObject: locale];
++      }
++    }
++#endif /* __ANDROID__ */
++
+   return GS_IMMUTABLE(array);
+ }
+ 
+@@ -3202,5 +3234,131 @@ + (NSString *) pathForLibraryResource: (NSString *)name
+   return path;
+ }
+ 
++- (void)cleanPathCache
++{
++  NSUInteger	plen = [_path length];
++  NSEnumerator	*enumerator;
++  NSString		*path;
++  
++  [pathCacheLock lock];
++  enumerator = [pathCache keyEnumerator];
++  while (nil != (path = [enumerator nextObject]))
++  {
++    if (YES == [path hasPrefix: _path])
++      {
++        if ([path length] == plen)
++        {
++          /* Remove the bundle directory path from the cache.
++           */
++          [pathCache removeObjectForKey: path];
++        }
++        else
++        {
++          unichar	c = [path characterAtIndex: plen];
++
++          /* if the directory is inside the bundle, remove from cache.
++           */
++          if ('/' == c)
++          {
++            [pathCache removeObjectForKey: path];
++          }
++#if defined(_WIN32)
++          else if ('\\' == c)
++          {
++            [pathCache removeObjectForKey: path];
++          }
++#endif
++        }
++      }
++  }
++  [pathCacheLock unlock];
++  
++  /* also destroy cached variables depending on bundle paths */
++  DESTROY(_infoDict);
++  DESTROY(_localizations);
++}
++
++#ifdef __ANDROID__
++
+++ (AAssetManager *)assetManager
++{
++    return _assetManager;
++}
++
+++ (void)setJavaAssetManager:(jobject)jassetManager withJNIEnv:(JNIEnv *)env
++{ 
++  // create global reference to Java asset manager to prevent garbage
++  // collection
++  _jassetManager = (*env)->NewGlobalRef(env, jassetManager);
++  
++  // get native asset manager (may be shared across multiple threads)
++  _assetManager = AAssetManager_fromJava(env, _jassetManager);
++
++  // clean main bundle path cache in case it was accessed before
++  [_mainBundle cleanPathCache];
++}
++
+++ (AAsset *)assetForPath:(NSString *)path
++{
++  return [self assetForPath:path withMode:AASSET_MODE_UNKNOWN];
++}
++
+++ (AAsset *)assetForPath:(NSString *)path withMode:(int)mode
++{
++  AAsset *asset = NULL;
++  
++  if (_assetManager && _mainBundle)
++  {
++    NSString *resourcePath = [_mainBundle resourcePath];
++
++    if ([path hasPrefix:resourcePath] && [path length] > [resourcePath length])
++    {
++      NSString *assetPath = [path substringFromIndex:[resourcePath length]+1];
++
++      asset = AAssetManager_open(_assetManager,
++        [assetPath fileSystemRepresentation], mode);
++    }
++  }
++  
++  return asset;
++}
++
+++ (AAssetDir *)assetDirForPath:(NSString *)path
++{
++  AAssetDir *assetDir = NULL;
++  
++  if (_assetManager && _mainBundle)
++  {
++    NSString *resourcePath = [_mainBundle resourcePath];
++
++    if ([path hasPrefix:resourcePath])
++    {
++      NSString *assetPath = @"";
++      if ([path length] > [resourcePath length]) {
++        assetPath = [path substringFromIndex:[resourcePath length] + 1];
++      }
++
++      assetDir = AAssetManager_openDir(_assetManager,
++        [assetPath fileSystemRepresentation]);
++      
++      if (assetDir) {
++        // AAssetManager_openDir() always returns an object, so we check if
++        // the directory exists by ensuring it contains a file
++        BOOL exists = AAssetDir_getNextFileName(assetDir) != NULL;
++        if (exists) {
++          AAssetDir_rewind(assetDir);
++        } else {
++          AAssetDir_close(assetDir);
++          assetDir = NULL;
++        }
++      }
++    }
++  }
++  
++  return assetDir;
++}
++
++#endif /* __ANDROID__ */
++
+ @end
+ 
+diff --git a/Source/NSData.m b/Source/NSData.m
+index 1a3f507a0..1e711aa29 100644
+--- a/Source/NSData.m
++++ b/Source/NSData.m
+@@ -242,6 +242,35 @@
+   void		*tmp = 0;
+   int		c;
+   off_t         fileLength;
++  
++#ifdef __ANDROID__
++  // Android: try using asset manager if path is in main bundle resources
++  AAsset *asset = [NSBundle assetForPath:path withMode:AASSET_MODE_BUFFER];
++  if (asset) {
++    fileLength = AAsset_getLength(asset);
++
++    tmp = NSZoneMalloc(zone, fileLength);
++    if (tmp == 0) {
++      NSLog(@"Malloc failed for file (%@) of length %jd - %@", path,
++        (intmax_t)fileLength, [NSError _last]);
++      AAsset_close(asset);
++      goto failure;
++    }
++
++    int result = AAsset_read(asset, tmp, fileLength);
++    AAsset_close(asset);
++    
++    if (result < 0) {
++      NSWarnFLog(@"read of file (%@) contents failed - %@", path,
++        [NSError errorWithDomain:NSPOSIXErrorDomain code:result userInfo:nil]);
++      goto failure;
++    }
++    
++    *buf = tmp;
++    *len = fileLength;
++    return YES;
++  }
++#endif /* __ANDROID__ */
+ 
+ #if defined(_WIN32)
+   thePath = (const unichar*)[path fileSystemRepresentation];
+diff --git a/Source/NSFileManager.m b/Source/NSFileManager.m
+index c741184ca..5e4a8512e 100644
+--- a/Source/NSFileManager.m
++++ b/Source/NSFileManager.m
+@@ -1652,6 +1652,24 @@ - (BOOL) fileExistsAtPath: (NSString*)path isDirectory: (BOOL*)isDirectory
+ 
+       if (_STAT(lpath, &statbuf) != 0)
+ 	{
++#ifdef __ANDROID__
++          // Android: try using asset manager if path is in main bundle resources
++          AAsset *asset = [NSBundle assetForPath:path];
++          if (asset) {
++            AAsset_close(asset);
++            return YES;
++          }
++          
++          AAssetDir *assetDir = [NSBundle assetDirForPath:path];
++          if (assetDir) {
++            AAssetDir_close(assetDir);
++            if (isDirectory) {
++              *isDirectory = YES;
++            }
++            return YES;
++          }
++#endif
++          
+ 	  return NO;
+ 	}
+ 
+@@ -1700,6 +1718,16 @@ - (BOOL) isReadableFileAtPath: (NSString*)path
+ 	{
+ 	  return YES;
+ 	}
++
++#ifdef __ANDROID__
++        // Android: try using asset manager if path is in main bundle resources
++        AAsset *asset = [NSBundle assetForPath:path];
++        if (asset) {
++          AAsset_close(asset);
++          return YES;
++        }
++#endif
++
+       return NO;
+     }
+ #endif
+@@ -2379,6 +2407,9 @@ - (NSString*) stringWithFileSystemRepresentation: (const GSNativeChar*)string
+ typedef	struct	_GSEnumeratedDirectory {
+   NSString *path;
+   _DIR *pointer;
++#ifdef __ANDROID__
++  AAssetDir *assetDir;
++#endif
+ } GSEnumeratedDirectory;
+ 
+ 
+@@ -2386,6 +2417,11 @@ static inline void gsedRelease(GSEnumeratedDirectory X)
+ {
+   DESTROY(X.path);
+   _CLOSEDIR(X.pointer);
++#ifdef __ANDROID__
++  if (X.assetDir) {
++    AAssetDir_close(X.assetDir);
++  }
++#endif
+ }
+ 
+ #define GSI_ARRAY_TYPES	0
+@@ -2443,12 +2479,26 @@ - (id) initWithDirectoryPath: (NSString*)path
+ 
+       localPath = [_mgr fileSystemRepresentationWithPath: path];
+       dir_pointer = _OPENDIR(localPath);
++      
++#ifdef __ANDROID__
++      AAssetDir *assetDir = NULL;
++      if (!dir_pointer) {
++        // Android: try using asset manager if path is in main bundle resources
++        assetDir = [NSBundle assetDirForPath:path];
++      }
++      
++      if (dir_pointer || assetDir)
++#else 
+       if (dir_pointer)
++#endif
+         {
+           GSIArrayItem item;
+ 
+           item.ext.path = @"";
+           item.ext.pointer = dir_pointer;
++#ifdef __ANDROID__
++          item.ext.assetDir = assetDir;
++#endif
+ 
+           GSIArrayAddItem(_stack, item);
+         }
+@@ -2535,35 +2585,54 @@ - (id) nextObject
+   while (GSIArrayCount(_stack) > 0)
+     {
+       GSEnumeratedDirectory dir = GSIArrayLastItem(_stack).ext;
+-      struct _DIRENT	*dirbuf;
+       struct _STATB	statbuf;
++#if defined(_WIN32)
++      const wchar_t *dirname = NULL;
++#else
++      const char *dirname = NULL;
++#endif
+ 
+-      dirbuf = _READDIR(dir.pointer);
++#ifdef __ANDROID__
++      if (dir.assetDir)
++      {
++        // This will only return files and not directories, which means that
++        // recursion is not supported.
++        // See https://issuetracker.google.com/issues/37002833
++        dirname = AAssetDir_getNextFileName(dir.assetDir);
++      }
++      else if (dir.pointer)
++#endif
++      {
++        struct _DIRENT *dirbuf = _READDIR(dir.pointer);
++        if (dirbuf) {
++          dirname = dirbuf->d_name;
++        }
++      }
+ 
+-      if (dirbuf)
++      if (dirname)
+ 	{
+ #if defined(_WIN32)
+ 	  /* Skip "." and ".." directory entries */
+-	  if (wcscmp(dirbuf->d_name, L".") == 0
+-	    || wcscmp(dirbuf->d_name, L"..") == 0)
++	  if (wcscmp(dirname, L".") == 0
++	    || wcscmp(dirname, L"..") == 0)
+ 	    {
+ 	      continue;
+ 	    }
+ 	  /* Name of file to return  */
+ 	  returnFileName = [_mgr
+-	    stringWithFileSystemRepresentation: dirbuf->d_name
+-	    length: wcslen(dirbuf->d_name)];
++	    stringWithFileSystemRepresentation: dirname
++	    length: wcslen(dirname)];
+ #else
+ 	  /* Skip "." and ".." directory entries */
+-	  if (strcmp(dirbuf->d_name, ".") == 0
+-	    || strcmp(dirbuf->d_name, "..") == 0)
++	  if (strcmp(dirname, ".") == 0
++	    || strcmp(dirname, "..") == 0)
+ 	    {
+ 	      continue;
+ 	    }
+ 	  /* Name of file to return  */
+ 	  returnFileName = [_mgr
+-	    stringWithFileSystemRepresentation: dirbuf->d_name
+-	    length: strlen(dirbuf->d_name)];
++	    stringWithFileSystemRepresentation: dirname
++	    length: strlen(dirname)];
+ #endif
+ 	  /* if we have a null FileName something went wrong (charset?) and we skip it */
+ 	  if (returnFileName == nil)
+diff --git a/Source/NSProcessInfo.m b/Source/NSProcessInfo.m
+index da94da15c..40ae03896 100644
+--- a/Source/NSProcessInfo.m
++++ b/Source/NSProcessInfo.m
+@@ -943,6 +943,31 @@ + (void) initialize
+     }
+ }
+ 
++#elif defined(__ANDROID__)
++
+++ (void) initialize
++{
++  if (nil == procLock) procLock = [NSRecursiveLock new];
++  if (self == [NSProcessInfo class]
++    && !_gnu_processName && !_gnu_arguments && !_gnu_environment)
++    {
++      FILE *f = fopen("/proc/self/cmdline", "r");
++      if (f) {
++        char identifier[BUFSIZ];
++        fgets(identifier, sizeof(identifier), f);
++        fclose(f);
++        
++        // construct fake executable path
++        char *arg0;
++        asprintf(&arg0, "/data/data/%s/exe", identifier);
++
++        char *argv[] = { arg0 };
++        _gnu_process_args(sizeof(argv)/sizeof(char *), argv, NULL);
++      } else {
++        fprintf(stderr, "Failed to read cmdline\n");
++      }
++    }
++}
+ 
+ #else
+ + (void) initialize
+diff --git a/configure b/configure
+index f5fc4c9d8..431d93732 100755
+--- a/configure
++++ b/configure
+@@ -5996,6 +5996,9 @@ case "$target_os" in
+ 		LDFLAGS="$LDFLAGS -L/usr/local/lib";;
+   netbsd*)	CPPFLAGS="$CPPFLAGS -I/usr/pkg/include"
+ 		LDFLAGS="$LDFLAGS -Wl,-R/usr/pkg/lib -L/usr/pkg/lib";;
++  linux-android* )
++		# link against libandroid for native application APIs
++		LIBS="$LIBS -landroid";;
+ esac
+ 
+ #--------------------------------------------------------------------
+diff --git a/configure.ac b/configure.ac
+index f7633aad8..0636c0350 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1246,6 +1246,9 @@ case "$target_os" in
+ 		LDFLAGS="$LDFLAGS -L/usr/local/lib";;
+   netbsd*)	CPPFLAGS="$CPPFLAGS -I/usr/pkg/include"
+ 		LDFLAGS="$LDFLAGS -Wl,-R/usr/pkg/lib -L/usr/pkg/lib";;
++  linux-android* )
++		# link against libandroid for native application APIs
++		LIBS="$LIBS -landroid";;
+ esac
+ 
+ #--------------------------------------------------------------------
