@@ -56,7 +56,7 @@ if [ ! -d $CROSS_BUILD_DIR ]; then
     --disable-tests \
 
   echo -e "\n### Building for $BUILD_PLATFORM"
-  make -j8
+  make -j${MAKE_JOBS}
   
   cd ..
 fi
@@ -85,7 +85,7 @@ echo -e "\n### Running configure"
   CPPFLAGS="${CPPFLAGS} -fPIC" `# required to remove unsupported text relocations` \
 
 echo -e "\n### Building for $ABI_NAME"
-make -j8
+make -j${MAKE_JOBS}
 
 echo -e "\n### Installing"
 make install

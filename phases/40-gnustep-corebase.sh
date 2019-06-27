@@ -21,7 +21,7 @@ echo -e "\n### Running configure"
   LDFLAGS="-L${INSTALL_PREFIX}/lib" \
 
 echo -e "\n### Building"
-make -j8 debug=yes
+make -j${MAKE_JOBS} debug=yes
 
 echo -e "\n### Installing"
 make install

@@ -6,11 +6,13 @@ case "$OSTYPE" in
     ANDROID_ROOT=${HOME}/Library/Android
     ANDROID_HOME=${ANDROID_ROOT}/sdk
     HOST_TAG=${HOST_TAG:-darwin-x86_64}
+    MAKE_JOBS=`sysctl -n hw.ncpu`
     ;;
   linux*)
     ANDROID_ROOT=${HOME}/Android
     ANDROID_HOME=${ANDROID_ROOT}/Sdk
     HOST_TAG=${HOST_TAG:-linux-x86_64}
+    MAKE_JOBS=`nproc`
     ;;
   *)
     echo "Error: Unsupported OS \"$OSTYPE\"."
