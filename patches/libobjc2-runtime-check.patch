@@ -1,0 +1,17 @@
+Pass on Android toolchain flags for CXX runtime check.
+
+https://github.com/gnustep/libobjc2/pull/113
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 32fdf33..baf5fd5 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -207,7 +207,7 @@ function(test_cxx CXX_RUNTIME_NAME IS_STDLIB)
+ 			"${CMAKE_BINARY_DIR}/CMake"
+ 			"${CMAKE_CURRENT_LIST_DIR}/CMake"
+ 			test_cxx_runtime
+-			CMAKE_FLAGS "-DCXX_RUNTIME=${CXX_RUNTIME_LIB}")
++			CMAKE_FLAGS "-DCXX_RUNTIME=${CXX_RUNTIME_LIB}" "-DANDROID_ABI=${ANDROID_ABI}" "-DANDROID_NDK=${ANDROID_NDK}" "-DANDROID_PLATFORM=${ANDROID_PLATFORM}")
+ 		if (USERUNTIME)
+ 			set(CXX_RUNTIME ${CXX_RUNTIME_LIB} PARENT_SCOPE)
+ 		endif()
