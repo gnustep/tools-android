@@ -105,10 +105,11 @@ if [ -z "${ONLY_PHASE}" ]; then
 fi
 
 mkdir -p "${SRCROOT}"
+mkdir -p "${INSTALL_ROOT}"
 
 # build toolchain for each ABI
 for ABI_NAME in $ABI_NAMES; do
-  echo -e "\n######## Building for ${ABI_NAME} ########"
+  echo -e "\n######## Building for ${ABI_NAME} ########" | tee -a "${BUILD_LOG}"
 
   # run phases
   for PHASE in ${phase_glob}; do
@@ -118,14 +119,14 @@ for ABI_NAME in $ABI_NAMES; do
       continue
     fi
 
-    echo -e "\n###### ${PHASE_NAME} ######"
-
+    echo -e "\n###### ${PHASE_NAME} ######" | tee -a "${BUILD_LOG}"
+    
     # execute phase for ABI
-    ABI_NAME=$ABI_NAME ${PHASE}
-    PHASE_RESULT=$?
+    ABI_NAME=$ABI_NAME ${PHASE} 2>&1 | tee -a "${BUILD_LOG}"
+    PHASE_RESULT=${PIPESTATUS[0]}
 
     if [ $PHASE_RESULT -ne 0 ]; then
-      echo -e "\n### phases/`basename $PHASE` failed"
+      echo -e "\n### phases/`basename $PHASE` failed" | tee -a "${BUILD_LOG}"
 
       if [ -d "${INSTALL_ROOT}.bak" ]; then
         mv "${INSTALL_ROOT}" "${INSTALL_ROOT}.failed"
