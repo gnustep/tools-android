@@ -33,7 +33,7 @@ The following options need to be installed via the Android SDK Manager (e.g. via
 * CMake _– version 3.10.2.4988404 as specified in [sdkenv.sh](env/sdkenv.sh)_
 * Android SDK Platform-Tools
 * Android SDK Tools
-* NDK
+* NDK _– revision r19c (r20 not supported due to [NDK issue #1025](https://github.com/android-ndk/ndk/issues/1025))_
 
 Usage
 -----
