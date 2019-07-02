@@ -17,12 +17,13 @@ ${CMAKE} \
   -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
   -DCMAKE_INSTALL_PREFIX="${INSTALL_PREFIX}" \
   -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE} \
+  -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY="BOTH" \
+  -DCMAKE_C_FLAGS="-DDEBUG_EXCEPTIONS=1" `# debug exception throwing` \
   -DANDROID_ABI=${ABI_NAME} \
   -DANDROID_NDK=${ANDROID_NDK_HOME} \
   -DANDROID_PLATFORM=android-${ANDROID_API_LEVEL} \
   -DGNUSTEP_CONFIG= `# prevent cmake from finding gnustep-config in install root` \
-  -DCMAKE_C_FLAGS="-DDEBUG_EXCEPTIONS=1" `# debug exception throwing` \
-  -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY="BOTH" \
+  -DOLDABI_COMPAT=false `# we're using gnustep-2.0 ABI, which may not be mixed with earlier versions'` \
 
 cd build-${ABI_NAME}
 

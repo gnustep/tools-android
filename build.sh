@@ -5,14 +5,17 @@ export ROOT_DIR=`pwd`
 
 display_usage() {
   echo "Usage: $0"
-  echo "  -a, --abis ABI_NAMES    ABIs being targeted (default: \"${ABI_NAMES}\")"
-  echo "  -l, --level API_LEVEL   Android API level being targeted (default: ${ANDROID_API_LEVEL})"
-  echo "  -b, --build BUILD_TYPE  Build type \"Debug\" or \"Release\" (default: ${BUILD_TYPE})"
-  echo "  -u, --no-update         Don't update projects to latest version from GitHub"
-  echo "  -c, --no-clean          Don't clean projects during build (e.g. for building local changes, only applies to first ABI being built)"
-  echo "  -p, --patches DIR       Apply additional patches from given directory"
-  echo "  -o, --only PHASE        Build only the given phase (e.g. \"gnustep-base\", requires previous build)"
-  echo "  -h, --help              Print usage information and exit"
+  echo "  -r, --rev NDK_REVISION     NDK revision (default: $ANDROID_NDK_VERSION)"
+  echo "  -c, --clang CLANG_VERSION  Clang prebuilt release (default: $ANDROID_CLANG_VERSION)"
+  echo "  -n, --ndk NDK_PATH         Path to Android NDK (default: $ANDROID_NDK_HOME)"
+  echo "  -a, --abis ABI_NAMES       ABIs being targeted (default: \"${ABI_NAMES}\")"
+  echo "  -l, --level API_LEVEL      Android API level being targeted (default: ${ANDROID_API_LEVEL})"
+  echo "  -b, --build BUILD_TYPE     Build type \"Debug\" or \"Release\" (default: ${BUILD_TYPE})"
+  echo "  -u, --no-update            Don't update projects to latest version from GitHub"
+  echo "  -c, --no-clean             Don't clean projects during build (e.g. for building local changes, only applies to first ABI being built)"
+  echo "  -p, --patches DIR          Apply additional patches from given directory"
+  echo "  -o, --only PHASE           Build only the given phase (e.g. \"gnustep-base\", requires previous build)"
+  echo "  -h, --help                 Print usage information and exit"
 }
 
 phase_name() {
@@ -32,6 +35,18 @@ do
   while [[ ${key+x} ]]
   do
     case $key in
+      -r|--rev)
+        export ANDROID_NDK_VERSION=$2
+        shift # option has parameter
+        ;;
+      -c|--clang)
+        export ANDROID_CLANG_VERSION=$2
+        shift # option has parameter
+        ;;
+      -n|--ndk)
+        export ANDROID_NDK_HOME=$2
+        shift # option has parameter
+        ;;
       -a|--abis)
         export ABI_NAMES=$2
         shift # option has parameter
@@ -93,6 +108,12 @@ echo "### Build type: ${BUILD_TYPE}"
 echo "### ABIs: ${ABI_NAMES}"
 echo "### Android API level: ${ANDROID_API_LEVEL}"
 
+# install custom NDK if required
+if [ ! -d "${ANDROID_NDK_HOME}" ]; then
+  echo "### Installing NDK $ANDROID_NDK_VERSION with Clang $ANDROID_CLANG_VERSION..."
+  ./install-ndk.sh -r $ANDROID_NDK_VERSION -c $ANDROID_CLANG_VERSION || exit $?
+fi
+
 if [ -z "${ONLY_PHASE}" ]; then
   # keep backup of previous build if any
   if [ -d "${INSTALL_ROOT}" ]; then
@@ -109,7 +130,7 @@ mkdir -p "${INSTALL_ROOT}"
 
 # build toolchain for each ABI
 for ABI_NAME in $ABI_NAMES; do
-  echo -e "\n######## Building for ${ABI_NAME} ########" | tee -a "${BUILD_LOG}"
+  echo -e "\n######## BUILDING FOR ${ABI_NAME} ########" | tee -a "${BUILD_LOG}"
 
   # run phases
   for PHASE in ${phase_glob}; do
@@ -126,7 +147,7 @@ for ABI_NAME in $ABI_NAMES; do
     PHASE_RESULT=${PIPESTATUS[0]}
 
     if [ $PHASE_RESULT -ne 0 ]; then
-      echo -e "\n### phases/`basename $PHASE` failed" | tee -a "${BUILD_LOG}"
+      echo -e "\n### phases/`basename $PHASE` failed for ABI ${ABI_NAME}" | tee -a "${BUILD_LOG}"
 
       if [ -d "${INSTALL_ROOT}.bak" ]; then
         mv "${INSTALL_ROOT}" "${INSTALL_ROOT}.failed"
