@@ -3,7 +3,7 @@ GNUstep Android Toolchain
 
 This project comprises a collection of scripts to build a GNUstep toolchain for Android. The toolchain can then be used in an Android project to compile and run Objective-C code using the Foundation and CoreFoundation libraries.
 
-The toolchain is built using the compiler and tools provided by the standard Android SDK and NDK (installed e.g. via [Android Studio](https://developer.android.com/studio)). It is currently set up to target Android API level 21 (5.0 / Lollipop) and supports all common Android ABIs (armeabi-v7a, arm64-v8a, x86, x86_64).
+The toolchain is built using the tools provided by the standard Android SDK (installed e.g. via [Android Studio](https://developer.android.com/studio)), plus a custom NDK using the latest Clang prebuilt from Google . It is currently set up to target Android API level 21 (5.0 / Lollipop) and supports all common Android ABIs (armeabi-v7a, arm64-v8a, x86, x86_64).
 
 Libraries
 ---------
@@ -29,11 +29,9 @@ The following options need to be installed via the Android SDK Manager (e.g. via
 
 * Android 5.0 (Lollipop / API level 21) SDK Platform _– or other SDK Platform as specified using `--level` option_
 * Android SDK Build-Tools
-* LLDB
 * CMake _– version 3.10.2.4988404 as specified in [sdkenv.sh](env/sdkenv.sh)_
 * Android SDK Platform-Tools
 * Android SDK Tools
-* NDK _– revision r19c (r20 not supported due to [NDK issue #1025](https://github.com/android-ndk/ndk/issues/1025))_
 
 Usage
 -----
@@ -42,17 +40,20 @@ Run the [build.sh](build.sh) script to build the toolchain:
 
 ```
 Usage: ./build.sh
-  -a, --abis ABI_NAMES    ABIs being targeted (default: "armeabi-v7a arm64-v8a x86 x86_64")
-  -l, --level API_LEVEL   Android API level being targeted (default: 21)
-  -b, --build BUILD_TYPE  Build type "Debug" or "Release" (default: Debug)
-  -u, --no-update         Don't update projects to latest version from GitHub
-  -c, --no-clean          Don't clean projects during build (e.g. for building local changes, only applies to first ABI being built)
-  -p, --patches DIR       Apply additional patches from given directory
-  -o, --only PHASE        Build only the given phase (e.g. "gnustep-base", requires previous build)
-  -h, --help              Print usage information and exit
+  -r, --rev NDK_REVISION     NDK revision (default: r20)
+  -c, --clang CLANG_VERSION  Clang prebuilt release (default: r353983d)
+  -n, --ndk NDK_PATH         Path to existing Android NDK (default: ~/Library/Android/android-ndk-r20-clang-r353983d)
+  -a, --abis ABI_NAMES       ABIs being targeted (default: "armeabi-v7a arm64-v8a x86 x86_64")
+  -l, --level API_LEVEL      Android API level being targeted (default: 21)
+  -b, --build BUILD_TYPE     Build type "Debug" or "Release" (default: Debug)
+  -u, --no-update            Don't update projects to latest version from GitHub
+  -c, --no-clean             Don't clean projects during build (e.g. for building local changes, only applies to first ABI being built)
+  -p, --patches DIR          Apply additional patches from given directory
+  -o, --only PHASE           Build only the given phase (e.g. "gnustep-base", requires previous build)
+  -h, --help                 Print usage information and exit
 ```
 
-The toolchain is installed into the following location (`$GNUSTEP_HOME`):
+The toolchain automatically downloads and installs the NDK and prebuilt Clang release (via [install-ndk.sh](install-ndk.sh)), and builds and installs the GNUstep toolchain into the following location (`$GNUSTEP_HOME`):
 
 * macOS: `~/Library/Android/GNUstep`
 * Linux: `~/Android/GNUstep`
@@ -66,6 +67,11 @@ To use the toolchain from an Android project, you can use `$GNUSTEP_HOME/$ABI_NA
 * `gnustep-config --base-libs`
 
 Call `gnustep-config --help` to obtain the full list of available variables.
+
+You may also want to configure your app’s build environment to use the custom NDK (e.g. in Android Studio), which is installed into the following location:
+
+* macOS: `~/Library/Android/android-ndk-r20-clang-r353983d`
+* Linux: `~/Android/android-ndk-r20-clang-r353983d`
 
 Examples
 --------
