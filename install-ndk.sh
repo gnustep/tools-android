@@ -182,8 +182,14 @@ pushd $CLANG_PREBUILT
   # get platform toolchain libraries from runtimes_ndk_cxx
   for VERSION in lib64/clang/*; do
     rm -rf $VERSION/lib/linux
-    cp -r $CLANG_TARGET_RUNTIMES $VERSION/lib/linux
+    cp -R $CLANG_TARGET_RUNTIMES/ $VERSION/lib/linux
   done
+  
+  # clean up target binaries and runtimes
+  if [ "$HOST_TAG" != "linux-x86_64" ]; then
+    rm -rf $CLANG_TARGET_BINARIES
+  fi
+  rm -rf $CLANG_TARGET_RUNTIMES
 
 popd
 
@@ -195,7 +201,5 @@ cp -Rf $CLANG_PREBUILT/ $CLANG_DEST
 
 # clean up
 rm -rf $CLANG_PREBUILT
-rm -rf $CLANG_TARGET_BINARIES
-rm -rf $CLANG_TARGET_RUNTIMES
 
 echo "Done"
