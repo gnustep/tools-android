@@ -7,7 +7,7 @@ display_usage() {
   echo "Usage: $0"
   echo "  -r, --rev NDK_REVISION     NDK revision (default: $ANDROID_NDK_VERSION)"
   echo "  -c, --clang CLANG_VERSION  Clang prebuilt release (default: $ANDROID_CLANG_VERSION)"
-  echo "  -n, --ndk NDK_PATH         Path to Android NDK (default: $ANDROID_NDK_HOME)"
+  echo "  -n, --ndk NDK_PATH         Path to existing Android NDK (default: $ANDROID_NDK_HOME)"
   echo "  -a, --abis ABI_NAMES       ABIs being targeted (default: \"${ABI_NAMES}\")"
   echo "  -l, --level API_LEVEL      Android API level being targeted (default: ${ANDROID_API_LEVEL})"
   echo "  -b, --build BUILD_TYPE     Build type \"Debug\" or \"Release\" (default: ${BUILD_TYPE})"

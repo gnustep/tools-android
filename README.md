@@ -3,7 +3,9 @@ GNUstep Android Toolchain
 
 This project comprises a collection of scripts to build a GNUstep toolchain for Android. The toolchain can then be used in an Android project to compile and run Objective-C code using the Foundation and CoreFoundation libraries.
 
-The toolchain is built using the tools provided by the standard Android SDK (installed e.g. via [Android Studio](https://developer.android.com/studio)), plus a custom NDK using the latest Clang prebuilt from Google . It is currently set up to target Android API level 21 (5.0 / Lollipop) and supports all common Android ABIs (armeabi-v7a, arm64-v8a, x86, x86_64).
+The toolchain is built using the tools provided by the standard Android SDK (installed e.g. via [Android Studio](https://developer.android.com/studio)), plus a custom NDK using the latest Clang prebuilt from Google (required to work around bugs in the older Clang version shipping with the official NDK which prevent usage of the gnustep-2.0 Objective C runtime).
+
+The toolchain is set up to target Android API level 21 (5.0 / Lollipop) and supports all common Android ABIs (armeabi-v7a, arm64-v8a, x86, x86_64).
 
 Libraries
 ---------
@@ -12,7 +14,7 @@ The toolchain currently compiles the following libraries for Android:
 
 * [GNUstep Base Library](https://github.com/gnustep/libs-base) (with some [patches](patches))
 * [GNUstep CoreBase Library](https://github.com/gnustep/libs-corebase)
-* [libobjc2](https://github.com/gnustep/libobjc2) (using gnustep-1.9 runtime)
+* [libobjc2](https://github.com/gnustep/libobjc2) (using gnustep-2.0 runtime)
 * [libdispatch](https://github.com/apple/swift-corelibs-libdispatch) (official Apple release from the Swift Core Libraries)
 * [libcxxrt](https://github.com/pathscale/libcxxrt) (for Objective-C++ exception support)
 * [libffi](https://github.com/libffi/libffi)
@@ -32,6 +34,10 @@ The following options need to be installed via the Android SDK Manager (e.g. via
 * CMake _– version 3.10.2.4988404 as specified in [sdkenv.sh](env/sdkenv.sh)_
 * Android SDK Platform-Tools
 * Android SDK Tools
+
+Additional requirements:
+
+* `curl` command-line utility
 
 Usage
 -----
@@ -70,8 +76,8 @@ Call `gnustep-config --help` to obtain the full list of available variables.
 
 You may also want to configure your app’s build environment to use the custom NDK (e.g. in Android Studio), which is installed into the following location:
 
-* macOS: `~/Library/Android/android-ndk-r20-clang-r353983d`
-* Linux: `~/Android/android-ndk-r20-clang-r353983d`
+* macOS: `~/Library/Android/android-ndk-<NDK_REVISION>-clang-<CLANG_VERSION>`
+* Linux: `~/Android/android-ndk-<NDK_REVISION>-clang-<CLANG_VERSION>`
 
 Examples
 --------
