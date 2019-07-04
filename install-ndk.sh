@@ -197,7 +197,7 @@ popd
 rm -rf $CLANG_DEST/lib64/clang
 
 # copy clang prebuilt directory over NDK clang
-cp -Rf $CLANG_PREBUILT/ $CLANG_DEST
+cp -Rf $CLANG_PREBUILT/* $CLANG_DEST
 
 # clean up
 rm -rf $CLANG_PREBUILT
