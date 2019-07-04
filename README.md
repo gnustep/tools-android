@@ -29,15 +29,20 @@ Supported host platforms are macOS and Linux.
 
 The following options need to be installed via the Android SDK Manager (e.g. via Android Studio):
 
-* Android 5.0 (Lollipop / API level 21) SDK Platform _– or other SDK Platform as specified using `--level` option_
-* Android SDK Build-Tools
 * CMake _– version 3.10.2.4988404 as specified in [sdkenv.sh](env/sdkenv.sh)_
-* Android SDK Platform-Tools
-* Android SDK Tools
 
-Additional requirements:
+Additional packages that may be required by the scripts or libraries:
 
-* `curl` command-line utility
+* `curl`
+* `git`
+* `autoconf`
+* `libtool`
+* `make`
+* `texinfo`
+* `pkg-config`
+* `python3-distutils`
+
+These will be already present on many systems, so you may want to try running the build script to see if it succeeds. If necessary you can install the packages via [Homebrew](https://brew.sh) on Mac (`brew install <package>`), or APT on Linux (`sudo apt install <package>`).
 
 Usage
 -----
