@@ -1,4 +1,9 @@
 #!/bin/bash
+#
+# Downloads the specified NDK, and integrates a Clang prebuilt from Google into
+# the NDK by performing the same steps as Clang.install() in checkbuild.py:
+# https://android.googlesource.com/platform/ndk/+/master/ndk/checkbuild.py
+#
 
 set -e # make any subsequent failing command exit the script
 
@@ -21,8 +26,8 @@ esac
 
 display_usage() {
   echo "Usage: $0 -n <NDK_VERSION> -c <CLANG_VERSION>"
-  echo "  -r, --rev NDK_REVISION     NDK revision (required)"
-  echo "  -c, --clang CLANG_VERSION  Clang prebuilt release (required)"
+  echo "  -r, --rev NDK_REVISION     NDK revision (required, e.g. 'n20')"
+  echo "  -c, --clang CLANG_VERSION  Clang prebuilt release (required, e.g. 'r353983d')"
   echo "  -d, --dest ANDROID_ROOT    Installation destination (default: $ANDROID_ROOT)"
   echo "  -h, --help                 Print usage information and exit"
   echo ""
