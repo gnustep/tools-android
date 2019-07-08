@@ -18,6 +18,8 @@ echo -e "\n### Running configure"
   --without-python \
   --without-lzma \
   --disable-shared \
+  --without-zlib \
+  LDFLAGS="${LDFLAGS} -lz" \
   CFLAGS="${CFLAGS} -fPIC" `# required to remove unsupported text relocations` \
 
 echo -e "\n### Building"
