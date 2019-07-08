@@ -36,6 +36,7 @@ Additional packages that may be required by the scripts or libraries:
 * `curl`
 * `git`
 * `autoconf`
+* `automake`
 * `libtool`
 * `make`
 * `texinfo`
