@@ -10,7 +10,7 @@ display_usage() {
   echo "  -n, --ndk NDK_PATH         Path to existing Android NDK (default: $ANDROID_NDK_HOME)"
   echo "  -a, --abis ABI_NAMES       ABIs being targeted (default: \"${ABI_NAMES}\")"
   echo "  -l, --level API_LEVEL      Android API level being targeted (default: ${ANDROID_API_LEVEL})"
-  echo "  -b, --build BUILD_TYPE     Build type \"Debug\" or \"Release\" (default: ${BUILD_TYPE})"
+  echo "  -b, --build BUILD_TYPE     Build type \"Debug\" or \"Release\" or \"RelWithDebInfo\" (default: ${BUILD_TYPE})"
   echo "  -u, --no-update            Don't update projects to latest version from GitHub"
   echo "  -c, --no-clean             Don't clean projects during build (e.g. for building local changes, only applies to first ABI being built)"
   echo "  -p, --patches DIR          Apply additional patches from given directory"
