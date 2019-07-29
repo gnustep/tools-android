@@ -23,7 +23,7 @@ esac
 ABI_NAMES=${ABI_NAMES:-armeabi-v7a arm64-v8a x86 x86_64}
 ABI_NAME=${ABI_NAME:-armeabi-v7a}
 ANDROID_API_LEVEL=${ANDROID_API_LEVEL:-21}
-BUILD_TYPE=${BUILD_TYPE:-Debug}
+BUILD_TYPE=${BUILD_TYPE:-RelWithDebInfo}
 
 # ABI-dependant properties
 case $ABI_NAME in
@@ -72,6 +72,24 @@ ANDROID_PLATFORM_TOOLS=${ANDROID_HOME}/platform-tools
 # CMake
 CMAKE=${ANDROID_CMAKE_ROOT}/bin/cmake
 CMAKE_TOOLCHAIN_FILE=${ANDROID_NDK_HOME}/build/cmake/android.toolchain.cmake
+
+# GNUstep Make
+if [ -z "$GNUSTEP_MAKE_OPTIONS" ]; then
+  GNUSTEP_MAKE_OPTIONS="messages=yes"
+  case $BUILD_TYPE in
+    Debug)
+      GNUSTEP_MAKE_OPTIONS="$GNUSTEP_MAKE_OPTIONS debug=yes"
+      ;;
+    RelWithDebInfo)
+      GNUSTEP_MAKE_OPTIONS="$GNUSTEP_MAKE_OPTIONS debug=yes OPTFLAG=-O2"
+      ;;
+    Release)
+      ;;
+    *)
+      echo "Error: unknown build type \"$BUILD_TYPE\"."
+      exit 1
+  esac
+fi
 
 # Ninja
 NINJA=${ANDROID_CMAKE_ROOT}/bin/ninja

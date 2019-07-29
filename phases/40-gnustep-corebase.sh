@@ -21,7 +21,7 @@ echo -e "\n### Running configure"
   LDFLAGS="${LDFLAGS} -L${INSTALL_PREFIX}/lib" \
 
 echo -e "\n### Building"
-make -j${MAKE_JOBS} debug=yes
+make -j${MAKE_JOBS} ${GNUSTEP_MAKE_OPTIONS}
 
 echo -e "\n### Installing"
 make install
