@@ -57,7 +57,7 @@ Usage: ./build.sh
   -n, --ndk NDK_PATH         Path to existing Android NDK (default: ~/Library/Android/android-ndk-r20-clang-r353983d)
   -a, --abis ABI_NAMES       ABIs being targeted (default: "armeabi-v7a arm64-v8a x86 x86_64")
   -l, --level API_LEVEL      Android API level being targeted (default: 21)
-  -b, --build BUILD_TYPE     Build type "Debug" or "Release" (default: Debug)
+  -b, --build BUILD_TYPE     Build type "Debug" or "Release" or "RelWithDebInfo" (default: RelWithDebInfo)
   -u, --no-update            Don't update projects to latest version from GitHub
   -c, --no-clean             Don't clean projects during build (e.g. for building local changes, only applies to first ABI being built)
   -p, --patches DIR          Apply additional patches from given directory
