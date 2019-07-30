@@ -81,9 +81,10 @@ if [ -z "$GNUSTEP_MAKE_OPTIONS" ]; then
       GNUSTEP_MAKE_OPTIONS="$GNUSTEP_MAKE_OPTIONS debug=yes"
       ;;
     RelWithDebInfo)
-      GNUSTEP_MAKE_OPTIONS="$GNUSTEP_MAKE_OPTIONS debug=yes OPTFLAG=-O2"
+      GNUSTEP_MAKE_OPTIONS="$GNUSTEP_MAKE_OPTIONS debug=yes OPTFLAG=-Os"
       ;;
     Release)
+      GNUSTEP_MAKE_OPTIONS="$GNUSTEP_MAKE_OPTIONS OPTFLAG=-Os"
       ;;
     *)
       echo "Error: unknown build type \"$BUILD_TYPE\"."
