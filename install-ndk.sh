@@ -108,6 +108,7 @@ fi
 
 # download and extract archives
 
+mkdir -p $ANDROID_ROOT
 mkdir -p $TMP_DIR
 
 pushd $TMP_DIR
