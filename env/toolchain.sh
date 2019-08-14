@@ -20,4 +20,5 @@ export OBJCFLAGS=""
 
 # -fuse-ld=gold required to work around BFD ld linker bugs on arm64 with gnustep-2.0 libobjc runtime
 # -rpath-link required for linker to find libcxxrt dependency of libobjc
-export LDFLAGS="-L${ANDROID_LIB} -fuse-ld=gold -Wl,-rpath-link,${INSTALL_PREFIX}/lib"
+# --build-id=sha1 required for Android Studio to locate debug information
+export LDFLAGS="-L${ANDROID_LIB} -fuse-ld=gold -Wl,-rpath-link,${INSTALL_PREFIX}/lib -Wl,--build-id=sha1"
