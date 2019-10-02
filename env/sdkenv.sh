@@ -70,7 +70,7 @@ ANDROID_CMAKE_ROOT=${ANDROID_HOME}/cmake/3.10.2.4988404
 ANDROID_PLATFORM_TOOLS=${ANDROID_HOME}/platform-tools
 
 # CMake
-CMAKE=${ANDROID_CMAKE_ROOT}/bin/cmake
+CMAKE=${CMAKE:-cmake}
 CMAKE_TOOLCHAIN_FILE=${ANDROID_NDK_HOME}/build/cmake/android.toolchain.cmake
 
 # GNUstep Make
