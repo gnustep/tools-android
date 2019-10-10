@@ -27,23 +27,29 @@ Requirements
 
 Supported host platforms are macOS and Linux.
 
-The following options need to be installed via the Android SDK Manager (e.g. via Android Studio):
+You must have [Android Studio](https://developer.android.com/studio), and have the following options installed in the SDK Manager:
 
 * CMake _– version 3.10.2.4988404 as specified in [sdkenv.sh](env/sdkenv.sh)_
 
-Additional packages that may be required by the scripts or libraries:
+Additionally the following packages are required depending on your system.
 
-* `curl`
-* `git`
-* `autoconf`
-* `automake`
-* `libtool`
-* `make`
-* `texinfo`
-* `pkg-config`
-* `python3-distutils`
+**macOS**
 
-These will be already present on many systems, so you may want to try running the build script to see if it succeeds. If necessary you can install the packages via [Homebrew](https://brew.sh) on Mac (`brew install <package>`), or APT on Linux (`sudo apt install <package>`).
+Install required packages via [Homebrew](https://brew.sh):
+
+```
+brew install cmake autoconf automake libtool pkg-config
+```
+
+**Linux**
+
+Install required packages via APT:
+
+```
+sudo apt install git curl cmake make autoconf libtool pkg-config texinfo python3-distutils
+```
+
+Please note that you need to have CMake version 3.15.1 or later ([for libdispatch](https://github.com/apple/swift-corelibs-libdispatch/blob/master/CMakeLists.txt#L2)).
 
 Usage
 -----
