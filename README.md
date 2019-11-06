@@ -38,7 +38,8 @@ Additionally the following packages are required depending on your system.
 Install required packages via [Homebrew](https://brew.sh):
 
 ```
-brew install cmake autoconf automake libtool pkg-config
+brew install git-lfs cmake autoconf automake libtool pkg-config
+git lfs install
 ```
 
 **Linux**
@@ -46,7 +47,8 @@ brew install cmake autoconf automake libtool pkg-config
 Install required packages via APT:
 
 ```
-sudo apt install git curl cmake make autoconf libtool pkg-config texinfo python3-distutils
+sudo apt install git git-lfs curl cmake make autoconf libtool pkg-config texinfo python3-distutils
+git lfs install
 ```
 
 Please note that you need to have CMake version 3.15.1 or later ([for libdispatch](https://github.com/apple/swift-corelibs-libdispatch/blob/master/CMakeLists.txt#L2)).
