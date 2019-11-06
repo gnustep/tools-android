@@ -74,23 +74,20 @@ CMAKE=${CMAKE:-cmake}
 CMAKE_TOOLCHAIN_FILE=${ANDROID_NDK_HOME}/build/cmake/android.toolchain.cmake
 
 # GNUstep Make
-if [ -z "$GNUSTEP_MAKE_OPTIONS" ]; then
-  GNUSTEP_MAKE_OPTIONS="messages=yes"
-  case $BUILD_TYPE in
-    Debug)
-      GNUSTEP_MAKE_OPTIONS="$GNUSTEP_MAKE_OPTIONS debug=yes"
-      ;;
-    RelWithDebInfo)
-      GNUSTEP_MAKE_OPTIONS="$GNUSTEP_MAKE_OPTIONS debug=yes OPTFLAG=-Os"
-      ;;
-    Release)
-      GNUSTEP_MAKE_OPTIONS="$GNUSTEP_MAKE_OPTIONS OPTFLAG=-Os"
-      ;;
-    *)
-      echo "Error: unknown build type \"$BUILD_TYPE\"."
-      exit 1
-  esac
-fi
+case $BUILD_TYPE in
+  Debug)
+    GNUSTEP_MAKE_OPTIONS="$GNUSTEP_MAKE_OPTIONS debug=yes"
+    ;;
+  RelWithDebInfo)
+    GNUSTEP_MAKE_OPTIONS="$GNUSTEP_MAKE_OPTIONS debug=yes OPTFLAG=-Os"
+    ;;
+  Release)
+    GNUSTEP_MAKE_OPTIONS="$GNUSTEP_MAKE_OPTIONS OPTFLAG=-Os"
+    ;;
+  *)
+    echo "Error: unknown build type \"$BUILD_TYPE\"."
+    exit 1
+esac
 
 # Ninja
 NINJA=${ANDROID_CMAKE_ROOT}/bin/ninja
