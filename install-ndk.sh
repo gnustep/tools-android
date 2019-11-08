@@ -207,5 +207,6 @@ cp -Rf $CLANG_PREBUILT/* $CLANG_DEST
 
 # clean up
 rm -rf $CLANG_PREBUILT
+rm -rf $TMP_DIR
 
 echo "Done"
