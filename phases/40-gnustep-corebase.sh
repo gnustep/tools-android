@@ -16,7 +16,7 @@ echo -e "\n### Running configure"
   --host=${ANDROID_TARGET} \
   --prefix="${INSTALL_PREFIX}" \
   `# for some reason we need to manually specify the include and lib dir` \
-  CFLAGS="${CCFLAGS} -I${INSTALL_PREFIX}/include" \
+  CFLAGS="${CFLAGS} -I${INSTALL_PREFIX}/include" \
   CPPFLAGS="${CPPFLAGS} -I${INSTALL_PREFIX}/include" \
   LDFLAGS="${LDFLAGS} -L${INSTALL_PREFIX}/lib" \
 
