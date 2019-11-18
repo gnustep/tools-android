@@ -45,6 +45,7 @@ case $ABI_NAME in
     ;;
   *)
     echo "Error: Unsupported ABI \"$ABI_NAME\"."
+    echo "Supported ABIs are: armeabi-v7a, arm64-v8a, x86, x86_64"
     exit 1
 esac
 
