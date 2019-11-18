@@ -4,7 +4,7 @@ set -e # make any subsequent failing command exit the script
 
 . `dirname $0`/common.sh
 
-prepare_project "libcxxrt" "https://github.com/pathscale/libcxxrt.git"
+prepare_project "libcxxrt" "https://github.com/libcxxrt/libcxxrt.git"
 
 echo -e "\n### Running cmake"
 mkdir -p build-${ABI_NAME}
