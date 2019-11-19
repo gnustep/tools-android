@@ -6,6 +6,15 @@ set -e # make any subsequent failing command exit the script
 
 prepare_project "libxslt" "https://github.com/GNOME/libxslt.git"
 
+if [ "$NO_UPDATE" != true ]; then
+  # check out latest release
+  echo -e "\n### Checking out latest release"
+  latest_release_tag=`curl -s https://api.github.com/repos/GNOME/libxslt/tags | grep '"name":' | sed -E 's/.*"([^"]+)".*/\1/' | egrep '^v\d+\.\d+(\.\d+)?$' | head -n 1`
+  echo -e "Release: $latest_release_tag\n"
+  git fetch --tags
+  git checkout -q $latest_release_tag
+fi
+
 . "${ROOT_DIR}"/env/toolchain.sh
 
 echo -e "\n### Running autogen"
