@@ -10,16 +10,9 @@ if [ "$NO_UPDATE" = true ]; then
   NO_CLEAN=true
 fi
 
-prepare_project "icu" "https://github.com/unicode-org/icu"
+latest_release_tag=`curl -s https://api.github.com/repos/unicode-org/icu/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/'`
 
-if [ "$NO_UPDATE" != true ]; then
-  # check out latest release
-  echo -e "\n### Checking out latest release"
-  latest_release_tag=`curl -s https://api.github.com/repos/unicode-org/icu/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/'`
-  echo -e "Release: $latest_release_tag\n"
-  git fetch --tags
-  git checkout -q $latest_release_tag
-fi
+prepare_project "icu" "https://github.com/unicode-org/icu" $latest_release_tag
 
 case "$OSTYPE" in
   darwin*)
