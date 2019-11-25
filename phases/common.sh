@@ -23,6 +23,7 @@ prepare_project () {
     echo -e "\n### Cleaning project"
     git reset --hard
     git clean -qfdx
+    git submodule update --init --recursive
   fi
 
   if [ "$NO_UPDATE" != true ]; then
