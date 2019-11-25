@@ -14,7 +14,7 @@ prepare_project () {
 
   if [ ! -d "${PROJECT}" ]; then
     echo -e "\n### Cloning project"
-    git clone ${REPO} ${PROJECT}
+    git clone --recursive ${REPO} ${PROJECT}
   fi
 
   cd ${PROJECT}
@@ -23,7 +23,6 @@ prepare_project () {
     echo -e "\n### Cleaning project"
     git reset --hard
     git clean -qfdx
-    git submodule update --init --recursive
   fi
 
   if [ "$NO_UPDATE" != true ]; then
@@ -47,6 +46,9 @@ prepare_project () {
       git fetch --tags
       git checkout -q $TAG
     fi
+
+    git submodule sync --recursive
+    git submodule update --recursive
   fi
 
   if [ "$NO_PATCHES" != true ]; then
