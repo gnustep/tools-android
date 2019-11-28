@@ -48,7 +48,7 @@ prepare_project () {
     fi
 
     git submodule sync --recursive
-    git submodule update --recursive
+    git submodule update --recursive --init # also init in case submodule was added with update
   fi
 
   if [ "$NO_PATCHES" != true ]; then
