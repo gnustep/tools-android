@@ -4,7 +4,9 @@ set -e # make any subsequent failing command exit the script
 
 . `dirname $0`/common.sh
 
-prepare_project "libffi" "https://github.com/libffi/libffi.git"
+latest_release_tag=`curl -s https://api.github.com/repos/libffi/libffi/tags | grep '"name":' | sed -E 's/.*"([^"]+)".*/\1/' | egrep '^v\d+\.\d+(\.\d+)?$' | head -n 1`
+
+prepare_project "libffi" "https://github.com/libffi/libffi.git" $latest_release_tag
 
 . "${ROOT_DIR}"/env/toolchain.sh
 
