@@ -61,8 +61,8 @@ Run the [build.sh](build.sh) script to build the toolchain:
 ```
 Usage: ./build.sh
   -r, --rev NDK_REVISION     NDK revision (default: r20)
-  -c, --clang CLANG_VERSION  Clang prebuilt release (default: r353983d)
-  -n, --ndk NDK_PATH         Path to existing Android NDK (default: ~/Library/Android/android-ndk-r20-clang-r353983d)
+  -c, --clang CLANG_VERSION  Clang prebuilt release (default: r353983c1)
+  -n, --ndk NDK_PATH         Path to existing Android NDK (default: ~/Library/Android/android-ndk-r20-clang-r353983c1)
   -a, --abis ABI_NAMES       ABIs being targeted (default: "armeabi-v7a arm64-v8a x86 x86_64")
   -l, --level API_LEVEL      Android API level being targeted (default: 21)
   -b, --build BUILD_TYPE     Build type "Debug" or "Release" or "RelWithDebInfo" (default: RelWithDebInfo)
