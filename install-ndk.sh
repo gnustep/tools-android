@@ -94,7 +94,7 @@ CLANG_TARGET_RUNTIMES_URL=https://android.googlesource.com/platform/prebuilts/cl
 
 # define paths
 
-TMP_DIR=/tmp/ndk-$NDK_VERSION-clang-$CLANG_VERSION
+TMP_DIR=/tmp/android-ndk-$NDK_VERSION-clang-$CLANG_VERSION
 NDK_ROOT=$ANDROID_ROOT/android-ndk-$NDK_VERSION-clang-$CLANG_VERSION
 CLANG_DEST=$NDK_ROOT/toolchains/llvm/prebuilt/$HOST_TAG
 CLANG_PREBUILT=$TMP_DIR/clang-$CLANG_VERSION
@@ -105,6 +105,8 @@ else
   CLANG_TARGET_BINARIES=$TMP_DIR/clang
   CLANG_TARGET_RUNTIMES=$TMP_DIR/runtimes_ndk_cxx
 fi
+
+echo "Download directory: $TMP_DIR"
 
 # download and extract archives
 
