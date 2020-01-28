@@ -20,7 +20,7 @@ ${CMAKE} \
   -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY="BOTH" \
   -DCMAKE_C_FLAGS="-DDEBUG_EXCEPTIONS=1" `# debug exception throwing` \
   -DANDROID_ABI=${ABI_NAME} \
-  -DANDROID_NDK=${ANDROID_NDK_HOME} \
+  -DANDROID_NDK=${ANDROID_NDK_ROOT} \
   -DANDROID_PLATFORM=android-${ANDROID_API_LEVEL} \
   -DGNUSTEP_CONFIG= `# prevent cmake from finding gnustep-config in install root` \
   -DOLDABI_COMPAT=false `# we're using gnustep-2.0 ABI, which may not be mixed with earlier versions'` \

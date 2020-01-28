@@ -4,7 +4,7 @@ echo "### Set toolchain vars"
 
 # See https://developer.android.com/ndk/guides/other_build_systems
 
-export TOOLCHAIN="${ANDROID_NDK_HOME}"/toolchains/llvm/prebuilt/${HOST_TAG}
+export TOOLCHAIN="${ANDROID_NDK_ROOT}"/toolchains/llvm/prebuilt/${HOST_TAG}
 export CC="${TOOLCHAIN}"/bin/${ANDROID_TARGET}${ANDROID_API_LEVEL}-clang
 export CXX="${TOOLCHAIN}"/bin/${ANDROID_TARGET}${ANDROID_API_LEVEL}-clang++
 export OBJC="${CC}"
