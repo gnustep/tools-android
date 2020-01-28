@@ -1,0 +1,26 @@
+Work around Android NDK r21 issues with _Atomic type.
+
+Include the C atomic header on Android because of issues with NDK r21:
+https://github.com/android/ndk/issues/1177
+https://github.com/android/ndk/issues/1178
+
+diff --git a/src/shims/atomic.h b/src/shims/atomic.h
+index c002e72..1dea39d 100644
+--- a/src/shims/atomic.h
++++ b/src/shims/atomic.h
+@@ -35,7 +35,15 @@
+ #if defined(__cplusplus)
+ #define _Bool bool
+ #endif
++
++#if defined(ANDROID) && __has_include(<bits/stdatomic.h>)
++// Include the C atomic header on Android because of issues with NDK r21:
++// https://github.com/android/ndk/issues/1177
++// https://github.com/android/ndk/issues/1178
++#include <bits/stdatomic.h>
++#else
+ #include <stdatomic.h>
++#endif
+ 
+ #define memory_order_ordered    memory_order_seq_cst
+ #define memory_order_dependency memory_order_acquire
