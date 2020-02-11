@@ -20,6 +20,7 @@ echo -e "\n### Running configure"
   --with-library-combo=ng-gnu-gnu \
   --with-layout=fhs \
   --with-user-config-file="${GNUSTEP_USER_CONFIG_FILE}" \
+  --with-runtime-abi=gnustep-2.0 \
   --enable-objc-arc \
   --enable-native-objc-exceptions
 
