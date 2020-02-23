@@ -93,6 +93,52 @@ You may also want to configure your app’s build environment to use the custom 
 * macOS: `~/Library/Android/android-ndk-<NDK_REVISION>-clang-<CLANG_VERSION>`
 * Linux: `~/Android/android-ndk-<NDK_REVISION>-clang-<CLANG_VERSION>`
 
+Step by step Android project configuration
+------------------------------------------
+1. Create or open an android project. Java or Kotlin works.
+2. In the project pane, switch to "Project Files".
+3. Create a new folder "app/src/main/cpp".
+4. Add your existing Objective-C header- and implementation-files to the cpp folder.
+5. Copy the sample projects [CMakeLists.txt](https://github.com/gnustep/android-examples/blob/master/hello-objectivec/app/src/main/cpp/CMakeLists.txt) and [GSInitialize.m](https://github.com/gnustep/android-examples/blob/master/hello-objectivec/app/src/main/cpp/GSInitialize.m).
+6. Right-click "app", select "Link to C++". Choose your CMakeLists.txt
+7. Edit CMakeLists.txt to include GSInitialize.m and your Objective-C implementation files in OBJECTUVEC_SRCS. Remove the the reference to "native-lib.cpp".
+8. Edit app/build.gradle and add the following to android > defaultConfig:
+```
+externalNativeBuild {
+  cmake {
+    cppFlags ""
+  }
+}
+ndk {
+  // ABIs supported by GNUstep toolchain
+  abiFilters "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
+}
+```
+9. Add the path to the custom NDK in File > Projet Structure… > SDK Location > Android NDK location
+10. Write JNI functions for every call into your Objective-C code.
+10. Load and call into the library from your android code. Example for a MainActivity written in Kotlin:
+```
+class MainActivity : AppCompatActivity() {
+
+    external fun initializeGNUstep(context: Context?)
+    external fun stringFromObjectiveC(context: Context?)
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        initializeGNUstep(this)
+        stringFromObjectiveC(this)
+        …
+    }
+
+    companion object {
+        // Used to load the 'native-lib' library on application startup.
+        init {
+            System.loadLibrary("native-lib")
+        }
+    }
+}
+```
+
 Examples
 --------
 
