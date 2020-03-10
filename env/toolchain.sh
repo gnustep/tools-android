@@ -19,3 +19,6 @@ export STRIP="${TOOLCHAIN}"/bin/${ANDROID_TARGET_BINUTILS}-strip
 # -rpath-link required for linker to find libcxxrt dependency of libobjc
 # --build-id=sha1 required for Android Studio to locate debug information
 export LDFLAGS="-fuse-ld=gold -Wl,-rpath-link,${INSTALL_PREFIX}/lib -Wl,--build-id=sha1"
+
+# ensure libraries link against shared C++ runtime library
+export LIBS="-lc++_shared"
