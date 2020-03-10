@@ -8,19 +8,10 @@ prepare_project "libcxxrt" "https://github.com/libcxxrt/libcxxrt.git"
 
 echo -e "\n### Running cmake"
 mkdir -p build-${ABI_NAME}
-
-${CMAKE} \
-  -H"${SRCROOT}"/${PROJECT} \
-  -B"${SRCROOT}"/${PROJECT}/build-${ABI_NAME} \
-  -G"Ninja" \
-  -DCMAKE_MAKE_PROGRAM=${NINJA} \
-  -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
-  -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE} \
-  -DANDROID_ABI=${ABI_NAME} \
-  -DANDROID_NDK=${ANDROID_NDK_ROOT} \
-  -DANDROID_PLATFORM=android-${ANDROID_API_LEVEL} \
-
 cd build-${ABI_NAME}
+
+${CMAKE} .. \
+  ${CMAKE_OPTIONS} \
 
 echo -e "\n### Building"
 ${NINJA}
