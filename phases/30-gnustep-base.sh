@@ -34,8 +34,7 @@ echo -e "\n### Running configure"
 
 echo -e "\n### Building"
 # use -nopie to avoid ld error: https://lists.gnu.org/archive/html/discuss-gnustep/2015-09/msg00057.html
-# use -static-libstdc++ to enable C++ support (for patches)
-make LDFLAGS="${LDFLAGS} -nopie -static-libstdc++" -j${MAKE_JOBS} ${GNUSTEP_MAKE_OPTIONS}
+make LDFLAGS="${LDFLAGS} -nopie" -j${MAKE_JOBS} ${GNUSTEP_MAKE_OPTIONS}
 
 echo -e "\n### Installing"
 make install
