@@ -21,7 +21,7 @@ echo -e "\n### Running configure"
   --disable-multi-os-directory `# fixes warning about unsupported -print-multi-os-directory with clang` \
 
 echo -e "\n### Building"
-make
+make -j${MAKE_JOBS}
 
 echo -e "\n### Installing"
 make install
