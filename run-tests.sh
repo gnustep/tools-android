@@ -1,38 +1,55 @@
 #!/bin/sh
 
 ARCH=$1
+DEVICE=$2
+
+export ABI_NAME=${ARCH}
+export GNUSTEP_TESTS_DIR=/data/local/tmp/gnustep-tests-${ARCH}
+
+set -e
+
+echo "## initialize environment"
+. ./env/sdkenv.sh
+. ./env/toolchain.sh
+. ./env/makeenv.sh
+
+$ADB start-server
 
 if [ "${ARCH}" == "" ]; then
-	echo "an argument is needed"
+	echo "usage: $0 <architecture> <device>"
 	exit 0
 fi 
 
+if [ "$DEVICE" == "" ]; then
+	DEVICE=`${ADB} devices | grep -v "List of devices" | sed 's/device//g' | head -n 1`
+fi
+
 echo "== building tests for android ${ARCH}"
-export PATH=~/Library/Android/sdk/platform-tools:${PATH}
-DEVICE=`~/Library/Android/sdk/platform-tools/adb devices | grep -v "List of devices attached" | sed "s/device//g" | sed "s/\t//g" | sed "s/ //g"`  
+export PATH=${ANDROID_PLATFORM_TOOLS}:${PATH}
+DEVICE=`${ADB} devices | grep -v "List of devices attached" | sed "s/device//g" | sed "s/\t//g" | sed "s/ //g"`  
 RUN_DIR=`pwd`
 cp ${RUN_DIR}/scripts/gnustep-tests /Users/heron/Library/Android/GNUstep/${ARCH}/bin/gnustep-tests
 
 # List devices...
-echo "\n* starting server"
-adb start-server
-adb devices
-adb shell rm -rf /data/local/temp/*
+echo "\n* starting server, cleaning up and making directory"
+${ADB} devices
+${ADB} -s ${DEVICE} shell rm -rf ${GNUSTEP_TESTS_DIR}
+${ADB} -s ${DEVICE} shell mkdir -p ${GNUSTEP_TESTS_DIR}
 
 echo "\n* copying files..."
 # Translate Architecture names...
 case $ARCH in
 	arm64-v8a)
-		ARCH_SRCH=aarch64-linux-android
+		TARGET=aarch64-linux-android
 		;;
 	armeabi-v7a)
-		ARCH_SRCH=arm-linux-androideabi
+		TARGET=arm-linux-androideabi
 		;;
 	x86)
-		ARCH_SRCH=i686-linux-android
+		TARGET=i686-linux-android
 		;;
 	x86_64)
-		ARCH_SRCH=x86_64-linux-android
+		TARGET=x86_64-linux-android
 		;;
 	*)
 		echo "Error, unknown architecture"
@@ -43,22 +60,22 @@ esac
 cd src/gnustep-base
 
 # Initialize for a given architecture...
-. ~/Library/Android/GNUstep/${ARCH}/share/GNUstep/Makefiles/GNUstep.sh
-cd ~/Library/Android/android-ndk-r20-clang-r353983c1
+. ${INSTALL_PREFIX}/share/GNUstep/Makefiles/GNUstep.sh
+cd ${ANDROID_NDK_ROOT} #~/Library/Android/android-ndk-r20-clang-r353983c1
 
 # Copy .so files needed to link against...
 echo "\n- sending toolchain .so files..."
-FILES=`find . | grep \\.so$ | grep ${ARCH_SRCH} | grep toolchains | grep 21`
+FILES=`find . | grep \\.so$ | grep ${TARGET} | grep toolchains | grep 21`
 for i in ${FILES}
 do
-	adb push ${i} /data/local/tmp
+	${ADB} -s ${DEVICE} push ${i} ${GNUSTEP_TESTS_DIR}
 done
 
 echo "\n- sending libc++_shared.so files..."
-FILES=`find . | grep \\.so$ | grep ${ARCH_SRCH} | grep toolchains | grep shared`
+FILES=`find . | grep \\.so$ | grep ${TARGET} | grep toolchains | grep shared`
 for i in ${FILES}
 do
-	adb push ${i} /data/local/tmp
+	${ADB} -s ${DEVICE} push ${i} ${GNUSTEP_TESTS_DIR}
 done
 
 echo "\n- sending GNUstep .so files..."
@@ -66,8 +83,10 @@ cd ~/Library/Android/GNUstep/${ARCH}
 FILES=`find . | grep \\.so$`
 for i in ${FILES}
 do
-	adb push ${i} /data/local/tmp
+	${ADB} -s ${DEVICE} push ${i} ${GNUSTEP_TESTS_DIR}
 done
+
+set +e
 
 # Run tests...
 echo "\n\n== running tests for ${ARCH}..."
@@ -76,7 +95,7 @@ pwd
 make check
 
 echo "\n\n== cleaning up"
-adb shell rm -rf /data/local/tmp/*
+${ADB} -s ${DEVICE} shell rm -rf ${GNUSTEP_TESTS_DIR}
 
 echo "\n\n* done"
 
