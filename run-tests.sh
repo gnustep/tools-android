@@ -24,9 +24,10 @@ if [ "$DEVICE" == "" ]; then
 	DEVICE=`${ADB} devices | grep -v "List of devices" | sed 's/device//g' | head -n 1`
 fi
 
+export ANDROID_DEVICE=${DEVICE}
+
 echo "== building tests for android ${ARCH}"
 export PATH=${ANDROID_PLATFORM_TOOLS}:${PATH}
-DEVICE=`${ADB} devices | grep -v "List of devices attached" | sed "s/device//g" | sed "s/\t//g" | sed "s/ //g"`  
 RUN_DIR=`pwd`
 cp ${RUN_DIR}/scripts/gnustep-tests /Users/heron/Library/Android/GNUstep/${ARCH}/bin/gnustep-tests
 
