@@ -314,8 +314,13 @@ build_and_run ()
   # Run the test.
 
   # RUN_CMD="./obj/$TESTNAME"
-  adb push ./obj/$TESTNAME
-  RUN_CMD='adb shell "LD_LIBRARY_PATH=. ./${TESTNAME}"'
+  DIR=`pwd`
+  # echo $TESTNAME
+  adb push ${DIR}/obj/$TESTNAME /data/local/tmp
+  #sleep 1
+  #RUN_CMD="adb shell \"LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/${TESTNAME}\""
+  # adb shell "LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/${TESTNAME}"
+  # echo $RUN_CMD
   if test x"$TEMPLATE" = x
   then
     # The very simple case, we just need to compile a single file
@@ -397,7 +402,8 @@ build_and_run ()
     # Env.sh is deprecated ... we should only use TestInfo to setup for a test
     if test -r ./Env.sh
     then
-      ( . ./Env.sh; $RUN_CMD )
+      #( . ./Env.sh; $RUN_CMD )
+      adb shell "LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/${TESTNAME}"
     else
       if test -r ./make-check.env
       then
