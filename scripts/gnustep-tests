@@ -313,7 +313,9 @@ build_and_run ()
 
   # Run the test.
 
-  RUN_CMD="./obj/$TESTNAME"
+  # RUN_CMD="./obj/$TESTNAME"
+  adb push ./obj/$TESTNAME
+  RUN_CMD='adb shell "LD_LIBRARY_PATH=. ./${TESTNAME}"'
   if test x"$TEMPLATE" = x
   then
     # The very simple case, we just need to compile a single file

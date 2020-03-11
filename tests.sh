@@ -6,6 +6,7 @@ echo "== building tests for android ${ARCH}"
 export PATH=~/Library/Android/sdk/platform-tools:${PATH}
 DEVICE=`~/Library/Android/sdk/platform-tools/adb devices | grep -v "List of devices attached" | sed "s/device//g" | sed "s/\t//g" | sed "s/ //g"`  
 RUN_DIR=`pwd`
+cp ${RUN_DIR}/scripts/gnustep-tests /Users/heron/Library/Android/GNUstep/${ARCH}/bin/gnustep-tests
 
 # List devices...
 echo "\n* starting server"
