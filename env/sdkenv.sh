@@ -67,9 +67,25 @@ ANDROID_NDK_ROOT=${ANDROID_NDK_ROOT:-$ANDROID_ROOT/android-ndk-$ANDROID_NDK_VERS
 ANDROID_CMAKE_ROOT=${ANDROID_HOME}/cmake/3.10.2.4988404
 ANDROID_PLATFORM_TOOLS=${ANDROID_HOME}/platform-tools
 
+# Ninja
+NINJA=${ANDROID_CMAKE_ROOT}/bin/ninja
+
 # CMake
 CMAKE=${CMAKE:-cmake}
 CMAKE_TOOLCHAIN_FILE=${ANDROID_NDK_ROOT}/build/cmake/android.toolchain.cmake
+
+# CMake command-line options
+CMAKE_OPTIONS=" \
+  -G Ninja \
+  -DCMAKE_MAKE_PROGRAM=${NINJA} \
+  -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
+  -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE} \
+  -DCMAKE_EXE_LINKER_FLAGS=-fuse-ld=gold `# required to link test executables` \
+  -DANDROID_ABI=${ABI_NAME} \
+  -DANDROID_NDK=${ANDROID_NDK_ROOT} \
+  -DANDROID_PLATFORM=android-${ANDROID_API_LEVEL} \
+  -DANDROID_STL=c++_shared \
+"
 
 # GNUstep Make
 case $BUILD_TYPE in
@@ -86,6 +102,3 @@ case $BUILD_TYPE in
     echo "Error: unknown build type \"$BUILD_TYPE\"."
     exit 1
 esac
-
-# Ninja
-NINJA=${ANDROID_CMAKE_ROOT}/bin/ninja
