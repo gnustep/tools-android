@@ -2,6 +2,11 @@
 
 ARCH=$1
 
+if [ "${ARCH}" == "" ]; then
+	echo "an argument is needed"
+	exit 0
+fi 
+
 echo "== building tests for android ${ARCH}"
 export PATH=~/Library/Android/sdk/platform-tools:${PATH}
 DEVICE=`~/Library/Android/sdk/platform-tools/adb devices | grep -v "List of devices attached" | sed "s/device//g" | sed "s/\t//g" | sed "s/ //g"`  
