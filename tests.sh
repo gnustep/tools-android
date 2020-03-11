@@ -70,4 +70,9 @@ cd ${RUN_DIR}/src/gnustep-base
 pwd
 make check
 
+echo "\n\n== cleaning up"
+adb shell rm -rf /data/local/tmp/*
+
+echo "\n\n* done"
+
 exit 0
