@@ -6,6 +6,8 @@ set -e # make any subsequent failing command exit the script
 
 prepare_project "libobjc2" "https://github.com/gnustep/libobjc2.git"
 
+. "${ROOT_DIR}"/env/toolchain.sh
+
 echo -e "\n### Running cmake"
 mkdir -p build-${ABI_NAME}
 cd build-${ABI_NAME}
@@ -19,7 +21,7 @@ ${CMAKE} .. \
   -DOLDABI_COMPAT=false `# we're using gnustep-2.0 ABI, which may not be mixed with earlier versions'` \
 
 echo -e "\n### Building"
-${NINJA}
+make -j${MAKE_JOBS}
 
 echo -e "\n### Installing"
-${NINJA} install
+make install

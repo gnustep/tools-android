@@ -6,6 +6,8 @@ set -e # make any subsequent failing command exit the script
 
 prepare_project "libdispatch" "https://github.com/apple/swift-corelibs-libdispatch.git"
 
+. "${ROOT_DIR}"/env/toolchain.sh
+
 echo -e "\n### Running cmake"
 mkdir -p build-${ABI_NAME}
 cd build-${ABI_NAME}
@@ -17,7 +19,7 @@ ${CMAKE} .. \
   -DINSTALL_PRIVATE_HEADERS=YES \
 
 echo -e "\n### Building"
-${NINJA}
+make -j${MAKE_JOBS}
 
 echo -e "\n### Installing"
-${NINJA} install
+make install

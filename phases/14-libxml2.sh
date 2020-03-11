@@ -23,7 +23,7 @@ echo -e "\n### Running configure"
   CFLAGS="${CFLAGS} -fPIC" `# required to remove unsupported text relocations` \
 
 echo -e "\n### Building"
-make
+make -j${MAKE_JOBS}
 
 echo -e "\n### Installing"
 make install

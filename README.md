@@ -25,13 +25,7 @@ The toolchain currently compiles the following libraries for Android:
 Requirements
 ------------
 
-Supported host platforms are macOS and Linux.
-
-You must have [Android Studio](https://developer.android.com/studio), and have the following options installed in the SDK Manager:
-
-* CMake _– version 3.10.2.4988404 as specified in [sdkenv.sh](env/sdkenv.sh)_
-
-Additionally the following packages are required depending on your system.
+Supported host platforms are macOS and Linux. The following packages are required depending on your system.
 
 **macOS**
 

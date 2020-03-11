@@ -6,6 +6,8 @@ set -e # make any subsequent failing command exit the script
 
 prepare_project "libcxxrt" "https://github.com/libcxxrt/libcxxrt.git"
 
+. "${ROOT_DIR}"/env/toolchain.sh
+
 echo -e "\n### Running cmake"
 mkdir -p build-${ABI_NAME}
 cd build-${ABI_NAME}
@@ -14,7 +16,7 @@ ${CMAKE} .. \
   ${CMAKE_OPTIONS} \
 
 echo -e "\n### Building"
-${NINJA}
+make -j${MAKE_JOBS}
 
 echo -e "\n### Installing"
 mkdir -p "${INSTALL_PREFIX}/lib"
