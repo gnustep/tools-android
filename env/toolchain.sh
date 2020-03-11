@@ -22,3 +22,14 @@ export LDFLAGS="-fuse-ld=gold -Wl,-rpath-link,${INSTALL_PREFIX}/lib -Wl,--build-
 
 # ensure libraries link against shared C++ runtime library
 export LIBS="-lc++_shared"
+
+# common options for CMake-based projects
+CMAKE_OPTIONS=" \
+  -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
+  -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE} \
+  -DCMAKE_EXE_LINKER_FLAGS=-fuse-ld=gold `# required to link test executables` \
+  -DANDROID_ABI=${ABI_NAME} \
+  -DANDROID_NDK=${ANDROID_NDK_ROOT} \
+  -DANDROID_PLATFORM=android-${ANDROID_API_LEVEL} \
+  -DANDROID_STL=c++_shared \
+"
