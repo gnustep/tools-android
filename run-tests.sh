@@ -4,7 +4,6 @@ ARCH=$1
 DEVICE=$2
 
 export ABI_NAME=${ARCH}
-export GNUSTEP_TESTS_DIR=/data/local/tmp/gnustep-tests-${ARCH}
 
 set -e
 
@@ -32,7 +31,7 @@ if [ "$DEVICE" == "" ]; then
 	echo "usage: $0 <architecture> <device>"
 	exit 0
 fi 
-
+export GNUSTEP_TESTS_DIR=/data/local/tmp/gnustep-tests-${ARCH}
 export ANDROID_DEVICE=${DEVICE}
 
 echo "== building tests for android ${ARCH}"
@@ -74,18 +73,19 @@ cd src/gnustep-base
 cd ${ANDROID_NDK_ROOT} #~/Library/Android/android-ndk-r20-clang-r353983c1
 
 # Copy .so files needed to link against...
+${ADB} -s ${DEVICE} shell mkdir -p ${GNUSTEP_TESTS_DIR}/libs
 echo "\n- sending toolchain .so files..."
 FILES=`find . | grep \\.so$ | grep ${TARGET} | grep toolchains | grep 21`
 for i in ${FILES}
 do
-	${ADB} -s ${DEVICE} push ${i} ${GNUSTEP_TESTS_DIR}
+	${ADB} -s ${DEVICE} push ${i} ${GNUSTEP_TESTS_DIR}/libs
 done
 
 echo "\n- sending libc++_shared.so files..."
 FILES=`find . | grep \\.so$ | grep ${TARGET} | grep toolchains | grep shared`
 for i in ${FILES}
 do
-	${ADB} -s ${DEVICE} push ${i} ${GNUSTEP_TESTS_DIR}
+	${ADB} -s ${DEVICE} push ${i} ${GNUSTEP_TESTS_DIR}/libs
 done
 
 echo "\n- sending GNUstep .so files..."
@@ -93,7 +93,7 @@ cd ~/Library/Android/GNUstep/${ARCH}
 FILES=`find . | grep \\.so$`
 for i in ${FILES}
 do
-	${ADB} -s ${DEVICE} push ${i} ${GNUSTEP_TESTS_DIR}
+	${ADB} -s ${DEVICE} push ${i} ${GNUSTEP_TESTS_DIR}/libs
 done
 
 set +e

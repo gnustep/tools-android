@@ -397,7 +397,7 @@ build_and_run ()
     if test -r ./Env.sh
     then
       #( . ./Env.sh; $RUN_CMD )
-      ${ADB} -s ${ANDROID_DEVICE} shell "LD_LIBRARY_PATH=${GNUSTEP_TESTS_DIR} ${GNUSTEP_TESTS_DIR}/${TESTNAME}"
+      ${ADB} -s ${ANDROID_DEVICE} shell "LD_LIBRARY_PATH=${GNUSTEP_TESTS_DIR}/libs ${GNUSTEP_TESTS_DIR}/${TESTNAME}"
     else
       if test -r ./make-check.env
       then
