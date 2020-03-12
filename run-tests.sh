@@ -89,7 +89,7 @@ do
 done
 
 echo "\n- sending GNUstep .so files..."
-cd ${INSTALL_PREFIX}/${ARCH}
+cd ${INSTALL_PREFIX}  #/${ARCH}
 FILES=`find . | grep \\.so$`
 for i in ${FILES}
 do
