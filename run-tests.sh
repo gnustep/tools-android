@@ -16,13 +16,22 @@ echo "## initialize environment"
 $ADB start-server
 
 if [ "${ARCH}" == "" ]; then
-	echo "usage: $0 <architecture> <device>"
-	exit 0
+	#	echo "Architecture specification missing..."
+	#echo "usage: $0 <architecture> <device>"
+	#exit 0
+	# Assume arm if nothing is specified....
+	ARCH=armeabi-v7a
 fi 
 
 if [ "$DEVICE" == "" ]; then
 	DEVICE=`${ADB} devices | grep -v "List of devices" | sed 's/device//g' | head -n 1`
 fi
+
+if [ "$DEVICE" == "" ]; then
+	echo "Device specification missing or no device/emulator available..."
+	echo "usage: $0 <architecture> <device>"
+	exit 0
+fi 
 
 export ANDROID_DEVICE=${DEVICE}
 
