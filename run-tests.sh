@@ -102,7 +102,7 @@ set +e
 echo "\n\n== running tests for ${ARCH}..."
 cd ${RUN_DIR}/src/gnustep-base
 pwd
-make check
+make LDFLAGS="${LDFLAGS} -nopie" check
 
 echo "\n\n== cleaning up"
 ${ADB} -s ${DEVICE} shell rm -rf ${GNUSTEP_TESTS_DIR}
