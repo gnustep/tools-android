@@ -37,7 +37,7 @@ export ANDROID_DEVICE=${DEVICE}
 echo "== building tests for android ${ARCH}"
 export PATH=${ANDROID_PLATFORM_TOOLS}:${PATH}
 RUN_DIR=`pwd`
-cp ${RUN_DIR}/scripts/gnustep-tests /Users/heron/Library/Android/GNUstep/${ARCH}/bin/gnustep-tests
+cp ${RUN_DIR}/scripts/gnustep-tests ${INSTALL_ROOT}/${ARCH}/bin/gnustep-tests
 
 # List devices...
 echo "\n* starting server, cleaning up and making directory"
