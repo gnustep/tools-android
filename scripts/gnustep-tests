@@ -312,9 +312,10 @@ build_and_run ()
   TESTNAME=`echo $TESTFILE | sed -e"s/^\(test^.]*\)$/\1.obj./;s/\.[^.]*//g"`
 
   # Run the test.
-  DIR=`pwd`
-  # echo "COMMAND: ${ADB} -s ${ANDROID_DEVICE} push ${DIR}/obj/$TESTNAME ${GNUSTEP_TESTS_DIR}"
-  ${ADB} -s ${ANDROID_DEVICE} push ${DIR}/obj/$TESTNAME ${GNUSTEP_TESTS_DIR}
+  CDIR=`pwd`
+  # echo "COMMAND: ${ADB} -s ${ANDROID_DEVICE} push ${CDIR}/obj/$TESTNAME ${GNUSTEP_TESTS_DIR}"
+  ${ADB} -s ${ANDROID_DEVICE} shell mkdir -p ${GNUSTEP_TESTS_DIR}/${dir}
+  ${ADB} -s ${ANDROID_DEVICE} push ${CDIR}/obj/$TESTNAME ${GNUSTEP_TESTS_DIR}/${dir}
   if test x"$TEMPLATE" = x
   then
     # The very simple case, we just need to compile a single file
@@ -397,7 +398,7 @@ build_and_run ()
     if test -r ./Env.sh
     then
       #( . ./Env.sh; $RUN_CMD )
-      ${ADB} -s ${ANDROID_DEVICE} shell "LD_LIBRARY_PATH=${GNUSTEP_TESTS_DIR}/libs ${GNUSTEP_TESTS_DIR}/${TESTNAME}"
+      ${ADB} -s ${ANDROID_DEVICE} shell "LD_LIBRARY_PATH=${GNUSTEP_TESTS_DIR}/libs ${GNUSTEP_TESTS_DIR}/${dir}/${TESTNAME}"
     else
       if test -r ./make-check.env
       then
