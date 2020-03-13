@@ -19,6 +19,7 @@ if [[ "$ABI_NAME" != *"64"* ]]; then
 fi
 
 echo -e "\n### Running configure"
+# autoconf
 ./configure \
   --host=${ANDROID_TARGET} \
   --enable-nxconstantstring \

@@ -104,9 +104,9 @@ cd ${RUN_DIR}/src/gnustep-base
 pwd
 make LDFLAGS="${LDFLAGS} -nopie" check
 
-echo "\n\n== cleaning up"
+echo "\n== cleaning up"
 ${ADB} -s ${DEVICE} shell rm -rf ${GNUSTEP_TESTS_DIR}
 
-echo "\n\n* done"
+echo "\n* done!"
 
 exit 0
