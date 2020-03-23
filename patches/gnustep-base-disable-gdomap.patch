@@ -1,0 +1,17 @@
+Disable compilation of gdomap tool.
+
+This can't be compiled for Android but is also unused.
+
+diff --git a/Tools/GNUmakefile b/Tools/GNUmakefile
+index 822eb3b32..1a6911ed3 100644
+--- a/Tools/GNUmakefile
++++ b/Tools/GNUmakefile
+@@ -74,7 +74,7 @@ TOOL_NAME = autogsdoc cvtenc plmerge sfparse xmlparse
+ else
+ TOOL_NAME = autogsdoc cvtenc gdnc gspath defaults pl plmerge \
+ 		plparse sfparse pldes plget plser pl2link xmlparse HTMLLinker
+-CTOOL_NAME = gdomap
++#CTOOL_NAME = gdomap
+ 
+ SUBPROJECTS = make_strings
+ endif
