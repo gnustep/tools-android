@@ -27,7 +27,7 @@ esac
 display_usage() {
   echo "Usage: $0 -n <NDK_VERSION> -c <CLANG_VERSION>"
   echo "  -r, --rev NDK_REVISION     NDK revision (required, e.g. 'n20')"
-  echo "  -c, --clang CLANG_VERSION  Clang prebuilt release (required, e.g. 'r353983c1')"
+  echo "  -c, --clang CLANG_VERSION  Clang prebuilt release (required, e.g. 'r353983c')"
   echo "  -d, --dest ANDROID_ROOT    Installation destination (default: $ANDROID_ROOT)"
   echo "  -h, --help                 Print usage information and exit"
   echo ""
