@@ -26,7 +26,6 @@ echo -e "\n### Running configure"
   --disable-iconv \
   --disable-tls \
   --disable-mixedabi \
-  --disable-gdomap \
   --with-cross-compilation-info=${ROOT_DIR}/config/gnustep-base-cross.config \
   --with-default-config=${ROOT_DIR}/config/gnustep-base-default.config \
   --with-config-file=/ \
