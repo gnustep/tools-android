@@ -3,9 +3,7 @@ GNUstep Android Toolchain
 
 This project comprises a collection of scripts to build a GNUstep toolchain for Android. The toolchain can then be used in an Android project to compile and run Objective-C code using the Foundation and CoreFoundation libraries.
 
-The toolchain is built using the Android NDK (installed e.g. via [Android Studio](https://developer.android.com/studio)). NDK r21 is required, as earlier NDK releases contain older Clang versions containing bugs which prevent usage of the gnustep-2.0 Objective C runtime.
-
-The toolchain is set up to target Android API level 21 (5.0 / Lollipop) and supports all common Android ABIs (armeabi-v7a, arm64-v8a, x86, x86_64).
+The toolchain is built using the Android NDK (installed e.g. via [Android Studio](https://developer.android.com/studio)), and is set up to target Android API level 21 (5.0 / Lollipop) and all common Android ABIs (armeabi-v7a, arm64-v8a, x86, x86_64).
 
 Libraries
 ---------
@@ -24,13 +22,15 @@ The toolchain currently compiles the following libraries for Android:
 Requirements
 ------------
 
-Supported host platforms are macOS and Linux. 
+Supported host platforms are macOS and Linux.
 
-You must have [Android Studio](https://developer.android.com/studio), and have the following options installed in the SDK Manager:
+You must have the Android NDK installed. The toolchain assumes the following version to be installed via [Android Studio](https://developer.android.com/studio)’s SDK Manager:
 
 * NDK (Side by side) _– version 21.1.6352462_
 
-Additionally the following packages are required depending on your system.
+A different NDK version or location can be provided using the `--ndk` flag (see below). Please note that NDK r21 (or later) is required, as earlier NDK releases contain Clang versions with bugs which prevent usage of the gnustep-2.0 Objective-C runtime.
+
+Additionally, the following packages are required depending on your system.
 
 **macOS**
 
