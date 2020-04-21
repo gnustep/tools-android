@@ -5,8 +5,6 @@ export ROOT_DIR=`pwd`
 
 display_usage() {
   echo "Usage: $0"
-  echo "  -r, --rev NDK_REVISION     NDK revision (default: $ANDROID_NDK_VERSION)"
-  echo "  -c, --clang CLANG_VERSION  Clang prebuilt release (default: $ANDROID_CLANG_VERSION)"
   echo "  -n, --ndk NDK_PATH         Path to Android NDK (default: $ANDROID_NDK_ROOT)"
   echo "  -a, --abis ABI_NAMES       ABIs being targeted (default: \"${ABI_NAMES}\")"
   echo "  -l, --level API_LEVEL      Android API level being targeted (default: ${ANDROID_API_LEVEL})"
@@ -35,14 +33,6 @@ do
   while [[ ${key+x} ]]
   do
     case $key in
-      -r|--rev)
-        export ANDROID_NDK_VERSION=$2
-        shift # option has parameter
-        ;;
-      -c|--clang)
-        export ANDROID_CLANG_VERSION=$2
-        shift # option has parameter
-        ;;
       -n|--ndk)
         export ANDROID_NDK_ROOT=$2
         shift # option has parameter
@@ -108,10 +98,15 @@ echo "### Build type: ${BUILD_TYPE}"
 echo "### ABIs: ${ABI_NAMES}"
 echo "### Android API level: ${ANDROID_API_LEVEL}"
 
-# install custom NDK if required
+# check if NDK exists
 if [ ! -d "${ANDROID_NDK_ROOT}" ]; then
-  echo "### Installing NDK $ANDROID_NDK_VERSION with Clang $ANDROID_CLANG_VERSION..."
-  ./install-ndk.sh -r $ANDROID_NDK_VERSION -c $ANDROID_CLANG_VERSION || exit $?
+  echo ""
+  echo "Missing Android NDK at:"
+  echo "    $ANDROID_NDK_ROOT"
+  echo "Please install this NDK version via:"
+  echo "    Android Studio > SDK Manager > SDK Tools > NDK (Side by side)"
+  echo "Or specify a different NDK path using the --ndk option."
+  exit 1
 fi
 
 if [ -z "${ONLY_PHASE}" ]; then

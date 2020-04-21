@@ -3,7 +3,7 @@ GNUstep Android Toolchain
 
 This project comprises a collection of scripts to build a GNUstep toolchain for Android. The toolchain can then be used in an Android project to compile and run Objective-C code using the Foundation and CoreFoundation libraries.
 
-The toolchain is built using the tools provided by the standard Android SDK (installed e.g. via [Android Studio](https://developer.android.com/studio)), plus a custom NDK using the latest Clang prebuilt from Google (required to work around bugs in the older Clang version shipping with the official NDK which prevent usage of the gnustep-2.0 Objective C runtime).
+The toolchain is built using the Android NDK (installed e.g. via [Android Studio](https://developer.android.com/studio)). NDK r21 is required, as earlier NDK releases contain older Clang versions containing bugs which prevent usage of the gnustep-2.0 Objective C runtime.
 
 The toolchain is set up to target Android API level 21 (5.0 / Lollipop) and supports all common Android ABIs (armeabi-v7a, arm64-v8a, x86, x86_64).
 
@@ -24,7 +24,13 @@ The toolchain currently compiles the following libraries for Android:
 Requirements
 ------------
 
-Supported host platforms are macOS and Linux. The following packages are required depending on your system.
+Supported host platforms are macOS and Linux. 
+
+You must have [Android Studio](https://developer.android.com/studio), and have the following options installed in the SDK Manager:
+
+* NDK (Side by side) _– version 21.1.6352462_
+
+Additionally the following packages are required depending on your system.
 
 **macOS**
 
@@ -53,9 +59,7 @@ Run the [build.sh](build.sh) script to build the toolchain:
 
 ```
 Usage: ./build.sh
-  -r, --rev NDK_REVISION     NDK revision (default: r20)
-  -c, --clang CLANG_VERSION  Clang prebuilt release (default: r353983c)
-  -n, --ndk NDK_PATH         Path to existing Android NDK (default: ~/Library/Android/android-ndk-r20-clang-r353983c)
+  -n, --ndk NDK_PATH         Path to existing Android NDK (default: ~/Library/Android/sdk/ndk/21.1.6352462)
   -a, --abis ABI_NAMES       ABIs being targeted (default: "armeabi-v7a arm64-v8a x86 x86_64")
   -l, --level API_LEVEL      Android API level being targeted (default: 21)
   -b, --build BUILD_TYPE     Build type "Debug" or "Release" or "RelWithDebInfo" (default: RelWithDebInfo)
