@@ -42,7 +42,7 @@ prepare_project () {
         echo -e "\n### NOT updating project (not on branch)"
       fi
     else
-      echo -e "\n### Checking out latest release: $TAG"
+      echo -e "\n### Checking out $TAG"
       git fetch --tags
       git checkout -q $TAG
     fi

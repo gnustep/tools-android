@@ -25,7 +25,6 @@ echo -e "\n### Running configure"
   --enable-nxconstantstring \
   --disable-iconv \
   --disable-tls \
-  --disable-mixedabi \
   --with-cross-compilation-info=${ROOT_DIR}/config/gnustep-base-cross.config \
   --with-default-config=${ROOT_DIR}/config/gnustep-base-default.config \
   --with-config-file=/ \
