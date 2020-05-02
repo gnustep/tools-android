@@ -70,7 +70,7 @@ Usage: ./build.sh
   -h, --help                 Print usage information and exit
 ```
 
-The toolchain automatically downloads and installs the NDK and prebuilt Clang release (via [install-ndk.sh](install-ndk.sh)), and builds and installs the GNUstep toolchain into the following location (`$GNUSTEP_HOME`):
+The toolchain builds and installs the GNUstep toolchain into the following location (`$GNUSTEP_HOME`):
 
 * macOS: `~/Library/Android/GNUstep`
 * Linux: `~/Android/GNUstep`
@@ -84,11 +84,6 @@ To use the toolchain from an Android project, you can use `$GNUSTEP_HOME/$ABI_NA
 * `gnustep-config --base-libs`
 
 Call `gnustep-config --help` to obtain the full list of available variables.
-
-You may also want to configure your app’s build environment to use the custom NDK (e.g. in Android Studio), which is installed into the following location:
-
-* macOS: `~/Library/Android/android-ndk-<NDK_REVISION>-clang-<CLANG_VERSION>`
-* Linux: `~/Android/android-ndk-<NDK_REVISION>-clang-<CLANG_VERSION>`
 
 Examples
 --------
