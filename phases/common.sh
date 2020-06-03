@@ -9,46 +9,60 @@ prepare_project () {
   PROJECT=$1
   REPO=$2
   TAG=$3
+  REPO_NAME=`basename $REPO`
 
   cd "${SRCROOT}"
 
   if [ ! -d "${PROJECT}" ]; then
-    echo -e "\n### Cloning project"
-    git clone --recursive ${REPO} ${PROJECT}
+    if [ ${REPO_NAME##*.} = "gz" ]; then
+      echo -e "\n### Downloading project"
+      curl -O -# ${REPO}
+      echo -e "\n### Extracting project"
+      mkdir ${PROJECT}
+      tar -xzf ${REPO_NAME} -C ${PROJECT} --strip-components 1
+      rm -f ${REPO_NAME}
+    else
+      echo -e "\n### Cloning project"
+      git clone --recursive ${REPO} ${PROJECT}
+    fi
   fi
 
   cd ${PROJECT}
+  
+  if [ ${REPO_NAME##*.} = "git" ]; then
 
-  if [ "$NO_CLEAN" != true ]; then
-    echo -e "\n### Cleaning project"
-    git reset --hard
-    git clean -qfdx
-  fi
-
-  if [ "$NO_UPDATE" != true ]; then
-    if [ -z $TAG ]; then
-      # check if we should update project
-      git_branch=`git symbolic-ref --short -q HEAD || echo "NONE"`
-      if [ "$git_branch" != "NONE" ]; then
-        # check if current branch has a remote
-        git_remote=`git config --get branch.$git_branch.remote || echo "NONE"`
-        if [ "$git_remote" != "NONE" ]; then
-          echo -e "\n### Updating project"
-          git pull
-        else
-          echo -e "\n### NOT updating project (no remote for branch $git_branch)"
-        fi
-      else
-        echo -e "\n### NOT updating project (not on branch)"
-      fi
-    else
-      echo -e "\n### Checking out $TAG"
-      git fetch --tags
-      git checkout -q $TAG
+    if [ "$NO_CLEAN" != true ]; then
+      echo -e "\n### Cleaning project"
+      git reset --hard
+      git clean -qfdx
     fi
 
-    git submodule sync --recursive
-    git submodule update --recursive --init # also init in case submodule was added with update
+    if [ "$NO_UPDATE" != true ]; then
+      if [ -z $TAG ]; then
+        # check if we should update project
+        git_branch=`git symbolic-ref --short -q HEAD || echo "NONE"`
+        if [ "$git_branch" != "NONE" ]; then
+          # check if current branch has a remote
+          git_remote=`git config --get branch.$git_branch.remote || echo "NONE"`
+          if [ "$git_remote" != "NONE" ]; then
+            echo -e "\n### Updating project"
+            git pull
+          else
+            echo -e "\n### NOT updating project (no remote for branch $git_branch)"
+          fi
+        else
+          echo -e "\n### NOT updating project (not on branch)"
+        fi
+      else
+        echo -e "\n### Checking out $TAG"
+        git fetch --tags
+        git checkout -q $TAG
+      fi
+
+      git submodule sync --recursive
+      git submodule update --recursive --init # also init in case submodule was added with update
+    fi
+    
   fi
 
   if [ "$NO_PATCHES" != true ]; then

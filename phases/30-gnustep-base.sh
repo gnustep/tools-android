@@ -4,7 +4,7 @@ set -e # make any subsequent failing command exit the script
 
 . `dirname $0`/common.sh
 
-prepare_project "gnustep-base" "https://github.com/gnustep/libs-base"
+prepare_project "gnustep-base" "https://github.com/gnustep/libs-base.git"
 
 . "${ROOT_DIR}"/env/toolchain.sh
 
@@ -22,7 +22,6 @@ echo -e "\n### Running configure"
 ./configure \
   --host=${ANDROID_TARGET} \
   --enable-nxconstantstring \
-  --disable-iconv \
   --disable-tls \
   --disable-gdomap \
   --with-cross-compilation-info=${ROOT_DIR}/config/gnustep-base-cross.config \

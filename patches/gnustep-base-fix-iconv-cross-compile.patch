@@ -1,0 +1,80 @@
+Fix finding libiconv via cross.config.
+https://github.com/gnustep/libs-base/pull/140
+
+diff --git a/configure b/configure
+index 70ad993b9..b7adb1fe5 100755
+--- a/configure
++++ b/configure
+@@ -11041,7 +11041,13 @@ esac
+   LIBS="-liconv $LIBS"
+   if test "$cross_compiling" = yes; then :
+   found_iconv="$cross_found_iconv_liconv";
+-    if test "$found_iconv" = "no"; then
++    if test "$found_iconv" = "yes"; then
++
++$as_echo "#define HAVE_ICONV 1" >>confdefs.h
++
++      { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes, -liconv (via cross.config)" >&5
++$as_echo "yes, -liconv (via cross.config)" >&6; }
++    else
+       LIBS="$old_LIBS"
+     fi
+ 
+@@ -11080,7 +11086,16 @@ if test $found_iconv = no ; then
+   LIBS="-lgiconv $LIBS"
+   if test "$cross_compiling" = yes; then :
+   found_iconv="$cross_found_iconv_lgiconv";
+-    if test "$found_iconv" = "no"; then
++    if test "$found_iconv" = "yes"; then
++
++$as_echo "#define HAVE_ICONV 1" >>confdefs.h
++
++
++$as_echo "#define HAVE_GICONV 1" >>confdefs.h
++
++      { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes, -lgiconv (via cross.config)" >&5
++$as_echo "yes, -lgiconv (via cross.config)" >&6; }
++    else
+       LIBS="$old_LIBS"
+     fi
+ 
+diff --git a/configure.ac b/configure.ac
+index e541f8c02..72c27e89b 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -2997,6 +2997,10 @@ int main(int argc,char **argv)
+   found_iconv=no
+ ,
+   found_iconv="$cross_found_iconv_libc",
++  if test "$found_iconv" = "yes"; then
++    AC_DEFINE(HAVE_ICONV,1, [Define if you have this function])
++    AC_MSG_RESULT([[yes, in libc (via cross.config)]])
++  fi
+ )
+ 
+ if test $found_iconv = no ; then
+@@ -3025,7 +3029,10 @@ if test $found_iconv = no ; then
+     LIBS="$old_LIBS"
+   ,
+     found_iconv="$cross_found_iconv_liconv";
+-    if test "$found_iconv" = "no"; then
++    if test "$found_iconv" = "yes"; then
++      AC_DEFINE(HAVE_ICONV,1, [Define if you have this function])
++      AC_MSG_RESULT([[yes, -liconv (via cross.config)]])
++    else
+       LIBS="$old_LIBS"
+     fi
+   )
+@@ -3049,7 +3056,11 @@ if test $found_iconv = no ; then
+     LIBS="$old_LIBS"
+   ,
+     found_iconv="$cross_found_iconv_lgiconv";
+-    if test "$found_iconv" = "no"; then
++    if test "$found_iconv" = "yes"; then
++      AC_DEFINE(HAVE_ICONV,1, [Define if you have this function])
++      AC_DEFINE(HAVE_GICONV,1, [Define if you have this function])
++      AC_MSG_RESULT([[yes, -lgiconv (via cross.config)]])
++    else
+       LIBS="$old_LIBS"
+     fi
+   )

@@ -18,8 +18,8 @@ echo -e "\n### Running configure"
   --host=${ANDROID_TARGET} \
   --prefix="${INSTALL_PREFIX}" \
   --with-libxml-prefix="${INSTALL_PREFIX}" \
-  --disable-shared \
   --without-crypto \
+  --disable-shared \
   CFLAGS="${CFLAGS} -fPIC" `# required to remove unsupported text relocations` \
 
 echo -e "\n### Building"

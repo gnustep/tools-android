@@ -12,7 +12,7 @@ fi
 
 latest_release_tag=`curl -s https://api.github.com/repos/unicode-org/icu/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/'`
 
-prepare_project "icu" "https://github.com/unicode-org/icu" $latest_release_tag
+prepare_project "icu" "https://github.com/unicode-org/icu.git" $latest_release_tag
 
 # common configure options when building for either current machine or cross-compilation
 CONFIGURE_OPTIONS=" \

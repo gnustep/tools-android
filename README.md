@@ -15,6 +15,7 @@ The toolchain currently compiles the following libraries for Android:
 * [libobjc2](https://github.com/gnustep/libobjc2) (using gnustep-2.0 runtime)
 * [libdispatch](https://github.com/apple/swift-corelibs-libdispatch) (official Apple release from the Swift Core Libraries)
 * [libffi](https://github.com/libffi/libffi)
+* [libiconv](https://www.gnu.org/software/libiconv/)
 * [libxml2](https://github.com/GNOME/libxml2)
 * [libxslt](https://github.com/GNOME/libxslt)
 * [ICU](https://github.com/unicode-org/icu)
