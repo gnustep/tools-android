@@ -8,11 +8,6 @@ prepare_project "libiconv" "https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.16.t
 
 . "${ROOT_DIR}"/env/toolchain.sh
 
-if [ -f Makefile ]; then
-  echo -e "\n### Cleaning"
-  make clean
-fi
-
 echo -e "\n### Running configure"
 ./configure \
   --host=${ANDROID_TARGET} \

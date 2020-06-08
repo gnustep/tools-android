@@ -9,18 +9,18 @@ prepare_project () {
   PROJECT=$1
   REPO=$2
   TAG=$3
-  REPO_NAME=`basename $REPO`
 
   cd "${SRCROOT}"
 
   if [ ! -d "${PROJECT}" ]; then
-    if [ ${REPO_NAME##*.} = "gz" ]; then
+    if [ ${REPO##*.} = "gz" ]; then
+      archive_name=`basename $REPO`
       echo -e "\n### Downloading project"
       curl -O -# ${REPO}
       echo -e "\n### Extracting project"
       mkdir ${PROJECT}
-      tar -xzf ${REPO_NAME} -C ${PROJECT} --strip-components 1
-      rm -f ${REPO_NAME}
+      tar -xzf ${archive_name} -C ${PROJECT} --strip-components 1
+      rm -f ${archive_name}
     else
       echo -e "\n### Cloning project"
       git clone --recursive ${REPO} ${PROJECT}
@@ -29,7 +29,7 @@ prepare_project () {
 
   cd ${PROJECT}
   
-  if [ ${REPO_NAME##*.} = "git" ]; then
+  if [ -d .git ]; then
 
     if [ "$NO_CLEAN" != true ]; then
       echo -e "\n### Cleaning project"
@@ -62,6 +62,12 @@ prepare_project () {
       git submodule sync --recursive
       git submodule update --recursive --init # also init in case submodule was added with update
     fi
+    
+  elif [ -f Makefile ]; then
+    
+    # no need to honor $NO_CLEAN here, as `make clean` doesn't reset any local changes
+    echo -e "\n### Cleaning"
+    make clean
     
   fi
 
