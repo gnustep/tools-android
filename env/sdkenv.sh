@@ -53,6 +53,13 @@ if [ -z "$ANDROID_TARGET_BINUTILS" ]; then
   ANDROID_TARGET_BINUTILS=$ANDROID_TARGET
 fi
 
+# Phases
+PHASE_GLOB="${ROOT_DIR}/phases/[0-9][0-9]-*.sh"
+phase_name() {
+  name=`basename -s .sh $1`
+  echo ${name/[0-9][0-9]-/}
+}
+
 # Directories
 SRCROOT="${ROOT_DIR}"/src
 CACHE_ROOT="${ROOT_DIR}"/cache

@@ -4,7 +4,9 @@ set -e # make any subsequent failing command exit the script
 
 . `dirname $0`/common.sh
 
-prepare_project "libdispatch" "https://github.com/apple/swift-corelibs-libdispatch.git"
+if ! prepare_project "libdispatch" "https://github.com/apple/swift-corelibs-libdispatch.git"; then
+  exit 0
+fi
 
 . "${ROOT_DIR}"/env/toolchain.sh
 

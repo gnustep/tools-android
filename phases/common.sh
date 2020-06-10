@@ -89,5 +89,10 @@ prepare_project () {
     done
   fi
   
-  mkdir -p "${INSTALL_PREFIX}"
+  if [ "$NO_BUILD" != true ]; then
+    mkdir -p "${INSTALL_PREFIX}"
+    return 0
+  else
+    return 1
+  fi
 }

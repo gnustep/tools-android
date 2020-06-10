@@ -4,6 +4,9 @@ cd `dirname $0`
 export ROOT_DIR=`pwd`
 
 display_usage() {
+  echo "Builds GNUstep Android toolchain."
+  echo "https://github.com/gnustep/tools-android"
+  echo ""
   echo "Usage: $0"
   echo "  -n, --ndk NDK_PATH         Path to Android NDK (default: $ANDROID_NDK_ROOT)"
   echo "  -a, --abis ABI_NAMES       ABIs being targeted (default: \"${ABI_NAMES}\")"
@@ -15,13 +18,6 @@ display_usage() {
   echo "  -o, --only PHASE           Build only the given phase (e.g. \"gnustep-base\", requires previous build)"
   echo "  -h, --help                 Print usage information and exit"
 }
-
-phase_name() {
-  name=`basename -s .sh $1`
-  echo ${name/[0-9][0-9]-/}
-}
-
-phase_glob="${ROOT_DIR}/phases/[0-9][0-9]-*.sh"
 
 . "${ROOT_DIR}"/env/sdkenv.sh
 
@@ -67,7 +63,7 @@ do
         if [ ! -f "${ROOT_DIR}"/phases/[0-9][0-9]-${ONLY_PHASE}.sh ]; then
           echo "Error: Unknown phase \"${ONLY_PHASE}\""
           
-          for PHASE in ${phase_glob}; do
+          for PHASE in $PHASE_GLOB; do
             PHASES="${PHASES}$(phase_name $PHASE) "
           done
           
@@ -128,7 +124,7 @@ for ABI_NAME in $ABI_NAMES; do
   echo -e "\n######## BUILDING FOR ${ABI_NAME} ########" | tee -a "${BUILD_LOG}"
 
   # run phases
-  for PHASE in ${phase_glob}; do
+  for PHASE in $PHASE_GLOB; do
     PHASE_NAME=$(phase_name $PHASE)
     
     if [[ ! -z "${ONLY_PHASE}" && "${ONLY_PHASE}" != "${PHASE_NAME}" ]]; then

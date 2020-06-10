@@ -4,7 +4,9 @@ set -e # make any subsequent failing command exit the script
 
 . `dirname $0`/common.sh
 
-prepare_project "gnustep-base" "https://github.com/gnustep/libs-base.git"
+if ! prepare_project "gnustep-base" "https://github.com/gnustep/libs-base.git"; then
+  exit 0
+fi
 
 . "${ROOT_DIR}"/env/toolchain.sh
 

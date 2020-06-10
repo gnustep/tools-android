@@ -4,7 +4,9 @@ set -e # make any subsequent failing command exit the script
 
 . `dirname $0`/common.sh
 
-prepare_project "libobjc2" "https://github.com/gnustep/libobjc2.git" "libc++"
+if ! prepare_project "libobjc2" "https://github.com/gnustep/libobjc2.git" "libc++"; then
+  exit 0
+fi
 
 . "${ROOT_DIR}"/env/toolchain.sh
 

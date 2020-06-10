@@ -4,7 +4,9 @@ set -e # make any subsequent failing command exit the script
 
 . `dirname $0`/common.sh
 
-prepare_project "libiconv" "https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.16.tar.gz"
+if ! prepare_project "libiconv" "https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.16.tar.gz"; then
+  exit 0
+fi
 
 . "${ROOT_DIR}"/env/toolchain.sh
 

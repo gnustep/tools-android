@@ -6,7 +6,9 @@ set -e # make any subsequent failing command exit the script
 
 latest_release_tag=`curl -s https://api.github.com/repos/GNOME/libxml2/tags | grep '"name":' | sed -E 's/.*"([^"]+)".*/\1/' | egrep '^v\d+\.\d+(\.\d+)?$' | head -n 1`
 
-prepare_project "libxml2" "https://github.com/GNOME/libxml2.git" $latest_release_tag
+if ! prepare_project "libxml2" "https://github.com/GNOME/libxml2.git" $latest_release_tag; then
+  exit 0
+fi
 
 . "${ROOT_DIR}"/env/toolchain.sh
 
