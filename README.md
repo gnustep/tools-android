@@ -86,6 +86,20 @@ To use the toolchain from an Android project, you can use `$GNUSTEP_HOME/$ABI_NA
 
 Call `gnustep-config --help` to obtain the full list of available variables.
 
+Status and Known Issues
+-----------------------
+
+* GNUstep base currently has no native integration between the Android run-loop and NSRunLoop or the libdispatch main queue, so things like `-performSelector:withObject:afterDelay:` or dispatching on `dispatch_get_main_queue()` will not work out of the box. An integration depends on the setup of the app (e.g. whether using Android Studio, Qt, or something else), and is possible to add in the app by swizzing NSRunLoop. Feel free to open an issue if this is of interest to you and you would like more information.
+* GNUstep Base is integrated with Android’s [app-specific storage](https://developer.android.com/training/data-storage) and uses the path returned by `Context.getFilesDir()` as `NSHomeDirectory()` and when querying for directory paths (`NSLibraryDirectory`, `NSApplicationSupportDirectory`, etc.). It also uses `Context.getCacheDir()` as `NSTemporaryDirectory` and `NSCachesDirectory` (with `NSUserDomainMask`).
+* GNUstep Base is further integrated with the [Android asset manager](https://developer.android.com/reference/android/content/res/AssetManager), and supports accessing the app’s resources from `[NSBundle mainBundle]` via APIs such as `-pathForResource:ofType:` and `-URLForResource:ofType:`, and reading them using NSFileManager, NSFileHandle, and NSDirectoryEnumerator APIs. This is done by returning paths from NSBundle APIs with a fixed, fake, per-app prefix (`Context.getPackageCodePath()` without extension + `/Resources`), which internally get routed through the NDK’s [AAsset](https://developer.android.com/ndk/reference/group/asset) API for reading.
+* Note that NSDirectoryEnumerator is not able to enumerate directories in the app’s main bundle due to a [limitation](https://issuetracker.google.com/issues/140538113) of the AAssetDir API.
+* The app must call `GSInitializeProcessAndroid()` (defined in `NSProcessInfo.h`) on launch in order to initialize the above Android-specific functionality in GNUstep.
+* GNUstep Base doesn’t currently get the system languages on Android, which combined with the inability to list directories in the main bundle (see above) means that `NSLocalizedString()` won’t work out of the box even if localized strings are present in the app’s assets. As a workaround, the app should manually call `-[NSUserDefaults setUserLanguages:]` with a list of supported locales ordered by the user’s system language preferences.
+* Android will not output stdout or stderr to logcat by default, which might cause some log or error output from GNUstep or other libraries to be missing. You can run a thread in your app to write these streams to the Android log to work around this, which is recommended for debugging.
+
+For the last three points above please refer to [GSInitialize.m](https://github.com/gnustep/android-examples/blob/master/hello-objectivec/app/src/main/cpp/GSInitialize.m) in the examples for details.
+
+
 Examples
 --------
 
