@@ -16,7 +16,10 @@ echo "### Source GNUstep.sh"
 echo -e "\n### Running configure"
 ./configure \
   --host=${ANDROID_TARGET} \
-  --prefix="${INSTALL_PREFIX}"
+  --prefix="${INSTALL_PREFIX}" \
+  `# for some reason we need to manually specify the include dir` \
+  CFLAGS="${CFLAGS} -I${INSTALL_PREFIX}/include" \
+  CPPFLAGS="${CPPFLAGS} -I${INSTALL_PREFIX}/include" \
 
 echo -e "\n### Building"
 make -j${MAKE_JOBS} ${GNUSTEP_MAKE_OPTIONS}
