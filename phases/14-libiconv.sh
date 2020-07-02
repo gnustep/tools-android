@@ -14,7 +14,8 @@ echo -e "\n### Running configure"
 ./configure \
   --host=${ANDROID_TARGET} \
   --prefix="${INSTALL_PREFIX}" \
-  --disable-shared
+  --enable-shared \
+  --disable-static \
 
 echo -e "\n### Building"
 make -j${MAKE_JOBS}

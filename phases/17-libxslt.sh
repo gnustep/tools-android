@@ -22,7 +22,9 @@ echo -e "\n### Running configure"
   --with-libxml-prefix="${INSTALL_PREFIX}" \
   --without-crypto \
   --disable-shared \
-  CFLAGS="${CFLAGS} -fPIC" `# required to remove unsupported text relocations` \
+  `# specify include dir to enable finding libiconv and ICU (from libxml headers)` \
+  `# -fPIC required to remove unsupported text relocations` \
+  CFLAGS="${CFLAGS} -I${INSTALL_PREFIX}/include -fPIC" \
 
 echo -e "\n### Building"
 make -j${MAKE_JOBS}
