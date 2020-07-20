@@ -27,7 +27,7 @@ Supported host platforms are macOS and Linux.
 
 You must have the Android NDK installed. The toolchain assumes the following version to be installed via [Android Studio](https://developer.android.com/studio)’s SDK Manager:
 
-* NDK (Side by side) _– version 21.2.6472646 (r21c)_
+* NDK (Side by side) _– version 21.3.6528147 (r21d)_
 
 A different NDK version or location can be provided using the `--ndk` flag (see below). Please note that NDK r21 (or later) is required, as earlier NDK releases contain Clang versions with bugs which prevent usage of the gnustep-2.0 Objective-C runtime.
 
@@ -60,7 +60,7 @@ Run the [build.sh](build.sh) script to build the toolchain:
 
 ```
 Usage: ./build.sh
-  -n, --ndk NDK_PATH         Path to existing Android NDK (default: ~/Library/Android/sdk/ndk/21.2.6472646)
+  -n, --ndk NDK_PATH         Path to existing Android NDK (default: ~/Library/Android/sdk/ndk/21.3.6528147)
   -a, --abis ABI_NAMES       ABIs being targeted (default: "armeabi-v7a arm64-v8a x86 x86_64")
   -l, --level API_LEVEL      Android API level being targeted (default: 21)
   -b, --build BUILD_TYPE     Build type "Debug" or "Release" or "RelWithDebInfo" (default: RelWithDebInfo)
