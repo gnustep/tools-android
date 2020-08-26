@@ -60,6 +60,7 @@ Run the [build.sh](build.sh) script to build the toolchain:
 
 ```
 Usage: ./build.sh
+      --prefix INSTALL_ROOT  Install toolchain into given directory (default: ~/Library/Android/GNUstep)
   -n, --ndk NDK_PATH         Path to existing Android NDK (default: ~/Library/Android/sdk/ndk/21.3.6528147)
   -a, --abis ABI_NAMES       ABIs being targeted (default: "armeabi-v7a arm64-v8a x86 x86_64")
   -l, --level API_LEVEL      Android API level being targeted (default: 21)

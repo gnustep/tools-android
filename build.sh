@@ -8,6 +8,7 @@ display_usage() {
   echo "https://github.com/gnustep/tools-android"
   echo ""
   echo "Usage: $0"
+  echo "      --prefix INSTALL_ROOT  Install toolchain into given directory (default: ${INSTALL_ROOT})"
   echo "  -n, --ndk NDK_PATH         Path to Android NDK (default: $ANDROID_NDK_ROOT)"
   echo "  -a, --abis ABI_NAMES       ABIs being targeted (default: \"${ABI_NAMES}\")"
   echo "  -l, --level API_LEVEL      Android API level being targeted (default: ${ANDROID_API_LEVEL})"
@@ -29,6 +30,10 @@ do
   while [[ ${key+x} ]]
   do
     case $key in
+      --prefix)
+        export INSTALL_ROOT=$2
+        shift # option has parameter
+        ;;
       -n|--ndk)
         export ANDROID_NDK_ROOT=$2
         shift # option has parameter
