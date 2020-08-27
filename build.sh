@@ -4,6 +4,8 @@ cd `dirname $0`
 export ROOT_DIR=`pwd`
 
 display_usage() {
+  . "$ROOT_DIR"/env/sdkenv.sh
+  
   echo "Builds GNUstep Android toolchain."
   echo "https://github.com/gnustep/tools-android"
   echo ""
@@ -19,8 +21,6 @@ display_usage() {
   echo "  -o, --only PHASE           Build only the given phase (e.g. \"gnustep-base\", requires previous build)"
   echo "  -h, --help                 Print usage information and exit"
 }
-
-. "${ROOT_DIR}"/env/sdkenv.sh
 
 # handle command-line options
 # adapted from https://stackoverflow.com/a/31024664/1534401
@@ -94,6 +94,8 @@ do
   done
   shift # option(s) fully processed, proceed to next input argument
 done
+
+. "$ROOT_DIR"/env/sdkenv.sh
 
 echo "### Build type: ${BUILD_TYPE}"
 echo "### ABIs: ${ABI_NAMES}"
