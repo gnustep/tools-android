@@ -10,7 +10,9 @@ display_usage() {
   echo "https://github.com/gnustep/tools-android"
   echo ""
   echo "Usage: $0"
-  echo "      --prefix INSTALL_ROOT  Install toolchain into given directory (default: ${INSTALL_ROOT})"
+  echo "  --prefix INSTALL_ROOT      Install toolchain into given directory (default: ${INSTALL_ROOT})"
+  echo "  --dist-root DIST_ROOT      Make toolchain relocatable to given path relative to home folder on other machines"
+  echo "                             (use \"HOME\" as placeholder for home folder, e.g. \"HOME/Library/Android/GNUstep\")"
   echo "  -n, --ndk NDK_PATH         Path to Android NDK (default: $ANDROID_NDK_ROOT)"
   echo "  -a, --abis ABI_NAMES       ABIs being targeted (default: \"${ABI_NAMES}\")"
   echo "  -l, --level API_LEVEL      Android API level being targeted (default: ${ANDROID_API_LEVEL})"
@@ -32,6 +34,10 @@ do
     case $key in
       --prefix)
         export INSTALL_ROOT=$2
+        shift # option has parameter
+        ;;
+      --dist-root)
+        export DIST_ROOT=$2
         shift # option has parameter
         ;;
       -n|--ndk)
@@ -195,3 +201,19 @@ done
 rm -rf "${INSTALL_ROOT}.bak"
 
 echo -e "\n### Finished building GNUstep Android toolchain"
+
+# make toolchain relocatable if requested
+if [[ $DIST_ROOT ]]; then
+  DIST_ROOT=${DIST_ROOT/HOME/\$\{HOME\}}
+  ANDROID_SDK_DIST_ROOT=${ANDROID_SDK_ROOT/$HOME/\$\{HOME\}}
+  ANDROID_NDK_DIST_ROOT=${ANDROID_NDK_ROOT/$HOME/\$\{HOME\}}
+  
+  echo -e "\n### Making toolchain relocatable with:"
+  echo "### - DIST_ROOT: $DIST_ROOT"
+  echo "### - ANDROID_SDK_ROOT: $ANDROID_SDK_DIST_ROOT"
+  echo "### - ANDROID_NDK_ROOT: $ANDROID_NDK_DIST_ROOT"
+  
+  find "$INSTALL_ROOT" -type f -exec perl -i -pe "s|$INSTALL_ROOT|${DIST_ROOT/\$/\\\$}|g; s|$ANDROID_SDK_ROOT|${ANDROID_SDK_DIST_ROOT/\$/\\\$}|g; s|$ANDROID_NDK_ROOT|${ANDROID_NDK_DIST_ROOT/\$/\\\$}|g;" {} +
+  
+  echo -e "\n### Done"
+fi
