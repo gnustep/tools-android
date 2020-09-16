@@ -3,7 +3,7 @@ GNUstep Android Toolchain
 
 This project comprises a collection of scripts to build a GNUstep toolchain for Android. The toolchain can then be used in an Android project to compile and run Objective-C code using the Foundation and CoreFoundation libraries.
 
-The toolchain is built using the Android NDK (installed e.g. via [Android Studio](https://developer.android.com/studio)), and is set up to target Android API level 21 (5.0 / Lollipop) and all common Android ABIs (armeabi-v7a, arm64-v8a, x86, x86_64).
+The toolchain is built using the Android NDK (installed e.g. via [Android Studio](https://developer.android.com/studio)), and is set up to target Android API level 23 (6.0 / Marshmallow) and all common Android ABIs (armeabi-v7a, arm64-v8a, x86, x86_64).
 
 Libraries
 ---------
@@ -65,7 +65,7 @@ Usage: ./build.sh
                              (use "HOME" as placeholder for home folder, e.g. "HOME/Library/Android/GNUstep")
   -n, --ndk NDK_PATH         Path to existing Android NDK (default: ~/Library/Android/sdk/ndk/21.3.6528147)
   -a, --abis ABI_NAMES       ABIs being targeted (default: "armeabi-v7a arm64-v8a x86 x86_64")
-  -l, --level API_LEVEL      Android API level being targeted (default: 21)
+  -l, --level API_LEVEL      Android API level being targeted (default: 23)
   -b, --build BUILD_TYPE     Build type "Debug" or "Release" or "RelWithDebInfo" (default: RelWithDebInfo)
   -u, --no-update            Don't update projects to latest version from GitHub
   -c, --no-clean             Don't clean projects during build (e.g. for building local changes, only applies to first ABI being built)
