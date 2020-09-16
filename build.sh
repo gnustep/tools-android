@@ -118,6 +118,13 @@ if [ ! -d "${ANDROID_NDK_ROOT}" ]; then
   exit 1
 fi
 
+# check if additional patches directory is valid
+if [[ ! -z "$ADDITIONAL_PATCHES" && ! -d "$ADDITIONAL_PATCHES" ]]; then
+  echo "Error: patches directory does not exist:"
+  echo "    $ADDITIONAL_PATCHES"
+  exit 1
+fi
+
 if [ -z "${ONLY_PHASE}" ]; then
   # keep backup of previous build if any
   if [ -d "${INSTALL_ROOT}" ]; then
