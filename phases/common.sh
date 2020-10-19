@@ -60,7 +60,7 @@ prepare_project () {
           git_remote=`git config --get branch.$git_branch.remote || echo "NONE"`
           if [ "$git_remote" != "NONE" ]; then
             echo -e "\n### Updating project"
-            git pull
+            git pull --ff-only
           else
             echo -e "\n### NOT updating project (no remote for branch $git_branch)"
           fi
