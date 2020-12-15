@@ -4,9 +4,7 @@ set -e # make any subsequent failing command exit the script
 
 . `dirname $0`/common.sh
 
-# currently using older version of libc++ branch until the following PR is merged:
-# https://github.com/gnustep/libobjc2/pull/152
-if ! prepare_project "libobjc2" "https://github.com/gnustep/libobjc2.git" "d521f61e8d67c77420b1687e5c1cbaf25571b871"; then
+if ! prepare_project "libobjc2" "https://github.com/gnustep/libobjc2.git" "master"; then
   exit 0
 fi
 
