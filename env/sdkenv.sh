@@ -32,7 +32,6 @@ case $ABI_NAME in
     ;;
   armeabi-v7a)
     ANDROID_TARGET=armv7a-linux-androideabi
-    ANDROID_TARGET_BINUTILS=arm-linux-androideabi
     ;;
   arm64-v8a)
     ANDROID_TARGET=aarch64-linux-android
@@ -48,10 +47,6 @@ case $ABI_NAME in
     echo "Supported ABIs are: armeabi-v7a, arm64-v8a, x86, x86_64"
     exit 1
 esac
-
-if [ -z "$ANDROID_TARGET_BINUTILS" ]; then
-  ANDROID_TARGET_BINUTILS=$ANDROID_TARGET
-fi
 
 # Phases
 PHASE_GLOB="${ROOT_DIR}/phases/[0-9][0-9]-*.sh"
@@ -69,7 +64,7 @@ BUILD_TXT=${BUILD_TXT:-$INSTALL_ROOT/build.txt}
 BUILD_LOG=${BUILD_LOG:-$INSTALL_ROOT/build.log}
 
 # Android SDK
-ANDROID_NDK_VERSION=${ANDROID_NDK_VERSION:-21.3.6528147}
+ANDROID_NDK_VERSION=${ANDROID_NDK_VERSION:-22.0.7026061}
 ANDROID_NDK_ROOT=${ANDROID_NDK_ROOT:-$ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION}
 ANDROID_PLATFORM_TOOLS=${ANDROID_PLATFORM_TOOLS:-$ANDROID_SDK_ROOT/platform-tools}
 

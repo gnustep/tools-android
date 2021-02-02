@@ -9,26 +9,28 @@ export CC="${TOOLCHAIN}"/bin/${ANDROID_TARGET}${ANDROID_API_LEVEL}-clang
 export CXX="${TOOLCHAIN}"/bin/${ANDROID_TARGET}${ANDROID_API_LEVEL}-clang++
 export OBJC="${CC}"
 export OBJCXX="${CXX}"
-export LD="${TOOLCHAIN}"/bin/${ANDROID_TARGET_BINUTILS}-ld.gold
-export AR="${TOOLCHAIN}"/bin/${ANDROID_TARGET_BINUTILS}-ar
-export AS="${TOOLCHAIN}"/bin/${ANDROID_TARGET_BINUTILS}-as
-export RANLIB="${TOOLCHAIN}"/bin/${ANDROID_TARGET_BINUTILS}-ranlib
-export STRIP="${TOOLCHAIN}"/bin/${ANDROID_TARGET_BINUTILS}-strip
+export LD="${TOOLCHAIN}"/bin/ld.lld
+export AR="${TOOLCHAIN}"/bin/llvm-ar
+export AS="${CC}"
+export RANLIB="${TOOLCHAIN}"/bin/llvm-ranlib
+export STRIP="${TOOLCHAIN}"/bin/llvm-strip
+export NM="${TOOLCHAIN}"/bin/llvm-nm
+export OBJDUMP="${TOOLCHAIN}"/bin/llvm-objdump
 export PKG_CONFIG_PATH="${INSTALL_PREFIX}/lib/pkgconfig"
 
-# -fuse-ld=gold required to work around BFD ld linker bugs on arm64 with gnustep-2.0 libobjc runtime
-# -rpath-link required for linker to find libcxxrt dependency of libobjc
+# -L library search path required for some projects to find libraries (e.g. gnustep-corebase)
 # --build-id=sha1 required for Android Studio to locate debug information
-export LDFLAGS="-L${INSTALL_PREFIX}/lib -fuse-ld=gold -Wl,-rpath-link,${INSTALL_PREFIX}/lib -Wl,--build-id=sha1"
+export LDFLAGS="-L${INSTALL_PREFIX}/lib -Wl,--build-id=sha1"
 
 # ensure libraries link against shared C++ runtime library
 export LIBS="-lc++_shared"
 
 # common options for CMake-based projects
+# CMAKE_FIND_USE_CMAKE_PATH=false fixes finding incorrect libraries in $TOOLCHAIN/lib[64] instead of $TOOLCHAIN/sysroot/usr/lib/$ANDROID_TARGET, e.g. for libc++abi.a for libobjc2.
 CMAKE_OPTIONS=" \
   -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
   -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE} \
-  -DCMAKE_EXE_LINKER_FLAGS=-fuse-ld=gold `# required to link test executables` \
+  -DCMAKE_FIND_USE_CMAKE_PATH=false \
   -DANDROID_ABI=${ABI_NAME} \
   -DANDROID_NDK=${ANDROID_NDK_ROOT} \
   -DANDROID_PLATFORM=android-${ANDROID_API_LEVEL} \
