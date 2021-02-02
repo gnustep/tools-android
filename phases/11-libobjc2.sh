@@ -4,7 +4,7 @@ set -e # make any subsequent failing command exit the script
 
 . `dirname $0`/common.sh
 
-if ! prepare_project "libobjc2" "https://github.com/gnustep/libobjc2.git" "master"; then
+if ! prepare_project "libobjc2" "https://github.com/gnustep/libobjc2.git"; then
   exit 0
 fi
 
