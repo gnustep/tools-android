@@ -23,7 +23,6 @@ fi
 echo -e "\n### Running configure"
 ./configure \
   --host=${ANDROID_TARGET} \
-  --enable-nxconstantstring \
   --disable-tls \
   --with-cross-compilation-info=${ROOT_DIR}/config/gnustep-base-cross.config \
   --with-default-config=${ROOT_DIR}/config/gnustep-base-default.config \
