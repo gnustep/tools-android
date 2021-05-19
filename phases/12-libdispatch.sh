@@ -19,6 +19,9 @@ ${CMAKE} .. \
   -DCMAKE_INSTALL_PREFIX="${INSTALL_PREFIX}" \
   -DBUILD_SHARED_LIBS=YES \
   -DINSTALL_PRIVATE_HEADERS=YES \
+  `# use blocks runtime from libobjc2 with libdispatch-own-blocksruntime.patch` \
+  -DBlocksRuntime_INCLUDE_DIR="${INSTALL_PREFIX}/include" \
+  -DBlocksRuntime_LIBRARIES="${INSTALL_PREFIX}/lib/libobjc.so" \
 
 echo -e "\n### Building"
 make -j${MAKE_JOBS}
