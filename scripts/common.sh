@@ -71,25 +71,26 @@ prepare_project () {
     fi
 
     if [ "$NO_UPDATE" != true ]; then
-      if [ -z $TAG ]; then
-        # check if we should update project
-        git_branch=`git symbolic-ref --short -q HEAD || echo "NONE"`
-        if [ "$git_branch" != "NONE" ]; then
-          # check if current branch has a remote
-          git_remote=`git config --get branch.$git_branch.remote || echo "NONE"`
-          if [ "$git_remote" != "NONE" ]; then
-            echo -e "\n### Updating project"
-            git pull --ff-only
-          else
-            echo -e "\n### NOT updating project (no remote for branch $git_branch)"
-          fi
-        else
-          echo -e "\n### NOT updating project (not on branch)"
-        fi
-      else
+      # check out tag/branch if any
+      if [ -n $TAG ]; then
         echo -e "\n### Checking out $TAG"
         git fetch --tags
         git checkout -q $TAG
+      fi
+
+      # check if we should update project
+      git_branch=`git symbolic-ref --short -q HEAD || echo "NONE"`
+      if [ "$git_branch" != "NONE" ]; then
+        # check if current branch has a remote
+        git_remote=`git config --get branch.$git_branch.remote || echo "NONE"`
+        if [ "$git_remote" != "NONE" ]; then
+          echo -e "\n### Updating project"
+          git pull --ff-only
+        else
+          echo -e "\n### NOT updating project (no remote for branch $git_branch)"
+        fi
+      elif [ -z $TAG ]; then
+        echo -e "\n### NOT updating project (not on branch)"
       fi
 
       git submodule sync --recursive
