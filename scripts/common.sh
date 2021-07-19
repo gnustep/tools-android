@@ -1,14 +1,33 @@
 #!/bin/bash
 
-cd `dirname $0`/..
-export ROOT_DIR=`pwd`
+set -e # make any subsequent failing command exit the script
 
-. "${ROOT_DIR}"/env/sdkenv.sh
+cd `dirname $0`/..
+export ROOT_DIR="$PWD"
+
+# load environment
+. "$ROOT_DIR"/scripts/sdkenv.sh
+
+get_latest_github_release_tag () {
+  GITHUB_REPO=$1
+
+  # get the tags JSON from the GitHub API and parse it manually
+  curl -s https://api.github.com/repos/$GITHUB_REPO/tags \
+    | grep '"name":' \
+    | sed -E 's/.*"([^"]+)".*/\1/' \
+    | egrep '^(release\-|v)[0-9]+[\.-][0-9]+([\.-][0-9]+)?$' \
+    | head -n 1
+}
 
 prepare_project () {
   PROJECT=$1
   REPO=$2
   TAG=$3
+
+  # allow passing GitHub username/repo
+  if [[ $REPO != http* ]]; then
+    REPO=https://github.com/$REPO.git
+  fi
 
   if [ ${REPO##*.} = "gz" ]; then
     # downloaded project

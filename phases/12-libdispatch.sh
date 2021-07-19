@@ -2,13 +2,17 @@
 
 set -e # make any subsequent failing command exit the script
 
-. `dirname $0`/common.sh
+. `dirname $0`/../scripts/common.sh
 
-if ! prepare_project "libdispatch" "https://github.com/apple/swift-corelibs-libdispatch.git"; then
+PROJECT=libdispatch
+GITHUB_REPO=apple/swift-corelibs-libdispatch
+
+# load environment and prepare project
+if ! prepare_project $PROJECT $GITHUB_REPO; then
   exit 0
 fi
 
-. "${ROOT_DIR}"/env/toolchain.sh
+. "$ROOT_DIR"/scripts/toolchain.sh
 
 echo -e "\n### Running cmake"
 mkdir -p build-${ABI_NAME}

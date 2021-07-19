@@ -12,7 +12,7 @@ display_usage() {
   echo "  -h, --help                 Print usage information and exit"
 }
 
-. "${ROOT_DIR}"/env/sdkenv.sh
+. "${ROOT_DIR}"/scripts/sdkenv.sh
 
 # handle command-line options
 # adapted from https://stackoverflow.com/a/31024664/1534401

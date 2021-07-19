@@ -2,16 +2,20 @@
 
 set -e # make any subsequent failing command exit the script
 
-. `dirname $0`/common.sh
+. `dirname $0`/../scripts/common.sh
 
-if ! prepare_project "gnustep-corebase" "https://github.com/gnustep/libs-corebase.git"; then
+PROJECT=gnustep-corebase
+GITHUB_REPO=gnustep/libs-corebase
+
+# load environment and prepare project
+if ! prepare_project $PROJECT $GITHUB_REPO; then
   exit 0
 fi
 
-. "${ROOT_DIR}"/env/toolchain.sh
+. "$ROOT_DIR"/scripts/toolchain.sh
 
 echo "### Source GNUstep.sh"
-. "${INSTALL_PREFIX}"/share/GNUstep/Makefiles/GNUstep.sh
+. "$INSTALL_PREFIX"/share/GNUstep/Makefiles/GNUstep.sh
 
 echo -e "\n### Running configure"
 ./configure \

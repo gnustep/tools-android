@@ -2,16 +2,20 @@
 
 set -e # make any subsequent failing command exit the script
 
-. `dirname $0`/common.sh
+. `dirname $0`/../scripts/common.sh
 
-if ! prepare_project "gnustep-base" "https://github.com/gnustep/libs-base.git"; then
+PROJECT=gnustep-base
+GITHUB_REPO=gnustep/libs-base
+
+# load environment and prepare project
+if ! prepare_project $PROJECT $GITHUB_REPO; then
   exit 0
 fi
 
-. "${ROOT_DIR}"/env/toolchain.sh
+. "$ROOT_DIR"/scripts/toolchain.sh
 
 echo "### Source GNUstep.sh"
-. "${INSTALL_PREFIX}"/share/GNUstep/Makefiles/GNUstep.sh
+. "$INSTALL_PREFIX"/share/GNUstep/Makefiles/GNUstep.sh
 
 OPTIONS=
 if [[ "$ABI_NAME" != *"64"* ]]; then

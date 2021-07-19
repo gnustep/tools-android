@@ -2,17 +2,18 @@
 
 set -e # make any subsequent failing command exit the script
 
-. `dirname $0`/common.sh
+. `dirname $0`/../scripts/common.sh
 
-# use master branch until https://github.com/libffi/libffi/pull/546 is available in a release (v3.3 does not have it)
-latest_release_tag=origin/master
-#latest_release_tag=`curl -s https://api.github.com/repos/libffi/libffi/tags | grep '"name":' | sed -E 's/.*"([^"]+)".*/\1/' | egrep '^v\d+\.\d+(\.\d+)?$' | head -n 1`
+PROJECT=libffi
+GITHUB_REPO=libffi/libffi
+TAG=$(get_latest_github_release_tag $GITHUB_REPO)
 
-if ! prepare_project "libffi" "https://github.com/libffi/libffi.git" $latest_release_tag; then
+# load environment and prepare project
+if ! prepare_project $PROJECT $GITHUB_REPO $TAG; then
   exit 0
 fi
 
-. "${ROOT_DIR}"/env/toolchain.sh
+. "$ROOT_DIR"/scripts/toolchain.sh
 
 echo -e "\n### Running autogen"
 ./autogen.sh

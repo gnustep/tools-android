@@ -2,7 +2,11 @@
 
 set -e # make any subsequent failing command exit the script
 
-. `dirname $0`/common.sh
+. `dirname $0`/../scripts/common.sh
+
+PROJECT=icu
+GITHUB_REPO=unicode-org/icu
+TAG=$(get_latest_github_release_tag $GITHUB_REPO)
 
 # don't clean project for subsequent builds so that the build for the current
 # machine is preserved, and because each ABI builds into separate directory
@@ -10,9 +14,8 @@ if [ "$NO_UPDATE" = true ]; then
   NO_CLEAN=true
 fi
 
-latest_release_tag=`curl -s https://api.github.com/repos/unicode-org/icu/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/'`
-
-if ! prepare_project "icu" "https://github.com/unicode-org/icu.git" $latest_release_tag; then
+# load environment and prepare project
+if ! prepare_project $PROJECT $GITHUB_REPO $TAG; then
   exit 0
 fi
 
@@ -60,7 +63,7 @@ fi
 
 # now cross-compile for Android
 
-. "${ROOT_DIR}"/env/toolchain.sh
+. "$ROOT_DIR"/scripts/toolchain.sh
 
 mkdir -p build-${ABI_NAME}
 cd build-${ABI_NAME}

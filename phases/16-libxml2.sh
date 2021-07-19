@@ -2,15 +2,18 @@
 
 set -e # make any subsequent failing command exit the script
 
-. `dirname $0`/common.sh
+. `dirname $0`/../scripts/common.sh
 
-latest_release_tag=`curl -s https://api.github.com/repos/GNOME/libxml2/tags | grep '"name":' | sed -E 's/.*"([^"]+)".*/\1/' | egrep '^v\d+\.\d+(\.\d+)?$' | head -n 1`
+PROJECT=libxml2
+GITHUB_REPO=GNOME/libxml2
+TAG=$(get_latest_github_release_tag $GITHUB_REPO)
 
-if ! prepare_project "libxml2" "https://github.com/GNOME/libxml2.git" $latest_release_tag; then
+# load environment and prepare project
+if ! prepare_project $PROJECT $GITHUB_REPO $TAG; then
   exit 0
 fi
 
-. "${ROOT_DIR}"/env/toolchain.sh
+. "$ROOT_DIR"/scripts/toolchain.sh
 
 echo -e "\n### Running autogen"
 NOCONFIGURE=1 ./autogen.sh

@@ -4,7 +4,7 @@ cd `dirname $0`
 export ROOT_DIR=`pwd`
 
 display_usage() {
-  . "$ROOT_DIR"/env/sdkenv.sh
+  . "$ROOT_DIR"/scripts/sdkenv.sh
   
   echo "Builds GNUstep Android toolchain."
   echo "https://github.com/gnustep/tools-android"
@@ -101,7 +101,7 @@ do
   shift # option(s) fully processed, proceed to next input argument
 done
 
-. "$ROOT_DIR"/env/sdkenv.sh
+. "$ROOT_DIR"/scripts/sdkenv.sh
 
 echo "### Build type: ${BUILD_TYPE}"
 echo "### ABIs: ${ABI_NAMES}"

@@ -2,13 +2,17 @@
 
 set -e # make any subsequent failing command exit the script
 
-. `dirname $0`/common.sh
+. `dirname $0`/../scripts/common.sh
 
-if ! prepare_project "libobjc2" "https://github.com/gnustep/libobjc2.git"; then
+PROJECT=libobjc2
+GITHUB_REPO=gnustep/libobjc2
+
+# load environment and prepare project
+if ! prepare_project $PROJECT $GITHUB_REPO; then
   exit 0
 fi
 
-. "${ROOT_DIR}"/env/toolchain.sh
+. "$ROOT_DIR"/scripts/toolchain.sh
 
 echo -e "\n### Running cmake"
 mkdir -p build-${ABI_NAME}

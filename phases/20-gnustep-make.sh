@@ -2,13 +2,17 @@
 
 set -e # make any subsequent failing command exit the script
 
-. `dirname $0`/common.sh
+. `dirname $0`/../scripts/common.sh
 
-if ! prepare_project "gnustep-make" "https://github.com/gnustep/tools-make.git"; then
+PROJECT=gnustep-make
+GITHUB_REPO=gnustep/tools-make
+
+# load environment and prepare project
+if ! prepare_project $PROJECT $GITHUB_REPO; then
   exit 0
 fi
 
-. "${ROOT_DIR}"/env/toolchain.sh
+. "$ROOT_DIR"/scripts/toolchain.sh
 
 # copy user config file
 mkdir -p "${INSTALL_PREFIX}"/etc/GNUstep
