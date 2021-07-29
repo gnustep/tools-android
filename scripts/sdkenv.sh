@@ -27,9 +27,6 @@ BUILD_TYPE=${BUILD_TYPE:-RelWithDebInfo}
 
 # ABI-dependant properties
 case $ABI_NAME in
-  armeabi)
-    ANDROID_TARGET=arm-linux-androideabi
-    ;;
   armeabi-v7a)
     ANDROID_TARGET=armv7a-linux-androideabi
     ;;
