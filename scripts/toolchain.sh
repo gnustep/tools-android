@@ -2,7 +2,9 @@
 
 echo "### Set toolchain vars"
 
-# See https://developer.android.com/ndk/guides/other_build_systems
+# Relevant documentation:
+# https://developer.android.com/ndk/guides/other_build_systems
+# https://android.googlesource.com/platform/ndk/+/master/docs/BuildSystemMaintainers.md
 
 export TOOLCHAIN="${ANDROID_NDK_ROOT}"/toolchains/llvm/prebuilt/${HOST_TAG}
 export CC="${TOOLCHAIN}"/bin/${ANDROID_TARGET}${ANDROID_API_LEVEL}-clang
@@ -18,9 +20,36 @@ export NM="${TOOLCHAIN}"/bin/llvm-nm
 export OBJDUMP="${TOOLCHAIN}"/bin/llvm-objdump
 export PKG_CONFIG_PATH="${INSTALL_PREFIX}/lib/pkgconfig"
 
+# NOTE: The following compiler and linker flags mirror the NDK's CMake toolchain file
+# and are recommended by the Android Build System Maintainers Guide (see link above)
+
+# emit stack guards to protect against security vulnerabilities caused by buffer overruns,
+# and enable FORTIFY to try to catch incorrect use of standard functions
+export CFLAGS="-fstack-protector-strong -D_FORTIFY_SOURCE=2"
+
 # -L library search path required for some projects to find libraries (e.g. gnustep-corebase)
+# -fuse-ld=lld require to enforce LLD, which is needed e.g. for --no-rosegment flag
 # --build-id=sha1 required for Android Studio to locate debug information
-export LDFLAGS="-L${INSTALL_PREFIX}/lib -Wl,--build-id=sha1"
+# --no-rosegment required for correct unwinding on devices prior to API 29
+# --gc-sections is recommended to decrease binary size
+export LDFLAGS="-L${INSTALL_PREFIX}/lib -fuse-ld=lld -Wl,--build-id=sha1 -Wl,--no-rosegment -Wl,--gc-sections"
+
+case $ABI_NAME in
+  armeabi-v7a)
+    # use Thumb instruction set for smaller code
+    export CFLAGS="$CFLAGS -mthumb"
+    # don't export symbols from libunwind
+    export LDFLAGS="$LDFLAGS -Wl,--exclude-libs,libunwind.a"
+    ;;
+  x86)
+    # properly align stacks for global constructors when targeting API < 24
+    if [ "$ANDROID_API_LEVEL" -lt "24" ]; then
+      export CFLAGS="$CFLAGS -mstackrealign"
+    fi
+    ;;
+esac
+
+export CXXFLAGS=$CFLAGS
 
 # ensure libraries link against shared C++ runtime library
 export LIBS="-lc++_shared"
