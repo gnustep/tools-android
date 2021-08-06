@@ -24,7 +24,6 @@ echo -e "\n### Running configure"
   --host=${ANDROID_TARGET} \
   --prefix="${INSTALL_PREFIX}" \
   --with-library-combo=ng-gnu-gnu \
-  --with-layout=fhs \
   --with-user-config-file="${GNUSTEP_USER_CONFIG_FILE}" \
   --with-runtime-abi=gnustep-2.0 \
 
