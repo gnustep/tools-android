@@ -1,6 +1,8 @@
 GNUstep Android Toolchain
 =========================
 
+[![CI](https://github.com/gnustep/tools-android/actions/workflows/ci.yml/badge.svg)](https://github.com/gnustep/tools-android/actions/workflows/ci.yml?query=branch%3Amaster)
+
 This project comprises a collection of scripts to build a GNUstep toolchain for Android. The toolchain can then be used in an Android project to compile and run Objective-C code using the Foundation and CoreFoundation libraries.
 
 The toolchain is built using the Android NDK (installed e.g. via [Android Studio](https://developer.android.com/studio)), and is set up to target Android API level 23 (6.0 / Marshmallow) and all common Android ABIs (armeabi-v7a, arm64-v8a, x86, x86_64).

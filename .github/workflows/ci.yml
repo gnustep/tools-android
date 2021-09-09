@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 4 1 * *'
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    # don't run pull requests from local branches twice
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: macOS
+            os: macos-latest
+            android-dir: Library/Android
+          - name: Linux
+            os: ubuntu-latest
+            android-dir: Android
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install packages (macOS)
+        if: ${{ startsWith(matrix.os, 'macos') }}
+        run: |
+          brew install cmake autoconf automake libtool pkg-config
+      - name: Install packages (Linux)
+        if: ${{ startsWith(matrix.os, 'ubuntu') }}
+        run: |
+          sudo apt-get install curl cmake make autoconf libtool pkg-config texinfo python3-distutils
+      - name: Build toolchain
+        run: |
+          ./build.sh --ndk $ANDROID_NDK_LATEST_HOME --dist-root HOME/${{matrix.android-dir}}/GNUstep
+      - name: Package release
+        run: |
+          tar -a -cf GNUstep-Android-${{matrix.name}}.tar.xz -C$HOME/${{matrix.android-dir}} GNUstep
+      - name: Read build.txt
+        id: read_build_txt
+        run: |
+          r=$(cat ~/${{matrix.android-dir}}/GNUstep/build.txt)
+          r="${r//'%'/'%25'}"   # Multiline escape sequences for %
+          r="${r//$'\n'/'%0A'}" # Multiline escape sequences for '\n'
+          r="${r//$'\r'/'%0D'}" # Multiline escape sequences for '\r'
+          echo "::set-output name=RELEASE_BODY::$r"
+      - name: Update GitHub prerelease
+        if: ${{ github.ref == 'refs/heads/master' }}
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: GNUstep-Android-${{matrix.name}}.tar.xz
+          tag: latest
+          release_name: "Latest Build"
+          body: ${{ steps.read_build_txt.outputs.RELEASE_BODY }}
+          prerelease: true
+          overwrite: true
