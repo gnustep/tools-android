@@ -220,7 +220,7 @@ echo -e "\n### Finished building GNUstep Android toolchain"
 if [[ $DIST_ROOT ]]; then
   DIST_ROOT=${DIST_ROOT/HOME/\$\{HOME\}}
   ANDROID_SDK_DIST_ROOT=${ANDROID_SDK_ROOT/$HOME/\$\{HOME\}}
-  ANDROID_NDK_DIST_ROOT=${ANDROID_NDK_ROOT/$HOME/\$\{HOME\}}
+  ANDROID_NDK_DIST_ROOT=${ANDROID_SDK_DIST_ROOT}/ndk/$(basename $ANDROID_NDK_ROOT)
   
   echo -e "\n### Making toolchain relocatable with:"
   echo "### - DIST_ROOT: $DIST_ROOT"
