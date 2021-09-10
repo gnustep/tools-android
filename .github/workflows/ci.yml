@@ -44,7 +44,7 @@ jobs:
       - name: Read build.txt
         id: read_build_txt
         run: |
-          r=$(cat ~/${{matrix.android-dir}}/GNUstep/build.txt)
+          r="Built using NDK version: $(basename $ANDROID_NDK_LATEST_HOME)"
           r="${r//'%'/'%25'}"   # Multiline escape sequences for %
           r="${r//$'\n'/'%0A'}" # Multiline escape sequences for '\n'
           r="${r//$'\r'/'%0D'}" # Multiline escape sequences for '\r'
