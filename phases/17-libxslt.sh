@@ -22,6 +22,7 @@ echo -e "\n### Running configure"
 ./configure \
   --host=${ANDROID_TARGET} \
   --prefix="${INSTALL_PREFIX}" \
+  --without-python \
   --without-crypto \
   --disable-shared \
   `# specify include dir to enable finding libiconv and ICU (from libxml headers)` \
