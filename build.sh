@@ -104,6 +104,7 @@ done
 . "$ROOT_DIR"/scripts/sdkenv.sh
 
 echo "### Build type: ${BUILD_TYPE}"
+echo "### NDK: $(basename $ANDROID_NDK_ROOT)"
 echo "### ABIs: ${ABI_NAMES}"
 echo "### Android API level: ${ANDROID_API_LEVEL}"
 
