@@ -103,21 +103,25 @@ done
 
 . "$ROOT_DIR"/scripts/sdkenv.sh
 
-echo "### Build type: ${BUILD_TYPE}"
-echo "### NDK: $(basename $ANDROID_NDK_ROOT)"
-echo "### ABIs: ${ABI_NAMES}"
-echo "### Android API level: ${ANDROID_API_LEVEL}"
-
 # check if NDK exists
-if [ ! -d "${ANDROID_NDK_ROOT}" ]; then
-  echo ""
-  echo "Missing Android NDK at:"
-  echo "    $ANDROID_NDK_ROOT"
-  echo "Please install this NDK version via:"
-  echo "    Android Studio > SDK Manager > SDK Tools > NDK (Side by side)"
-  echo "Or specify a different NDK path using the --ndk option."
+if [ -z $ANDROID_NDK_ROOT ]; then
+  echo "Error: no Android NDK found."
+  echo "Please install via Android Studio > SDK Manager > SDK Tools > NDK (Side by side),"
+  echo "or use the --ndk option or ANDROID_NDK_ROOT environment variable to specify the"
+  echo "path to your NDK installation."
+  exit 1
+elif [ ! -d "$ANDROID_NDK_ROOT" ]; then
+  echo "Error: Android NDK folder not found: $ANDROID_NDK_ROOT"
+  echo "Please install via Android Studio > SDK Manager > SDK Tools > NDK (Side by side),"
+  echo "or use the --ndk option or ANDROID_NDK_ROOT environment variable to specify the"
+  echo "path to your NDK installation."
   exit 1
 fi
+
+echo "### Build type: ${BUILD_TYPE}"
+echo "### NDK: $(basename $ANDROID_NDK_ROOT 2>/dev/null)"
+echo "### ABIs: ${ABI_NAMES}"
+echo "### Android API level: ${ANDROID_API_LEVEL}"
 
 # check if additional patches directory is valid
 if [[ ! -z "$ADDITIONAL_PATCHES" && ! -d "$ADDITIONAL_PATCHES" ]]; then
@@ -181,6 +185,8 @@ done
 
 # write build.txt
 echo "Build type: ${BUILD_TYPE}" >> "${BUILD_TXT}"
+echo "NDK: $(basename $ANDROID_NDK_ROOT)" >> "${BUILD_TXT}"
+echo "ABIs: ${ABI_NAMES}" >> "${BUILD_TXT}"
 echo "Android API level: ${ANDROID_API_LEVEL}" >> "${BUILD_TXT}"
 
 for src in "${SRCROOT}"/*; do
