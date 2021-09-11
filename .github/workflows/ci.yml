@@ -41,14 +41,6 @@ jobs:
       - name: Package release
         run: |
           tar -a -cf GNUstep-Android-${{matrix.name}}.tar.xz -C$HOME/${{matrix.android-dir}} GNUstep
-      - name: Read build.txt
-        id: read_build_txt
-        run: |
-          r="Built using NDK version: $(basename $ANDROID_NDK_LATEST_HOME)"
-          r="${r//'%'/'%25'}"   # Multiline escape sequences for %
-          r="${r//$'\n'/'%0A'}" # Multiline escape sequences for '\n'
-          r="${r//$'\r'/'%0D'}" # Multiline escape sequences for '\r'
-          echo "::set-output name=RELEASE_BODY::$r"
       - name: Update GitHub prerelease
         if: ${{ github.ref == 'refs/heads/master' }}
         uses: svenstaro/upload-release-action@v2
@@ -57,6 +49,5 @@ jobs:
           file: GNUstep-Android-${{matrix.name}}.tar.xz
           tag: latest
           release_name: "Latest Build"
-          body: ${{ steps.read_build_txt.outputs.RELEASE_BODY }}
           prerelease: true
           overwrite: true
