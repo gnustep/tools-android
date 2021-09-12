@@ -27,20 +27,40 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Install packages (macOS)
-        if: ${{ startsWith(matrix.os, 'macos') }}
+
+      - name: Install packages
         run: |
-          brew install cmake autoconf automake libtool pkg-config
-      - name: Install packages (Linux)
-        if: ${{ startsWith(matrix.os, 'ubuntu') }}
-        run: |
-          sudo apt-get install curl cmake make autoconf libtool pkg-config texinfo python3-distutils
+          if [ "$RUNNER_OS" = "macOS" ]; then
+            brew install cmake autoconf automake libtool pkg-config
+          elif [ "$RUNNER_OS" = "Linux" ]; then
+            sudo apt-get install curl cmake make autoconf libtool pkg-config texinfo python3-distutils
+          else
+            echo Unsupported OS $RUNNER_OS
+            exit 1
+          fi
+
       - name: Build toolchain
         run: |
           ./build.sh --ndk $ANDROID_NDK_LATEST_HOME --dist-root HOME/${{matrix.android-dir}}/GNUstep
-      - name: Package release
+
+      - name: Package build
         run: |
           tar -a -cf GNUstep-Android-${{matrix.name}}.tar.xz -C$HOME/${{matrix.android-dir}} GNUstep
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v2
+        with:
+          path: GNUstep-Android-${{matrix.name}}.tar.xz
+
+  prerelease:
+    needs: build
+    runs-on: ubuntu-latest
+    if: ${{ github.ref == 'refs/heads/master' }}
+
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+
       - name: Update GitHub prerelease
         if: ${{ github.ref == 'refs/heads/master' }}
         uses: marvinpinto/action-automatic-releases@latest
@@ -49,4 +69,4 @@ jobs:
           automatic_release_tag: latest
           prerelease: true
           title: "Latest Build"
-          files: GNUstep-Android-${{matrix.name}}.tar.xz
+          files: GNUstep-Android-*.tar.xz
