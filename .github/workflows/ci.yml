@@ -51,6 +51,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           path: GNUstep-Android-${{matrix.name}}.tar.xz
+          name: GNUstep-Android-${{matrix.name}}
 
   prerelease:
     needs: build
@@ -69,4 +70,4 @@ jobs:
           automatic_release_tag: latest
           prerelease: true
           title: "Latest Build"
-          files: GNUstep-Android-*.tar.xz
+          files: "**/GNUstep-Android-*.tar.xz"
