@@ -43,11 +43,10 @@ jobs:
           tar -a -cf GNUstep-Android-${{matrix.name}}.tar.xz -C$HOME/${{matrix.android-dir}} GNUstep
       - name: Update GitHub prerelease
         if: ${{ github.ref == 'refs/heads/master' }}
-        uses: svenstaro/upload-release-action@v2
+        uses: marvinpinto/action-automatic-releases@latest
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: GNUstep-Android-${{matrix.name}}.tar.xz
-          tag: latest
-          release_name: "Latest Build"
+          automatic_release_tag: latest
           prerelease: true
-          overwrite: true
+          title: "Latest Build"
+          files: GNUstep-Android-${{matrix.name}}.tar.xz
