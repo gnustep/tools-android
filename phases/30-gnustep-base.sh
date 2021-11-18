@@ -6,10 +6,9 @@ set -e # make any subsequent failing command exit the script
 
 PROJECT=gnustep-base
 GITHUB_REPO=gnustep/libs-base
-TAG=master
 
 # load environment and prepare project
-if ! prepare_project $PROJECT $GITHUB_REPO $TAG; then
+if ! prepare_project $PROJECT $GITHUB_REPO; then
   exit 0
 fi
 
