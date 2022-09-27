@@ -27,8 +27,7 @@ echo -e "\n### Running configure"
   --with-icu \
   --disable-shared \
   `# specify include dir to enable finding libiconv and ICU` \
-  `# -fPIC required to remove unsupported text relocations` \
-  CFLAGS="${CFLAGS} -I${INSTALL_PREFIX}/include -fPIC" \
+  CFLAGS="${CFLAGS} -I${INSTALL_PREFIX}/include" \
 
 echo -e "\n### Building"
 make -j${MAKE_JOBS}

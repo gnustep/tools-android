@@ -21,9 +21,6 @@ echo -e "\n### Running configure"
 ./configure \
   --host=${ANDROID_TARGET} \
   --prefix="${INSTALL_PREFIX}" \
-  `# specify include dir to enable finding ICU` \
-  CFLAGS="${CFLAGS} -I${INSTALL_PREFIX}/include" \
-  CPPFLAGS="${CPPFLAGS} -I${INSTALL_PREFIX}/include" \
 
 echo -e "\n### Building"
 make -j${MAKE_JOBS} ${GNUSTEP_MAKE_OPTIONS}

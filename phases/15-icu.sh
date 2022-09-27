@@ -74,8 +74,6 @@ echo -e "\n### Running configure"
   --prefix="${INSTALL_PREFIX}" \
   --with-cross-build=$CROSS_BUILD_DIR \
   ${CONFIGURE_OPTIONS} \
-  CFLAGS="${CFLAGS} -fPIC" `# required to remove unsupported text relocations` \
-  CPPFLAGS="${CPPFLAGS} -fPIC" `# required to remove unsupported text relocations` \
 
 echo -e "\n### Building for $ABI_NAME"
 make -j${MAKE_JOBS}

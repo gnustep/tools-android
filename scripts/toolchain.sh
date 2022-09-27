@@ -23,9 +23,10 @@ export PKG_CONFIG_PATH="${INSTALL_PREFIX}/lib/pkgconfig"
 # NOTE: The following compiler and linker flags mirror the NDK's CMake toolchain file
 # and are recommended by the Android Build System Maintainers Guide (see link above)
 
-# emit stack guards to protect against security vulnerabilities caused by buffer overruns,
-# and enable FORTIFY to try to catch incorrect use of standard functions
-export CFLAGS="-fstack-protector-strong -D_FORTIFY_SOURCE=2"
+# - emit stack guards to protect against security vulnerabilities caused by buffer overruns
+# - enable FORTIFY to try to catch incorrect use of standard functions
+# - generate position-independent code (PIC) to remove unsupported text relocations
+export CFLAGS="-fstack-protector-strong -D_FORTIFY_SOURCE=2 -fPIC"
 
 # -L library search path required for some projects to find libraries (e.g. gnustep-corebase)
 # -fuse-ld=lld require to enforce LLD, which is needed e.g. for --no-rosegment flag

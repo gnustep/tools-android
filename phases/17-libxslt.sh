@@ -26,8 +26,7 @@ echo -e "\n### Running configure"
   --without-crypto \
   --disable-shared \
   `# specify include dir to enable finding libiconv and ICU (from libxml headers)` \
-  `# -fPIC required to remove unsupported text relocations` \
-  CFLAGS="${CFLAGS} -I${INSTALL_PREFIX}/include -fPIC" \
+  CFLAGS="${CFLAGS} -I${INSTALL_PREFIX}/include" \
 
 echo -e "\n### Building"
 make -j${MAKE_JOBS}
