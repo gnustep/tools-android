@@ -227,7 +227,8 @@ if [[ $DIST_ROOT ]]; then
   echo "### - ANDROID_SDK_ROOT: $ANDROID_SDK_DIST_ROOT"
   echo "### - ANDROID_NDK_ROOT: $ANDROID_NDK_DIST_ROOT"
   
-  find "$INSTALL_ROOT" -type f -exec perl -i -pe "s|$INSTALL_ROOT|${DIST_ROOT/\$/\\\$}|g; s|$ANDROID_SDK_ROOT|${ANDROID_SDK_DIST_ROOT/\$/\\\$}|g; s|$ANDROID_NDK_ROOT|${ANDROID_NDK_DIST_ROOT/\$/\\\$}|g;" {} +
+  # replaces suitable paths in all text files
+  find "$INSTALL_ROOT" -type f | perl -lne 'print if -T' | xargs perl -i -pe "s|$INSTALL_ROOT|${DIST_ROOT/\$/\\\$}|g; s|$ANDROID_SDK_ROOT|${ANDROID_SDK_DIST_ROOT/\$/\\\$}|g; s|$ANDROID_NDK_ROOT|${ANDROID_NDK_DIST_ROOT/\$/\\\$}|g;"
   
   echo -e "\n### Done"
 fi
