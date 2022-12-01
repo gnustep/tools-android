@@ -24,6 +24,7 @@ echo -e "\n### Running configure"
   --prefix="${INSTALL_PREFIX}" \
   --disable-shared \
   --disable-multi-os-directory `# fixes warning about unsupported -print-multi-os-directory with clang` \
+  --disable-docs \
 
 echo -e "\n### Building"
 make -j${MAKE_JOBS}
