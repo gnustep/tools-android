@@ -26,7 +26,7 @@ jobs:
             android-dir: Android
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Install packages
         run: |
@@ -59,7 +59,7 @@ jobs:
           tar -a -cf GNUstep-Android-${{matrix.name}}.tar.xz -C$HOME/${{matrix.android-dir}} GNUstep
 
       - name: Upload build artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           path: GNUstep-Android-${{matrix.name}}.tar.xz
           name: GNUstep-Android-${{matrix.name}}
@@ -71,7 +71,7 @@ jobs:
 
     steps:
       - name: Download artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
 
       - name: Update GitHub prerelease
         if: ${{ github.ref == 'refs/heads/master' }}
