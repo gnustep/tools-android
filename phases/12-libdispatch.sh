@@ -20,7 +20,6 @@ cd build-${ABI_NAME}
 
 ${CMAKE} .. \
   ${CMAKE_OPTIONS} \
-  -DCMAKE_INSTALL_PREFIX="${INSTALL_PREFIX}" \
   -DBUILD_SHARED_LIBS=YES \
   -DINSTALL_PRIVATE_HEADERS=YES \
   `# use blocks runtime from libobjc2 with libdispatch-own-blocksruntime.patch` \
