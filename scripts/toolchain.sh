@@ -58,6 +58,7 @@ export LIBS="-lc++_shared"
 # common options for CMake-based projects
 # CMAKE_FIND_USE_CMAKE_PATH=false fixes finding incorrect libraries in $TOOLCHAIN/lib[64] instead of $TOOLCHAIN/sysroot/usr/lib/$ANDROID_TARGET, e.g. for libc++abi.a for libobjc2.
 CMAKE_OPTIONS=" \
+  -DCMAKE_INSTALL_PREFIX="${INSTALL_PREFIX}" \
   -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
   -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE} \
   -DCMAKE_FIND_USE_CMAKE_PATH=false \
