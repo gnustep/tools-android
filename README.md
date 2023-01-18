@@ -11,7 +11,7 @@ The toolchain is built using the Android NDK (installed e.g. via [Android Studio
 Libraries
 ---------
 
-The toolchain currently compiles the following libraries for Android:
+The toolchain consists of the following libraries:
 
 * [GNUstep Base Library](https://github.com/gnustep/libs-base) (Foundation)
 * [GNUstep CoreBase Library](https://github.com/gnustep/libs-corebase) (CoreFoundation)
@@ -21,6 +21,8 @@ The toolchain currently compiles the following libraries for Android:
 * [libiconv](https://www.gnu.org/software/libiconv/)
 * [libxml2](https://github.com/GNOME/libxml2)
 * [libxslt](https://github.com/GNOME/libxslt)
+* [libcurl](https://github.com/curl/curl)
+* [OpenSSL](https://github.com/KDAB/android_openssl)
 * [ICU](https://github.com/unicode-org/icu)
 
 

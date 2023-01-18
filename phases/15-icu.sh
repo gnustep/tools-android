@@ -6,7 +6,7 @@ set -e # make any subsequent failing command exit the script
 
 PROJECT=icu
 GITHUB_REPO=unicode-org/icu
-TAG=$(get_latest_github_release_tag $GITHUB_REPO)
+TAG=$(get_latest_github_release_tag $GITHUB_REPO release-)
 
 # don't clean project for subsequent builds so that the build for the current
 # machine is preserved, and because each ABI builds into separate directory

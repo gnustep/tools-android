@@ -10,12 +10,24 @@ export ROOT_DIR="$PWD"
 
 get_latest_github_release_tag () {
   GITHUB_REPO=$1
+  TAG_PREFIX=$2
+  
+  # use GitHub token authentication on CI to prevent rate limit errors
+  if [ -n "$GITHUB_TOKEN" ]; then
+    GITHUB_AUTHORIZATION_HEADER="Authorization: Bearer $GITHUB_TOKEN"
+  fi
+  
+  # get the tags JSON from the GitHub API and parse it manually,
+  # or output it to stderr if the server returns an error
+  github_tags=`curl \
+    --silent --show-error --fail-with-body \
+    --header "$GITHUB_AUTHORIZATION_HEADER" \
+    https://api.github.com/repos/$GITHUB_REPO/tags`
 
-  # get the tags JSON from the GitHub API and parse it manually
-  curl -s https://api.github.com/repos/$GITHUB_REPO/tags \
+  echo "$github_tags" \
     | grep '"name":' \
     | sed -E 's/.*"([^"]+)".*/\1/' \
-    | egrep '^(release\-|v)[0-9]+[\.-][0-9]+([\.-][0-9]+)?$' \
+    | egrep "^${TAG_PREFIX:-[a-z_-]+}[0-9]+[\._-][0-9]+([\._-][0-9]+)?\$" \
     | head -n 1
 }
 
@@ -73,7 +85,7 @@ prepare_project () {
     if [ "$NO_UPDATE" != true ]; then
       # check out tag/branch if any
       if [ -n $TAG ]; then
-        echo -e "\n### Checking out $TAG"
+        echo -e "\n### Checking out \"$TAG\""
         git fetch --tags
         git checkout -q $TAG
       fi
