@@ -51,6 +51,8 @@ jobs:
           fi
 
       - name: Build toolchain
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           ./build.sh --ndk $ANDROID_NDK_LATEST_HOME --dist-root HOME/${{matrix.android-dir}}/GNUstep
 
