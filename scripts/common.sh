@@ -84,7 +84,7 @@ prepare_project () {
 
     if [ "$NO_UPDATE" != true ]; then
       # check out tag/branch if any
-      if [ -n $TAG ]; then
+      if [ -n "$TAG" ]; then
         echo -e "\n### Checking out \"$TAG\""
         git fetch --tags
         git checkout -q $TAG
