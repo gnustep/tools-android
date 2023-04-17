@@ -12,27 +12,16 @@ if ! prepare_project $PROJECT $GITHUB_REPO; then
   exit 0
 fi
 
-case $ABI_NAME in
-  armeabi-v7a)
-    ABI_FOLDER=arm
-    ;;
-  arm64-v8a)
-    ABI_FOLDER=arm64
-    ;;
-  *)
-    ABI_FOLDER=$ABI_NAME
-esac
-
 echo -e "\n### Installing headers"
 
-cp -Rf no-asm/static/include/ ${INSTALL_PREFIX}/include
+cp -Rf ssl_3/include/ ${INSTALL_PREFIX}/include
 
 echo -e "\n### Installing libraries"
 
-cp -f latest/$ABI_FOLDER/*.so ${INSTALL_PREFIX}/lib
+cp -f ssl_3/$ABI_NAME/*.so ${INSTALL_PREFIX}/lib
 
 # create version-less symlinks for libcrypto/libssl.so to versioned libraries
-libraries=`ls latest/$ABI_FOLDER/*.so`
+libraries=`ls ssl_3/$ABI_NAME/*.so`
 cd ${INSTALL_PREFIX}/lib
 for lib in $libraries; do
   libname=`basename $lib`
