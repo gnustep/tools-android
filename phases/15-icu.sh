@@ -8,9 +8,10 @@ PROJECT=icu
 GITHUB_REPO=unicode-org/icu
 TAG=$(get_latest_github_release_tag $GITHUB_REPO release-)
 
-# don't clean project for subsequent builds so that the build for the current
+# don't clean project for subsequent ABIs so that the build for the current
 # machine is preserved, and because each ABI builds into separate directory
-if [ "$NO_UPDATE" = true ]; then
+set -- $ABI_NAMES # splits space-separated ABI list into $1, $2 etc.
+if [ "${ABI_NAME}" != "$1" ]; then
   NO_CLEAN=true
 fi
 
