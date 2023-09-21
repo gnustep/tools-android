@@ -192,10 +192,18 @@ echo "Android API level: ${ANDROID_API_LEVEL}" >> "${BUILD_TXT}"
 for src in "${SRCROOT}"/*; do
   cd "${src}"
   PROJECT=`basename "${src}"`
-  
-  project_rev=`git rev-parse HEAD`
   echo -e "\n* ${PROJECT}" >> "${BUILD_TXT}"
-  echo -e "\t- Revision: ${project_rev}" >> "${BUILD_TXT}"
+  
+  if [ -d ".git" ]; then
+    project_rev=`git rev-parse HEAD`
+    echo -e "\t- Revision: ${project_rev}" >> "${BUILD_TXT}"
+  else
+    cache_file=($CACHE_ROOT/$PROJECT*)
+    cache_file=${cache_file[${#cache_file[@]}-1]} # last item
+    if [ -e "$cache_file" ]; then
+      echo -e "\t- File: $(basename $cache_file)" >> "${BUILD_TXT}"
+    fi
+  fi
   
   has_patches=false
   
