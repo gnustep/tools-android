@@ -22,7 +22,7 @@ esac
 # Target (allow overrides)
 ABI_NAMES=${ABI_NAMES:-armeabi-v7a arm64-v8a x86 x86_64}
 ABI_NAME=${ABI_NAME:-armeabi-v7a}
-ANDROID_API_LEVEL=${ANDROID_API_LEVEL:-23}
+ANDROID_API_LEVEL=${ANDROID_API_LEVEL:-24}
 BUILD_TYPE=${BUILD_TYPE:-RelWithDebInfo}
 
 # ABI-dependant properties
