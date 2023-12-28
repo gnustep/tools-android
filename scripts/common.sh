@@ -19,10 +19,11 @@ get_latest_github_release_tag () {
   
   # get the tags JSON from the GitHub API and parse it manually,
   # or output it to stderr if the server returns an error
+  # per_page=100 is required for some repositories with a lot of beta tags
   github_tags=`curl \
     --silent --show-error --fail-with-body \
     --header "$GITHUB_AUTHORIZATION_HEADER" \
-    https://api.github.com/repos/$GITHUB_REPO/tags`
+    https://api.github.com/repos/$GITHUB_REPO/tags?per_page=100`
 
   echo "$github_tags" \
     | grep '"name":' \
