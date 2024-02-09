@@ -79,8 +79,10 @@ prepare_project () {
 
     if [ "$NO_CLEAN" != true ]; then
       echo -e "\n### Cleaning project"
-      git reset --hard
       git clean -qfdx
+      git submodule foreach --recursive git clean -qfdx
+      git reset --hard
+      git submodule foreach --recursive git reset --hard
     fi
 
     if [ "$NO_UPDATE" != true ]; then
