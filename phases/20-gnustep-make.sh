@@ -33,7 +33,7 @@ echo -e "\n### Running configure"
   --prefix="${INSTALL_PREFIX}" \
   --with-library-combo=ng-gnu-gnu \
   --with-user-config-file="${GNUSTEP_USER_CONFIG_FILE}" \
-  --with-runtime-abi=gnustep-2.0 \
+  --with-runtime-abi=gnustep-2.2 \
   ${OPTIONS}
 
 echo -e "\n### Installing"
