@@ -61,7 +61,7 @@ jobs:
           tar -a -cf GNUstep-Android-${{matrix.name}}.tar.xz -C$HOME/${{matrix.android-dir}} GNUstep
 
       - name: Upload build artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           path: GNUstep-Android-${{matrix.name}}.tar.xz
           name: GNUstep-Android-${{matrix.name}}
