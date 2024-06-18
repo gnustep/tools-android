@@ -1,18 +1,18 @@
 https://github.com/apple/swift-corelibs-libdispatch/pull/534
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index eff610b..21a30b9 100644
+index 2bae74e..0877f56 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -187,6 +187,8 @@ if(NOT CMAKE_SYSTEM_NAME STREQUAL Android)
+@@ -190,6 +190,8 @@ if(NOT CMAKE_SYSTEM_NAME STREQUAL Android)
    find_package(LibRT)
  endif()
  
 +find_package(BlocksRuntime QUIET)
 +
  check_function_exists(_pthread_workqueue_init HAVE__PTHREAD_WORKQUEUE_INIT)
- check_function_exists(aligned_alloc HAVE_ALIGNED_ALLOC)
  check_function_exists(getprogname HAVE_GETPROGNAME)
+ check_function_exists(mach_absolute_time HAVE_MACH_ABSOLUTE_TIME)
 diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
 index 570c919..6d45899 100644
 --- a/src/CMakeLists.txt
