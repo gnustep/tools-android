@@ -25,6 +25,7 @@ ${CMAKE} .. \
   -DBUILD_CURL_EXE=NO \
   -DCURL_CA_BUNDLE=NONE `# disable CA bundle path, needs to be read at runtime from app bundle` \
   -DCMAKE_FIND_ROOT_PATH=${INSTALL_PREFIX} `# make CMake look for OpenSSL in installation directory` \
+  -DUSE_LIBIDN2=NO \ # Prevent accidental detection of an idn2 installation
 
 echo -e "\n### Building"
 make -j${MAKE_JOBS}
