@@ -18,6 +18,11 @@ fi
 echo -e "\n### Running autogen"
 ./autogen.sh
 
+# Copy Makefile.in from libffi 3.4.6 release
+# until https://github.com/libffi/libffi/issues/853 is fixed
+echo -e "\n### Copying Makefile.in from 3.4.6 release"
+cp "$ROOT_DIR"/data/libffi/Makefile.in .
+
 echo -e "\n### Running configure"
 ./configure \
   --host=${ANDROID_TARGET} \
