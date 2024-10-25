@@ -15,19 +15,19 @@ fi
 
 . "$ROOT_DIR"/scripts/toolchain.sh
 
-echo -e "\n### Running autogen"
-NOCONFIGURE=1 ./autogen.sh
+echo -e "\n### Running cmake"
+mkdir -p build-${ABI_NAME}
+cd build-${ABI_NAME}
 
-echo -e "\n### Running configure"
-./configure \
-  --host=${ANDROID_TARGET} \
-  --prefix="${INSTALL_PREFIX}" \
-  --without-python \
-  --without-lzma \
-  --with-icu \
-  --disable-shared \
-  `# specify include dir to enable finding libiconv and ICU` \
-  CFLAGS="${CFLAGS} -I${INSTALL_PREFIX}/include" \
+${CMAKE} .. \
+  ${CMAKE_OPTIONS} \
+  -DBUILD_SHARED_LIBS=NO \
+  -DLIBXML2_WITH_LZMA=NO \
+  -DLIBXML2_WITH_PYTHON=NO \
+  -DLIBXML2_WITH_ZLIB=NO \
+  -DLIBXML2_WITH_TESTS=NO \
+  -DLIBXML2_WITH_PROGRAMS=NO \
+  -DLIBXML2_WITH_ICU=YES \
 
 echo -e "\n### Building"
 make -j${MAKE_JOBS}
