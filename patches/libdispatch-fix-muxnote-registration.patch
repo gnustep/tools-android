@@ -1,0 +1,53 @@
+Fix reuse when re-adding dispatch source for socket file descriptors.
+
+https://github.com/swiftlang/swift-corelibs-libdispatch/issues/833
+
+diff --git a/src/event/event_epoll.c b/src/event/event_epoll.c
+index f31d13e..8654104 100644
+--- a/src/event/event_epoll.c
++++ b/src/event/event_epoll.c
+@@ -268,7 +268,10 @@ _dispatch_unote_register_muxed(dispatch_unote_t du)
+ 		if (events & ~_dispatch_muxnote_armed_events(dmn)) {
+ 			events |= _dispatch_muxnote_armed_events(dmn);
+ 			if (_dispatch_epoll_update(dmn, events, EPOLL_CTL_MOD) < 0) {
+-				dmn = NULL;
++				// The file descriptor was closed, reregister in epoll
++				if (_dispatch_epoll_update(dmn, events, EPOLL_CTL_ADD) < 0) {
++					dmn = NULL;
++				}
+ 			} else {
+ 				dmn->dmn_events |= events;
+ 				dmn->dmn_disarmed_events &= ~events;
+@@ -319,6 +322,8 @@ _dispatch_unote_unregister_muxed(dispatch_unote_t du)
+ 	dispatch_unote_linkage_t dul = _dispatch_unote_get_linkage(du);
+ 	dispatch_muxnote_t dmn = dul->du_muxnote;
+ 	uint32_t events = dmn->dmn_events;
++	int has_readers = 1;
++	int has_writers = 1;
+ 
+ 	LIST_REMOVE(dul, du_link);
+ 	_LIST_TRASH_ENTRY(dul, du_link);
+@@ -326,6 +331,7 @@ _dispatch_unote_unregister_muxed(dispatch_unote_t du)
+ 
+ 	if (LIST_EMPTY(&dmn->dmn_readers_head)) {
+ 		events &= (uint32_t)~EPOLLIN;
++		has_readers = 0;
+ 		if (dmn->dmn_disarmed_events & EPOLLIN) {
+ 			dmn->dmn_disarmed_events &= (uint16_t)~EPOLLIN;
+ 			dmn->dmn_events &= (uint32_t)~EPOLLIN;
+@@ -333,13 +339,14 @@ _dispatch_unote_unregister_muxed(dispatch_unote_t du)
+ 	}
+ 	if (LIST_EMPTY(&dmn->dmn_writers_head)) {
+ 		events &= (uint32_t)~EPOLLOUT;
++		has_writers = 0;
+ 		if (dmn->dmn_disarmed_events & EPOLLOUT) {
+ 			dmn->dmn_disarmed_events &= (uint16_t)~EPOLLOUT;
+ 			dmn->dmn_events &= (uint32_t)~EPOLLOUT;
+ 		}
+ 	}
+
+-	if (events & (EPOLLIN | EPOLLOUT)) {
++	if (events & (EPOLLIN | EPOLLOUT) || has_readers || has_writers) {
+ 		if (events != _dispatch_muxnote_armed_events(dmn)) {
+ 			dmn->dmn_events = events;
+ 			events = _dispatch_muxnote_armed_events(dmn);
