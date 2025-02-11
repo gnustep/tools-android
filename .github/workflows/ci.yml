@@ -33,7 +33,7 @@ jobs:
           if [ "$RUNNER_OS" = "macOS" ]; then
             brew install cmake autoconf automake libtool pkg-config
           elif [ "$RUNNER_OS" = "Linux" ]; then
-            sudo apt-get install curl cmake make libtool pkg-config texinfo python3-distutils
+            sudo apt-get install curl cmake make libtool pkg-config texinfo
 
             # install autoconf 2.71 from source (required by libffi, not available via apt-get on Ubuntu focal)
             wget http://ftp.gnu.org/gnu/autoconf/autoconf-2.71.tar.xz
