@@ -26,6 +26,7 @@ ${CMAKE} .. \
   -DCURL_CA_BUNDLE=NONE `# disable CA bundle path, needs to be read at runtime from app bundle` \
   -DUSE_LIBIDN2=NO `# Prevent accidental detection of an idn2 installation` \
   -DBUILD_LIBCURL_DOCS=NO \
+  -DCURL_USE_LIBPSL=NO \
   -DBUILD_MISC_DOCS=NO \
 
 echo -e "\n### Building"
