@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    name: ${{ matrix.name }}
+    name: ${{ startsWith(matrix.os, 'macos-') && 'macOS' || 'Linux' }}-NDK-${{ matrix.ndk }}
     runs-on: ${{ matrix.os }}
     # don't run pull requests from local branches twice
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
@@ -17,16 +17,20 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - name: macOS
-            os: macos-latest
-            android-dir: Library/Android
-          - name: Linux
-            os: ubuntu-latest
-            android-dir: Android
+        os: [ macos-latest, ubuntu-latest ]
+        ndk: [ r25c, r26d, r27c ]
+
+    env:
+      ANDROID_DIR: ${{ startsWith(matrix.os, 'macos-') && 'Library/Android' || 'Android' }}
 
     steps:
       - uses: actions/checkout@v3
+      
+      - uses: nttld/setup-ndk@v1
+        id: setup-ndk
+        with:
+          ndk-version: ${{ matrix.ndk }}
+          link-to-sdk: true
 
       - name: Install packages
         run: |
@@ -54,17 +58,17 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          ./build.sh --ndk $ANDROID_NDK_LATEST_HOME --dist-root HOME/${{matrix.android-dir}}/GNUstep
+          ./build.sh --ndk $ANDROID_HOME/ndk/${{steps.setup-ndk.outputs.ndk-full-version}} --dist-root HOME/${{env.ANDROID_DIR}}/GNUstep
 
       - name: Package build
         run: |
-          tar -a -cf GNUstep-Android-${{matrix.name}}.tar.xz -C$HOME/${{matrix.android-dir}} GNUstep
+          tar -a -cf GNUstep-Android-NDK-${{matrix.ndk}}-${{runner.os}}.tar.xz -C$HOME/${{env.ANDROID_DIR}} GNUstep
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          path: GNUstep-Android-${{matrix.name}}.tar.xz
-          name: GNUstep-Android-${{matrix.name}}
+          path: GNUstep-Android-NDK-${{matrix.ndk}}-${{runner.os}}.tar.xz
+          name: GNUstep-Android-NDK-${{matrix.ndk}}-${{runner.os}}
 
   prerelease:
     needs: build
