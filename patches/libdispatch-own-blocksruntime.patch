@@ -1,10 +1,8 @@
-https://github.com/apple/swift-corelibs-libdispatch/pull/534
-
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 2bae74e..0877f56 100644
+index 527c4bc..8c37a32 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -190,6 +190,8 @@ if(NOT CMAKE_SYSTEM_NAME STREQUAL Android)
+@@ -176,6 +176,8 @@ if(NOT ANDROID)
    find_package(LibRT)
  endif()
  
@@ -14,18 +12,18 @@ index 2bae74e..0877f56 100644
  check_function_exists(getprogname HAVE_GETPROGNAME)
  check_function_exists(mach_absolute_time HAVE_MACH_ABSOLUTE_TIME)
 diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
-index 570c919..6d45899 100644
+index a1f8a0c..995a972 100644
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
-@@ -1,5 +1,4 @@
--
--if(NOT CMAKE_SYSTEM_NAME STREQUAL Darwin)
+@@ -1,5 +1,5 @@
+ 
+-if(NOT APPLE)
 +if(NOT BlocksRuntime_FOUND)
    add_subdirectory(BlocksRuntime)
  endif()
  
 diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
-index 0176a06..523ae06 100644
+index f061628..fb67be7 100644
 --- a/tests/CMakeLists.txt
 +++ b/tests/CMakeLists.txt
 @@ -78,9 +78,6 @@ function(add_unit_test name)
