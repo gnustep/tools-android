@@ -1,8 +1,8 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 527c4bc..8c37a32 100644
+index 711f64a..0ecb044 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -176,6 +176,8 @@ if(NOT ANDROID)
+@@ -178,6 +178,8 @@ if(NOT ANDROID)
    find_package(LibRT)
  endif()
  
@@ -11,22 +11,20 @@ index 527c4bc..8c37a32 100644
  check_function_exists(_pthread_workqueue_init HAVE__PTHREAD_WORKQUEUE_INIT)
  check_function_exists(getprogname HAVE_GETPROGNAME)
  check_function_exists(mach_absolute_time HAVE_MACH_ABSOLUTE_TIME)
-diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
-index a1f8a0c..995a972 100644
---- a/src/CMakeLists.txt
-+++ b/src/CMakeLists.txt
-@@ -1,5 +1,5 @@
- 
+@@ -330,7 +332,7 @@ add_subdirectory(dispatch)
+ add_subdirectory(man)
+ add_subdirectory(os)
+ add_subdirectory(private)
 -if(NOT APPLE)
 +if(NOT BlocksRuntime_FOUND)
-   add_subdirectory(BlocksRuntime)
+   add_subdirectory(src/BlocksRuntime)
  endif()
- 
+ add_subdirectory(src)
 diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
-index f061628..fb67be7 100644
+index 0ec6038..0faf979 100644
 --- a/tests/CMakeLists.txt
 +++ b/tests/CMakeLists.txt
-@@ -78,9 +78,6 @@ function(add_unit_test name)
+@@ -80,9 +80,6 @@ function(add_unit_test name)
      # to reduce probability of test failures due to machine load.
      target_compile_options(${name} PRIVATE -DLENIENT_DEADLINES=1)
    endif()
