@@ -35,13 +35,21 @@ if [ "${BUILD_TYPE}" = "Debug" ]; then
   SSL_BUILD_TYPE=debug
 fi
 
+ANDROID_NDK_MAJOR=`basename $ANDROID_NDK_ROOT | cut -d. -f1`
+ASM=
+# Seems like there is a bug in the r26 ndk which prevents us from compiling some assembly
+if [ "$ANDROID_NDK_MAJOR" = "26" ]; then
+  ASM=no-asm
+fi
+
 
 echo -e "\n### Running configure"
-PATH=$ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/darwin-x86_64/bin:$PATH
+PATH=$ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/${HOST_TAG}/bin:$PATH
 ./Configure \
   shared \
   no-docs \
   no-apps \
+  ${ASM} \
   ${BUILD_TARGET} \
   --prefix="${INSTALL_PREFIX}" \
   --${SSL_BUILD_TYPE} \
