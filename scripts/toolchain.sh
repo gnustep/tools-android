@@ -58,6 +58,10 @@ case $ABI_NAME in
       export CFLAGS="$CFLAGS -mstackrealign"
     fi
     ;;
+  x86_64)
+    export LDFLAGS="$LDFLAGS -Wl,-z,max-page-size=16384"
+    ADDITIONAL_CMAKE_FLAGS="-Wl,-z,max-page-size=16384"
+    ;;
 esac
 
 export CXXFLAGS=$CFLAGS
