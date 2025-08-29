@@ -40,6 +40,7 @@ export CFLAGS="$OPTFLAG -fstack-protector-strong -D_FORTIFY_SOURCE=2 -fPIC"
 # --gc-sections is recommended to decrease binary size
 export LDFLAGS="-L${INSTALL_PREFIX}/lib -fuse-ld=lld -Wl,--build-id=sha1 -Wl,--no-rosegment -Wl,--gc-sections"
 
+ADDITIONAL_CMAKE_FLAGS=
 case $ABI_NAME in
   armeabi-v7a)
     # use Thumb instruction set for smaller code
@@ -47,11 +48,19 @@ case $ABI_NAME in
     # don't export symbols from libunwind
     export LDFLAGS="$LDFLAGS -Wl,--exclude-libs,libunwind.a"
     ;;
+  arm64-v8a)
+    export LDFLAGS="$LDFLAGS -Wl,-z,max-page-size=16384"
+    ADDITIONAL_CMAKE_FLAGS="-Wl,-z,max-page-size=16384"
+    ;;
   x86)
     # properly align stacks for global constructors when targeting API < 24
     if [ "$ANDROID_API_LEVEL" -lt "24" ]; then
       export CFLAGS="$CFLAGS -mstackrealign"
     fi
+    ;;
+  x86_64)
+    export LDFLAGS="$LDFLAGS -Wl,-z,max-page-size=16384"
+    ADDITIONAL_CMAKE_FLAGS="-Wl,-z,max-page-size=16384"
     ;;
 esac
 
@@ -72,4 +81,5 @@ CMAKE_OPTIONS=" \
   -DANDROID_NDK=${ANDROID_NDK_ROOT} \
   -DANDROID_PLATFORM=android-${ANDROID_API_LEVEL} \
   -DANDROID_STL=c++_shared \
+  -DCMAKE_SHARED_LINKER_FLAGS=$ADDITIONAL_CMAKE_FLAGS \
 "

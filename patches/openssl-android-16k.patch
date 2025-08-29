@@ -1,0 +1,31 @@
+From 66ed6db2ac83430e5bb768a44308df04ad685847 Mon Sep 17 00:00:00 2001
+From: vkryl <6242627+vkryl@users.noreply.github.com>
+Date: Fri, 15 Aug 2025 15:01:51 +0300
+Subject: [PATCH] Android: Enable 16 KB ELF alignment for `arm64-v8a` and
+ `x86_64` platforms
+
+CLA: trivial
+---
+ Configurations/15-android.conf | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/Configurations/15-android.conf b/Configurations/15-android.conf
+index 1de6b7a91571d..26d9d6508f582 100644
+--- a/Configurations/15-android.conf
++++ b/Configurations/15-android.conf
+@@ -232,6 +232,7 @@ my %targets = (
+         bn_ops           => add("RC4_CHAR"),
+         asm_arch         => 'aarch64',
+         perlasm_scheme   => "linux64",
++        shared_ldflag    => add("-Wl,-z,max-page-size=16384"),
+     },
+ 
+     "android-mips" => {
+@@ -269,6 +270,7 @@ my %targets = (
+         bn_ops           => add("RC4_INT"),
+         asm_arch         => 'x86_64',
+         perlasm_scheme   => "elf",
++        shared_ldflag    => add("-Wl,-z,max-page-size=16384"),
+     },
+ 
+     "android-riscv64" => {
