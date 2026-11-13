@@ -63,7 +63,8 @@ entry=`write_entry`
 
 if [ -f "$BUILD_TXT" ]; then
   # replace previous entry for this project in place, or append it
-  awk -v RS= -v header="* $PROJECT" -v entry="$entry" '
+  ENTRY="$entry" awk -v RS= -v header="* $PROJECT" '
+    BEGIN { entry = ENVIRON["ENTRY"] }
     { split($0, lines, "\n"); if (lines[1] == header) { $0 = entry; found = 1 } }
     { print sep $0; sep = "\n" }
     END { if (!found) print sep entry }
