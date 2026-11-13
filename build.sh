@@ -173,6 +173,8 @@ for ABI_NAME in $ABI_NAMES; do
 
       exit $PHASE_RESULT
     fi
+
+    "${ROOT_DIR}"/scripts/write-build-info.sh "${PHASE_NAME}" || exit 1
   done
 
   # don't update projects for subsequent ABIs to avoid mismatching builds
@@ -181,42 +183,6 @@ for ABI_NAME in $ABI_NAMES; do
   # always clean projects for subsequent ABIs
   export NO_CLEAN=false
 
-done
-
-# write build.txt
-echo "Build type: ${BUILD_TYPE}" >> "${BUILD_TXT}"
-echo "NDK: $(basename $ANDROID_NDK_ROOT)" >> "${BUILD_TXT}"
-echo "ABIs: ${ABI_NAMES}" >> "${BUILD_TXT}"
-echo "Android API level: ${ANDROID_API_LEVEL}" >> "${BUILD_TXT}"
-
-for src in "${SRCROOT}"/*; do
-  cd "${src}"
-  PROJECT=`basename "${src}"`
-  echo -e "\n* ${PROJECT}" >> "${BUILD_TXT}"
-  
-  if [ -d ".git" ]; then
-    project_rev=`git rev-parse HEAD`
-    echo -e "\t- Revision: ${project_rev}" >> "${BUILD_TXT}"
-  else
-    cache_file=($CACHE_ROOT/$PROJECT*)
-    cache_file=${cache_file[${#cache_file[@]}-1]} # last item
-    if [ -e "$cache_file" ]; then
-      echo -e "\t- File: $(basename $cache_file)" >> "${BUILD_TXT}"
-    fi
-  fi
-  
-  has_patches=false
-  
-  for patch in {"${ROOT_DIR}"/patches,${ADDITIONAL_PATCHES}}/${PROJECT}-*.patch; do
-    if [ -f $patch ] ; then
-      patch_name=`basename "$patch"`
-      if [ "$has_patches" != true ]; then
-        echo -e "\t- Patches:" >> "${BUILD_TXT}"
-        has_patches=true
-      fi
-      echo -e "\t\t$patch_name" >> "${BUILD_TXT}"
-    fi
-  done
 done
 
 # remove backup if all went well
