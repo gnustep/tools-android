@@ -72,7 +72,8 @@ prepare_project () {
     
     if [ ! -d "$PROJECT" ]; then
       echo -e "\n### Cloning project"
-      git clone --recursive $REPO $PROJECT
+      # shallow clone to speed up builds (we don't need the history)
+      git clone --depth 1 --recursive --shallow-submodules ${TAG:+--branch "$TAG"} $REPO $PROJECT
     fi
     
     cd "$PROJECT"
@@ -89,7 +90,12 @@ prepare_project () {
       # check out tag/branch if any
       if [ -n "$TAG" ]; then
         echo -e "\n### Checking out \"$TAG\""
-        git fetch --tags
+        if [ "`git rev-parse --is-shallow-repository`" = true ]; then
+          # only fetch the tagged commit to keep shallow clones shallow
+          git fetch --depth 1 origin tag $TAG
+        else
+          git fetch --tags
+        fi
         git checkout -q $TAG
       fi
 
